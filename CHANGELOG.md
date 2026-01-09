@@ -2,6 +2,19 @@
 
 # `qnexus` Release Notes
 
+## v0.39.0 (2026-01-09)
+
+
+### Added
+
+- Avoid starting login flow unless the tokens are expired (#304).
+
+
+### Fixed
+
+- Update quantinuum-schemas with current HeliosErrorParams.
+
+
 ## v0.38.0 (2025-12-01)
 
 

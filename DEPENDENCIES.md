@@ -12,6 +12,6 @@
 | `pytket` | `>=2.3.1, <3.0` | Quantum computing toolkit and interface to the TKET compiler | [https://pypi.org/project/pytket/](https://pypi.org/project/pytket/) |
 | `websockets` | `>11, <16` | An implementation of the WebSocket Protocol (RFC 6455 & 7692) | [https://pypi.org/project/websockets/](https://pypi.org/project/websockets/) |
 | `pydantic-settings` | `>=2, <3.0` | Settings management using Pydantic | [https://pypi.org/project/pydantic-settings/](https://pypi.org/project/pydantic-settings/) |
-| `quantinuum-schemas` | `>=7.3, <8.0` | Shared data models for Quantinuum. | [https://github.com/CQCL/quantinuum-schemas](https://github.com/CQCL/quantinuum-schemas) |
-| `hugr` | `>=0.14.0, <1.0.0` | Quantinuum's common representation for quantum programs | [https://github.com/CQCL/hugr/tree/main/hugr-py](https://github.com/CQCL/hugr/tree/main/hugr-py) |
+| `quantinuum-schemas` | `>=7.4.1, <8.0` | Shared data models for Quantinuum. | [https://github.com/CQCL/quantinuum-schemas](https://github.com/CQCL/quantinuum-schemas) |
+| `hugr` | `>=0.14.0, <1.0.0` | Quantinuum's common representation for quantum programs | [https://github.com/quantinuum/hugr/tree/main/hugr-py](https://github.com/quantinuum/hugr/tree/main/hugr-py) |
 | `pyjwt` | `>=2.10.1,<3.0.0` | JSON Web Token implementation in Python | [https://pypi.org/project/PyJWT/](https://pypi.org/project/PyJWT/) |
