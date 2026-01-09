@@ -2,7 +2,7 @@
 name = "cz_customize"
 tag_format = "v$version"
 version_scheme = "semver"
-version = "0.38.0"
+version = "0.39.0"
 version_files = [
     "pyproject.toml:version",
     "uv.lock:version"
