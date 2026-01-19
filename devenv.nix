@@ -9,18 +9,14 @@ in
     pkgs-unstable.uv
     pkgs.commitizen
     pkgs.git
+    pkgs.just
   ];
 
   dotenv.enable = true;
 
   # https://devenv.sh/scripts/
   scripts.qfmt.exec = ''
-    echo -e "Running formatting, linting and typechecking 🧹 🔧 \n"
-
-    uv run ruff check --select I --fix
-    uv run ruff check 
-    uv run ruff format 
-    uv run mypy qnexus/ tests/ integration/
+    just qfmt
   '';
   scripts.qtest.exec = ''
     echo -e "Running unit tests  📏🔍\n"

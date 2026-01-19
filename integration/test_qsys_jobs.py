@@ -1,11 +1,9 @@
 """Tests related to running jobs against QSys devices."""
 
-from typing import Any, Callable, ContextManager, cast
+from typing import Callable, ContextManager, cast
 
 import pytest
-from guppylang import guppy
-from guppylang.std.builtins import result
-from guppylang.std.quantum import cx, h, measure, qubit, x, z
+from hugr.package import Package
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
 from quantinuum_schemas.models.backend_config import (
@@ -24,36 +22,6 @@ from qnexus.models.references import (
 )
 
 
-def prepare_teleportation() -> Any:
-    """Prepares the teleportation circuit."""
-
-    @guppy
-    def bell() -> tuple[qubit, qubit]:
-        """Constructs a bell state."""
-        q1, q2 = qubit(), qubit()
-        h(q1)
-        cx(q1, q2)
-        return q1, q2
-
-    @guppy
-    def main() -> None:
-        src = qubit()
-        x(src)
-        alice, bob = bell()
-
-        cx(src, alice)
-        h(src)
-        if measure(alice):
-            x(bob)
-        if measure(src):
-            z(bob)
-
-        result("teleported", measure(bob))
-
-    main.check()
-    return main.compile()
-
-
 @pytest.mark.parametrize(
     "backend_config",
     [
@@ -70,6 +38,7 @@ def test_guppy_execution(
     test_case_name: str,
     create_project: Callable[[str], ContextManager[ProjectRef]],
     backend_config: BackendConfig,
+    qa_hugr_package: Package,
 ) -> None:
     """Test the execution of a guppy program
     on a next-generation QSys device."""
@@ -78,7 +47,7 @@ def test_guppy_execution(
         n_shots = 10
 
         hugr_ref = qnx.hugr.upload(
-            hugr_package=prepare_teleportation(),
+            hugr_package=qa_hugr_package,
             name=f"hugr for {test_case_name}",
             project=project_ref,
         )
@@ -127,12 +96,13 @@ def test_guppy_execution(
 def test_hugr_costing(
     test_case_name: str,
     create_project: Callable[[str], ContextManager[ProjectRef]],
+    qa_hugr_package: Package,
 ) -> None:
     """Test the costing of a Hugr program on a cost checking device."""
 
     with create_project(f"project for {test_case_name}") as project_ref:
         hugr_ref = qnx.hugr.upload(
-            hugr_package=prepare_teleportation(),
+            hugr_package=qa_hugr_package,
             name=f"hugr for {test_case_name}",
             project=project_ref,
         )
