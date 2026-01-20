@@ -35,4 +35,5 @@ def main() -> None:
 
 main.check()
 program = main.compile_function()
+# remove the .gpy suffix and add .hugr
 Path(argv[0]).with_suffix("").with_suffix(".hugr").write_bytes(program.to_bytes())
