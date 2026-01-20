@@ -35,4 +35,4 @@ def main() -> None:
 
 main.check()
 program = main.compile_function()
-Path(argv[0]).with_suffix(".hugr").write_bytes(program.to_bytes())
+Path(argv[0]).with_suffix("").with_suffix(".hugr").write_bytes(program.to_bytes())

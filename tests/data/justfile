@@ -3,12 +3,12 @@ help:
     @just --list --justfile {{justfile()}}
 
 # Re-generate all test hugr files.
-recompile: recompile-hugrs
+recompile: recompile-test-files
 
 # Re-generate all hugr files.
-recompile-hugrs:
+recompile-test-files:
     #!/usr/bin/env sh
-    for example in $(find . -type f -name "*.py"); do
+    for example in $(find . -type f -name "*.gpy.py"); do
         echo "Re-generating $example"
         uv run --no-project "$example"
     done

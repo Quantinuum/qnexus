@@ -463,7 +463,7 @@ def fixture_test_ref_serialisation(  # type: ignore[no-untyped-def]
 
 @pytest.fixture(name="qa_hugr_package")
 def qa_hugr_package_fixture() -> Package:
-    hugr_path = Path("tests/data/example_hugr.hugr").resolve()
+    hugr_path = Path("tests/data/example_bell.hugr").resolve()
     return Package.from_bytes(hugr_path.read_bytes())
 
 
