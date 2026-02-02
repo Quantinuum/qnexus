@@ -59,7 +59,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          uv run pytest integration/test_auth_flows.py \
+          uv run pytest integration/ \
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
                         --timeout=600 \
