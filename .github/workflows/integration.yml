@@ -104,4 +104,4 @@ jobs:
           slackbotid: "U03HPPBH99A"
           slackbottoken: ${{ secrets.NEXUS_TESTS_SLACK_BOT_TOKEN }}
           slackchannel: "C08LQ4ST2JV"
-          junitxml_filepath: integration-results/integration-results.xml
+          junitxml_filepath: integration-results.xml
