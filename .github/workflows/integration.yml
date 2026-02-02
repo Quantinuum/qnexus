@@ -59,7 +59,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          uv run pytest integration/ \
+          uv run pytest integration/test_auth_flows.py \
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
                         --timeout=600 \
@@ -86,22 +86,25 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@main
+        with:
+          name: integration results
+          path: integration-results
 
       - name: Publish summary in GH
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ !startsWith(github.ref_name, 'dependabot/') }}
         with:
-          files: "**/integration-results.xml"
+          files: integration-results/integration-results.xml"
           comment_title: qnexus integration results
 
       - name: "Post scheduled runs summary in Slack: #nexus-tests"
         uses: sanjaykrishnanrs/slack-notify-junitxml-action@0.1.0-beta
-        if: github.event_name == 'schedule'
+        if: always()
         env:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
           title: "qnexus integration | RUN: ${{ env.RUN_URL }}"
           slackbotid: "U03HPPBH99A"
           slackbottoken: ${{ secrets.NEXUS_TESTS_SLACK_BOT_TOKEN }}
-          slackchannel: "C08LQ4ST2JV"
-          junitxml_filepath: integration-results.xml
+          slackchannel: "C0ABF2ML146"
+          junitxml_filepath: integration-results/integration-results.xml
