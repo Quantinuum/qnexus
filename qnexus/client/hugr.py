@@ -1,8 +1,4 @@
-"""Client API for HUGR in Nexus.
-
-N.B. Nexus support for HUGR is experimental, and any HUGRs programs
-uploaded to Nexus before stability is achieved might not work in the future.
-"""
+"""Client API for HUGR in Nexus."""
 
 import base64
 from datetime import datetime
@@ -181,11 +177,7 @@ def upload(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> HUGRRef:
-    """Upload a HUGR to Nexus.
-
-    N.B. HUGR support in Nexus is subject to change. Until full support is achieved any
-    programs uploaded may not work in the future.
-    """
+    """Upload a HUGR to Nexus."""
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 
