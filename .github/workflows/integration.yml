@@ -91,7 +91,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ !startsWith(github.ref_name, 'dependabot/') }}
         with:
-          files: integration-results/integration-results.xml
+          files: "**/integration-results.xml"
           comment_title: qnexus integration results
 
       - name: "Post scheduled runs summary in Slack: #nexus-tests"
