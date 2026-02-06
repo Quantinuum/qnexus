@@ -1480,6 +1480,15 @@ wheels = [
 ]
 
 [[package]]
+name = "nest-asyncio2"
+version = "1.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/eb/ecf8bbf9d22a4e8f7be1628336fe0202da7660790053aa28abeb6c15eb14/nest_asyncio2-1.7.1.tar.gz", hash = "sha256:a1fe5bbbd20894dcceb1842322d74992c5834d5ab692af2c4f59a9a4fcf75fe8", size = 13797 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/48/c1f1ddcfd04bba60470235c2f83733ecff43ebe068dc7715aab60bc92ad8/nest_asyncio2-1.7.1-py3-none-any.whl", hash = "sha256:f83bc1744c3cfa7d47fd29431e5e168db6cb76eda1bb20108955c32f60d7eddf", size = 7504 },
+]
+
+[[package]]
 name = "networkx"
 version = "3.4.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2638,7 +2647,7 @@ dependencies = [
     { name = "colorama" },
     { name = "httpx" },
     { name = "hugr" },
-    { name = "nest-asyncio" },
+    { name = "nest-asyncio2" },
     { name = "pandas" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -2682,7 +2691,7 @@ requires-dist = [
     { name = "colorama", specifier = ">=0.4,<1.0" },
     { name = "httpx", specifier = ">=0,<1" },
     { name = "hugr", specifier = ">=0.14.0,<1.0.0" },
-    { name = "nest-asyncio", specifier = ">=1.6,<2.0" },
+    { name = "nest-asyncio2", specifier = ">=1.6,<2.0" },
     { name = "pandas", specifier = ">=2,<3" },
     { name = "pydantic", specifier = ">=2.4,<3.0" },
     { name = "pydantic-settings", specifier = ">=2,<3.0" },
