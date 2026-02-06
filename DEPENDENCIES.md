@@ -7,7 +7,7 @@
 | `click` | `>=8.1, <9.0` | Composable command line interface toolkit | [https://pypi.org/project/click/](https://pypi.org/project/click/) |
 | `httpx` | `>=0, <1` | The next generation HTTP client. | [https://pypi.org/project/httpx/](https://pypi.org/project/httpx/) |
 | `pandas` | `>=2, <3` | Powerful data structures for data analysis, time series, and statistics | [https://pandas.pydata.org](https://pandas.pydata.org) |
-| `nest-asyncio` | `>=1.6, <2.0` | Patch asyncio to allow nested event loops | [https://github.com/erdewit/nest_asyncio](https://github.com/erdewit/nest_asyncio) |
+| `nest-asyncio2` | `>=1.6, <2.0` | Patch asyncio to allow nested event loops | [https://github.com/Chaoses-Ib/nest-asyncio2](https://github.com/Chaoses-Ib/nest-asyncio2) |
 | `rich` | `>=13.6, <14.0` | Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal | [https://github.com/Textualize/rich](https://github.com/Textualize/rich) |
 | `pytket` | `>=2.3.1, <3.0` | Quantum computing toolkit and interface to the TKET compiler | [https://pypi.org/project/pytket/](https://pypi.org/project/pytket/) |
 | `websockets` | `>11, <16` | An implementation of the WebSocket Protocol (RFC 6455 & 7692) | [https://pypi.org/project/websockets/](https://pypi.org/project/websockets/) |
