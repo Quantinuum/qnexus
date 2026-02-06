@@ -81,7 +81,7 @@ def get(name: QuotaName) -> Quota:
     return Quota(
         name=quota["quota"]["name"],
         description=quota["quota"]["details"]["description"],
-        usage=quota["quota"]["usage"].get(quota_key, None),
+        usage=quota["quota"]["usage"].get(quota_key, 0),
         quota=quota_value if quota_value else NO_QUOTA_SET,
     )
 
