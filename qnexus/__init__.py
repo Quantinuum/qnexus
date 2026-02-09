@@ -2,7 +2,7 @@
 
 import warnings
 
-import nest_asyncio  # type: ignore
+import nest_asyncio2  # type: ignore
 from quantinuum_schemas.models.backend_config import (
     AerConfig,
     AerStateConfig,
@@ -44,7 +44,7 @@ warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
 
 # This is necessary for use in Jupyter notebooks to allow for nested asyncio loops
 try:
-    nest_asyncio.apply()
+    nest_asyncio2.apply()
 except (RuntimeError, ValueError):
     # May fail in some cloud environments: ignore.
     pass
