@@ -5,7 +5,6 @@ import json
 import os
 import warnings
 from functools import wraps
-from pathlib import Path
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 from httpx import Response
@@ -46,7 +45,7 @@ def remove_token(token_type: TokenTypes) -> None:
     # these get mounted in automatically and managed externally
     if is_jupyterhub_environment() and token_type == "refresh_token":
         return
-    token_file_path = Path.home() / CONFIG.token_path / token_file_from_type[token_type]
+    token_file_path = CONFIG.resolved_token_path / token_file_from_type[token_type]
     if token_file_path.exists():
         token_file_path.unlink()
 
@@ -78,7 +77,7 @@ class AccessToken(BaseModel):
 
 def read_token(token_type: TokenTypes) -> str:
     """Read a token from a file."""
-    token_file_path = Path.home() / CONFIG.token_path
+    token_file_path = CONFIG.resolved_token_path
     with (token_file_path / token_file_from_type[token_type]).open(
         encoding="UTF-8"
     ) as file:
@@ -96,7 +95,7 @@ def write_token(token_type: TokenTypes, token: str) -> None:
     if is_jupyterhub_environment() and token_type == "refresh_token":
         return
 
-    token_file_path = Path.home() / CONFIG.token_path
+    token_file_path = CONFIG.resolved_token_path
     token_file_path.mkdir(parents=True, exist_ok=True)
     with (token_file_path / token_file_from_type[token_type]).open(
         encoding="UTF-8", mode="w"
