@@ -4,6 +4,7 @@ N.B. Nexus support for HUGR is experimental, and any HUGRs programs
 uploaded to Nexus before stability is achieved might not work in the future.
 """
 
+import warnings
 import base64
 from datetime import datetime
 from typing import Any, Literal, Union, cast
@@ -287,6 +288,11 @@ def cost(
     """
     import qnexus as qnx
 
+    warnings.warn(
+        "hugr.cost() is deprecated. Please update to use hugr.cost_confidence() instead.",
+        category=DeprecationWarning,
+    )
+
     if isinstance(programs, HUGRRef):
         programs = [programs]
 
@@ -300,6 +306,40 @@ def cost(
     status = qnx.jobs.wait_for(job_ref)
 
     return cast(float, status.cost)
+
+
+def cost_confidence(
+    programs: HUGRRef | list[HUGRRef],
+    n_shots: int | list[int],
+    project: ProjectRef | None = None,
+    system_name: Literal["Helios-1"] = "Helios-1",
+) -> list[tuple[float, float]]:
+    """Estimate the cost (in HQC) of running Hugr programs for n_shots
+    number of shots on a Quantinuum Helios system.
+
+    Returns a list of tuples of (cost, confidence) for each job item.
+
+    NB: This will execute a costing job on a dedicated cost estimation device.
+        Once run, the cost will be visible also in the Nexus web portal
+        as part of the job.
+    """
+    import qnexus as qnx
+
+    if isinstance(programs, HUGRRef):
+        programs = [programs]
+
+    job_ref = qnx.start_execute_job(
+        programs=cast(list[ExecutionProgram], programs),
+        n_shots=n_shots,
+        # No other parameters matter for cost estimation, so construct a minimal costing config
+        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        project=project,
+        name="Circuit cost confidence estimation job",
+    )
+
+    qnx.jobs.wait_for(job_ref)
+
+    return qnx.jobs.cost_confidence(job_ref)
 
 
 @merge_scope_from_context

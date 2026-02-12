@@ -114,3 +114,27 @@ def test_hugr_costing(
             project=project_ref,
         )
         assert isinstance(cost, float)
+
+
+def test_hugr_cost_confidence(
+    test_case_name: str,
+    create_project: Callable[[str], ContextManager[ProjectRef]],
+    qa_hugr_package: Package,
+) -> None:
+    """Test the cost confidence of a Hugr program on a cost checking device."""
+
+    with create_project(f"project for {test_case_name}") as project_ref:
+        hugr_ref = qnx.hugr.upload(
+            hugr_package=qa_hugr_package,
+            name=f"hugr for {test_case_name}",
+            project=project_ref,
+        )
+
+        # Check that we can get a cost confidence estimate (using Helios-1SC)
+        cost_confidence = qnx.hugr.cost_confidence(
+            programs=[hugr_ref],
+            n_shots=[10],
+            project=project_ref,
+        )
+        assert isinstance(cost_confidence, list)
+        assert len(cost_confidence) > 0

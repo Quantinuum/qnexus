@@ -247,6 +247,32 @@ def test_costing_qir_on_NG_devices(
         assert isinstance(cost, float)
 
 
+def test_qir_cost_confidence(
+    test_case_name: str,
+    create_qir_in_project: Callable[[str, str, bytes], ContextManager[QIRRef]],
+) -> None:
+    """Test the cost confidence of a QIR program on a cost checking device."""
+
+    project_name = f"project for {test_case_name}"
+    qir_name = f"qir for {test_case_name}"
+
+    with create_qir_in_project(
+        project_name,
+        qir_name,
+        make_qir_bitcode_from_file("base.ll"),
+    ) as qir_ref:
+        project_ref = qnx.projects.get(name=project_name)
+
+        # Check that we can get a cost confidence estimate (using Helios-1SC)
+        cost_confidence = qnx.qir.cost_confidence(
+            programs=[qir_ref],
+            n_shots=[10],
+            project=project_ref,
+        )
+        assert isinstance(cost_confidence, list)
+        assert len(cost_confidence) > 0
+
+
 def make_qir_bitcode_from_file(filename: str) -> bytes:
     with open(
         Path("tests/data").resolve() / filename,
