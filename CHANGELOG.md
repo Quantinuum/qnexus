@@ -2,6 +2,20 @@
 
 # `qnexus` Release Notes
 
+## v0.40.0 (2026-02-12)
+
+
+### Added
+
+- Added cost_confidence api on jobs, hugr and qir (#312).
+
+
+### Fixed
+
+- Update nest-asyncio package (#310).
+- Use files glob search for publish-unit-test-result-action (#309).
+
+
 ## v0.39.0 (2026-01-09)
 
 
