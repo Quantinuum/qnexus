@@ -355,7 +355,7 @@ def cost(
         syntax_checker_device_name = syntax_checker
 
     if not syntax_checker_device_name.startswith("H2-"):
-        raise ValueError("Cicuit cost estimation is only supported for H2-x systems.")
+        raise ValueError("Circuit cost estimation is only supported for H2-x systems.")
 
     if not syntax_checker_device_name.endswith("SC"):
         syntax_checker_device_name += "SC"

@@ -60,6 +60,7 @@ from qnexus.models.references import (
     SystemRef,
     WasmModuleRef,
 )
+
 from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never
 
@@ -659,6 +660,7 @@ def cost(
     job: CompileJobRef | ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> float:
     """Get the HQC cost of a job from a JobRef."""
+
     resp = get_nexus_client().get(
         f"/api/jobs/v1beta3/{job.id}",
         params={"scope": scope.value},
@@ -671,3 +673,35 @@ def cost(
     job_status = resp_data["attributes"]["status"]
     cost = job_status.get("cost")
     return float(cost) if cost is not None else 0.0
+
+
+@merge_scope_from_context
+def cost_confidence(
+    job: CompileJobRef | ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
+) -> list[tuple[float, float]]:
+    """
+    Get the HQC cost and confidence of a job from a JobRef.
+
+    Returns a list of tuples of (cost, confidence) for each job item.
+    """
+    resp = get_nexus_client().get(
+        f"/api/jobs/v1beta3/{job.id}", params={"scope": scope.value}
+    )
+    if resp.status_code != 200:
+        raise qnx_exc.ResourceFetchFailed(
+            message=resp.text, status_code=resp.status_code
+        )
+
+    # Loop over all items from the API and gather cost_confidence_items
+    resp_data = resp.json()["data"]
+    items = resp_data["attributes"]["definition"]["items"]
+    cost_confidence_items = []
+    for i, item in enumerate(items):
+        cost_confidence_items.append(
+            (
+                float(item["status"].get("cost", 0.0)),
+                float(item["status"].get("cost_confidence", -1.0)),
+            )
+        )
+
+    return cost_confidence_items

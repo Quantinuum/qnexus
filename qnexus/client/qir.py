@@ -1,5 +1,6 @@
 """Client API for QIR in Nexus."""
 
+import warnings
 import base64
 from datetime import datetime
 from typing import Any, Literal, Union, cast
@@ -266,6 +267,11 @@ def cost(
     """
     import qnexus as qnx
 
+    warnings.warn(
+        "qir.cost() is deprecated. Please update to use qir.cost_confidence() instead.",
+        category=DeprecationWarning,
+    )
+
     if isinstance(programs, QIRRef):
         programs = [programs]
 
@@ -279,6 +285,39 @@ def cost(
     status = qnx.jobs.wait_for(job_ref)
 
     return cast(float, status.cost)
+
+
+def cost_confidence(
+    programs: QIRRef | list[QIRRef],
+    n_shots: int | list[int],
+    project: ProjectRef | None = None,
+    system_name: Literal["Helios-1"] = "Helios-1",
+) -> list[tuple[float, float]]:
+    """Estimate the cost (in HQC) of running QIR programs for n_shots
+    number of shots on a Quantinuum Helios system.
+
+    Returns a list of tuples of (cost, confidence) for each job item.
+
+    NB: This will execute a costing job on a dedicated cost estimation device.
+        Once run, the cost will be visible also in the Nexus web portal
+        as part of the job.
+    """
+    import qnexus as qnx
+
+    if isinstance(programs, QIRRef):
+        programs = [programs]
+
+    job_ref = qnx.start_execute_job(
+        programs=cast(list[ExecutionProgram], programs),
+        n_shots=n_shots,
+        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        project=project,
+        name="QIR cost estimation job",
+    )
+
+    qnx.jobs.wait_for(job_ref)
+
+    return qnx.jobs.cost_confidence(job_ref)
 
 
 @merge_scope_from_context

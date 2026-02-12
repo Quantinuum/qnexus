@@ -8,6 +8,7 @@ from uuid import UUID
 
 import pandas as pd
 import pytest
+from hugr.package import Package
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Circuit
@@ -26,6 +27,7 @@ from qnexus.models.references import (
     ExecutionResultRef,
     IncompleteJobItemRef,
     JobRef,
+    ProjectRef,
     Ref,
 )
 
@@ -674,3 +676,35 @@ def test_job_cost(
     result_ref = results[0]
     assert isinstance(result_ref, ExecutionResultRef)
     assert result_ref.cost is not None
+
+
+def test_job_cost_confidence(
+    test_case_name: str,
+    create_project: Callable[[str], ContextManager[ProjectRef]],
+    qa_hugr_package: Package,
+) -> None:
+    """Test the cost confidence of a Hugr program on a cost checking device,
+    and that the cost confidence is available using jobs.cost_confidence()."""
+
+    with create_project(f"project for {test_case_name}") as project_ref:
+        hugr_ref = qnx.hugr.upload(
+            hugr_package=qa_hugr_package,
+            name=f"hugr for {test_case_name}",
+            project=project_ref,
+        )
+
+        # Check that we can get a cost confidence estimate (using Helios-1SC)
+        execute_job_ref = qnx.start_execute_job(
+            programs=[hugr_ref],
+            n_shots=[10],
+            # No other parameters matter for cost estimation, so construct a minimal costing config
+            backend_config=qnx.QuantinuumConfig(device_name="Helios-1SC"),
+            project=project_ref,
+            name="Circuit cost confidence estimation job",
+        )
+
+        qnx.jobs.wait_for(execute_job_ref)
+
+        cost_confidence = qnx.jobs.cost_confidence(execute_job_ref)
+        assert isinstance(cost_confidence, list)
+        assert len(cost_confidence) > 0
