@@ -133,7 +133,7 @@ As some auth tests these manipulate environment variables they are currently run
 - Create a release branch `git checkout -b release/vx.y.z`
 - `git add` the modifications, then `git commit` and `git push` them.
 - Create a PR (title: `docs: Update CHANGELOG for vx.y.z`)
-- Ask a colleague to review the changes (should be just `CHANGELOG.md`, `pyproject.toml` and `.cz.toml`)
+- Ask a colleague to review the changes (should be just `CHANGELOG.md`, `pyproject.toml`, `.cz.toml` and `uv.lock`)
 - Squash merge the PR into `main`
 
 ### Step 2 - run the release workflow
