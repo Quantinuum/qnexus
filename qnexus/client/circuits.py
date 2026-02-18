@@ -358,6 +358,9 @@ def cost(
         raise ValueError("Circuit cost estimation is only supported for H2-x systems.")
 
     if not syntax_checker_device_name.endswith("SC"):
+        syntax_checker_device_name.strip(
+            "E"
+        )  # costing for H2-xE devices is the same as for H2-x
         syntax_checker_device_name += "SC"
 
     job_ref = qnx.start_execute_job(
