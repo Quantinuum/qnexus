@@ -2,6 +2,15 @@
 
 # `qnexus` Release Notes
 
+## v0.40.1 (2026-02-19)
+
+
+### Fixed
+
+- Costing for h2-xe devices using the wrong device name (#314).
+- Improved the log message for missing gate definitions (#315).
+
+
 ## v0.40.0 (2026-02-12)
 
 
