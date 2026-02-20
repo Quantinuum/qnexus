@@ -25,12 +25,10 @@ from qnexus.models.references import (
 @pytest.mark.parametrize(
     "backend_config",
     [
-        SeleneConfig(
-            n_qubits=5,
-        ),
+        SeleneConfig(),
         HeliosConfig(
             system_name="Helios-1E-lite",
-            emulator_config=HeliosEmulatorConfig(n_qubits=5),
+            emulator_config=HeliosEmulatorConfig(),
         ),
     ],
 )
@@ -58,6 +56,7 @@ def test_guppy_execution(
             backend_config=backend_config,
             project=project_ref,
             name=f"selene job for {test_case_name}",
+            n_qubits=[5],
         )
 
         qnx.jobs.wait_for(job_ref)

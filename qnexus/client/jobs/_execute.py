@@ -58,7 +58,7 @@ def start_execute_job(
     wasm_module: WasmModuleRef | None = None,
     gpu_decoder_config: GpuDecoderConfigRef | None = None,
     user_group: str | None = None,
-    max_cost: float | list[float] | list[None] = list(), 
+    max_cost: float | list[float] | list[None] = list(),
     n_qubits: int | list[int] | list[None] = list(),
 ) -> ExecuteJobRef:
     """
@@ -88,6 +88,10 @@ def start_execute_job(
 
     if len(n_shots) != len(program_ids):
         raise ValueError("Number of programs must equal number of n_shots.")
+    if len(max_cost) != len(program_ids):
+        raise ValueError("Number of programs must equal number of max_cost.")
+    if len(n_qubits) != len(program_ids):
+        raise ValueError("Number of programs must equal number of n_qubits.")
 
     attributes_dict = CreateAnnotations(
         name=name,

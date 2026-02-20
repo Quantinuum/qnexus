@@ -85,9 +85,9 @@ def test_gpu_decoder_config_flow(
             programs=[qir_program_ref],
             name=f"qir gpu decoder config execute job for {test_case_name}",
             n_shots=[100],
+            max_cost=[10.0],
             backend_config=qnx.QuantinuumConfig(
                 device_name="H1-1E",
-                max_cost=10,
             ),
             gpu_decoder_config=gpu_decoder_config_ref,
             project=proj_ref,

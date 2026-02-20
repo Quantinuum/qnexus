@@ -4,8 +4,8 @@ N.B. Nexus support for HUGR is experimental, and any HUGRs programs
 uploaded to Nexus before stability is achieved might not work in the future.
 """
 
-import warnings
 import base64
+import warnings
 from datetime import datetime
 from typing import Any, Literal, Union, cast
 from uuid import UUID
