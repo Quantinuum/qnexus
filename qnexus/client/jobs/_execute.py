@@ -58,6 +58,8 @@ def start_execute_job(
     wasm_module: WasmModuleRef | None = None,
     gpu_decoder_config: GpuDecoderConfigRef | None = None,
     user_group: str | None = None,
+    max_cost: float | list[float] | list[None] = list(),
+    n_qubits: int | list[int] | list[None] = list(),
 ) -> ExecuteJobRef:
     """
     Submit an execute job to be run in Nexus. Returns an ``ExecuteJobRef``
@@ -75,15 +77,38 @@ def start_execute_job(
 
     if isinstance(n_shots, int):
         n_shots = [n_shots] * len(program_ids)
+    if isinstance(max_cost, (int, float)):
+        max_cost = [float(max_cost)] * len(program_ids)
+    elif not max_cost:
+        max_cost = [None] * len(program_ids)
+    if isinstance(n_qubits, int):
+        n_qubits = [n_qubits] * len(program_ids)
+    elif not n_qubits:
+        n_qubits = [None] * len(program_ids)
 
     if len(n_shots) != len(program_ids):
         raise ValueError("Number of programs must equal number of n_shots.")
+    if len(max_cost) != len(program_ids):
+        raise ValueError("Number of programs must equal number of max_cost.")
+    if len(n_qubits) != len(program_ids):
+        raise ValueError("Number of programs must equal number of n_qubits.")
 
     attributes_dict = CreateAnnotations(
         name=name,
         description=description,
         properties=properties,
     ).model_dump(exclude_none=True)
+
+    items = [
+        {
+            "program_id": program_id,
+            "n_shots": n_shot,
+            **({"max_cost": mc} if mc is not None else {}),
+            **({"n_qubits": nq} if nq is not None else {}),
+        }
+        for program_id, n_shot, mc, nq in zip(program_ids, n_shots, max_cost, n_qubits)
+    ]
+
     attributes_dict.update(
         {
             "job_type": "execute",
@@ -100,10 +125,7 @@ def start_execute_job(
                     str(gpu_decoder_config.id) if gpu_decoder_config else None
                 ),
                 "credential_name": credential_name,
-                "items": [
-                    {"program_id": program_id, "n_shots": n_shot}
-                    for program_id, n_shot in zip(program_ids, n_shots)
-                ],
+                "items": items,
             },
         }
     )
