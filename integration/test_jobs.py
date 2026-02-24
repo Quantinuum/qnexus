@@ -17,6 +17,7 @@ from quantinuum_schemas.models.hypertket_config import HyperTketConfig
 
 import qnexus as qnx
 import qnexus.exceptions as qnx_exc
+from qnexus.client.jobs import WaitStrategy
 from qnexus.models.job_status import JobStatusEnum
 from qnexus.models.references import (
     CircuitRef,
@@ -708,3 +709,62 @@ def test_job_cost_confidence(
         cost_confidence = qnx.jobs.cost_confidence(execute_job_ref)
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0
+
+
+def test_wait_for_with_polling_strategy(
+    create_compile_job_in_project: Callable[..., ContextManager[CompileJobRef]],
+    test_circuit: Circuit,
+) -> None:
+    """Test that we can wait for a job using the polling strategy."""
+
+    with create_compile_job_in_project(
+        project_name=project_name,
+        job_name=compile_job_name,
+        circuit=test_circuit,
+        circuit_name=circuit_name,
+        backend_config=qnx.AerConfig(),
+    ) as compile_job_ref:
+        assert isinstance(compile_job_ref, CompileJobRef)
+
+        job_status = qnx.jobs.wait_for(
+            compile_job_ref,
+            strategy=WaitStrategy.POLLING,
+            timeout=120.0,
+        )
+
+        assert job_status.status == JobStatusEnum.COMPLETED
+
+        compile_results = qnx.jobs.results(compile_job_ref)
+        assert len(compile_results) == 1
+        assert isinstance(compile_results[0], CompilationResultRef)
+
+
+def test_wait_for_with_auto_strategy(
+    create_execute_job_in_project: Callable[..., ContextManager[ExecuteJobRef]],
+    test_circuit: Circuit,
+) -> None:
+    """Test that we can wait for a job using the auto (hybrid) strategy,
+    which uses websocket initially then falls back to polling."""
+
+    with create_execute_job_in_project(
+        project_name=project_name,
+        job_name=execute_job_name,
+        circuit=test_circuit,
+        circuit_name=circuit_name,
+    ) as execute_job_ref:
+        assert isinstance(execute_job_ref, ExecuteJobRef)
+
+        # Use a short websocket_timeout to test the fallback mechanism
+        # (though the job will likely complete before the timeout)
+        job_status = qnx.jobs.wait_for(
+            execute_job_ref,
+            strategy=WaitStrategy.AUTO,
+            websocket_timeout=5.0,
+            timeout=120.0,
+        )
+
+        assert job_status.status == JobStatusEnum.COMPLETED
+
+        execute_results = qnx.jobs.results(execute_job_ref)
+        assert len(execute_results) == 1
+        assert isinstance(execute_results[0], ExecutionResultRef)

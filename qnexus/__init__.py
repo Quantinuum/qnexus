@@ -1,5 +1,6 @@
 """The qnexus package."""
 
+import logging
 import warnings
 
 import nest_asyncio2  # type: ignore
@@ -39,8 +40,23 @@ from qnexus.client.auth import login, login_with_credentials, logout
 from qnexus.client.jobs import compile, execute
 from qnexus.client.jobs._compile import start_compile_job
 from qnexus.client.jobs._execute import start_execute_job
+from qnexus.config import CONFIG
 
 warnings.filterwarnings("default", category=DeprecationWarning, module=__name__)
+
+# Configure library logging: silent by default, let applications configure handlers
+logging.getLogger("qnexus").addHandler(logging.NullHandler())
+# Convenience logger, can be enabled via CONFIG.log_level
+if CONFIG.log_level is not None:
+    import sys
+
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
+    qnexus_logger = logging.getLogger("qnexus")
+    qnexus_logger.addHandler(handler)
+    qnexus_logger.setLevel(CONFIG.log_level)
 
 # This is necessary for use in Jupyter notebooks to allow for nested asyncio loops
 try:
