@@ -712,31 +712,30 @@ def test_job_cost_confidence(
 
 
 def test_wait_for_with_polling_strategy(
-    create_compile_job_in_project: Callable[..., ContextManager[CompileJobRef]],
+    create_execute_job_in_project: Callable[..., ContextManager[ExecuteJobRef]],
     test_circuit: Circuit,
 ) -> None:
     """Test that we can wait for a job using the polling strategy."""
 
-    with create_compile_job_in_project(
+    with create_execute_job_in_project(
         project_name=project_name,
-        job_name=compile_job_name,
+        job_name=execute_job_name,
         circuit=test_circuit,
         circuit_name=circuit_name,
-        backend_config=qnx.AerConfig(),
-    ) as compile_job_ref:
-        assert isinstance(compile_job_ref, CompileJobRef)
+    ) as execute_job_ref:
+        assert isinstance(execute_job_ref, ExecuteJobRef)
 
         job_status = qnx.jobs.wait_for(
-            compile_job_ref,
+            execute_job_ref,
             strategy=WaitStrategy.POLLING,
             timeout=120.0,
         )
 
         assert job_status.status == JobStatusEnum.COMPLETED
 
-        compile_results = qnx.jobs.results(compile_job_ref)
-        assert len(compile_results) == 1
-        assert isinstance(compile_results[0], CompilationResultRef)
+        execute_results = qnx.jobs.results(execute_job_ref)
+        assert len(execute_results) == 1
+        assert isinstance(execute_results[0], ExecutionResultRef)
 
 
 def test_wait_for_with_auto_strategy(
