@@ -356,26 +356,26 @@ def _fetch_by_id(
     )
 
 
-async def _poll_job_status(
+async def poll_job_status(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
     initial_interval: float = 1.0,
-    max_interval_queued: float = 300.0,
-    max_interval_running: float = 60.0,
+    max_interval_queued: float = 1200.0,
+    max_interval_running: float = 180.0,
     backoff_factor: float = 2.0,
 ) -> JobStatus:
     """Poll job status with exponential backoff and adaptive intervals.
 
     Uses different maximum poll intervals based on job state:
-    - QUEUED: Polls less frequently (default 5 min) since queue position changes slowly
-    - RUNNING/SUBMITTED: Polls more frequently (default 1 min) for responsiveness
+    - QUEUED: Polls less frequently (default 20 min) since queue position changes slowly
+    - RUNNING/SUBMITTED: Polls more frequently (default 3 min) for responsiveness
 
     Args:
         job: The job to monitor.
         wait_for_status: The status to wait for.
         initial_interval: Starting poll interval in seconds.
-        max_interval_queued: Maximum poll interval when job is queued (default: 300s).
-        max_interval_running: Maximum poll interval when job is running (default: 60s).
+        max_interval_queued: Maximum poll interval when job is queued (default: 1200s).
+        max_interval_running: Maximum poll interval when job is running (default: 180s).
         backoff_factor: Multiplier for interval after each poll.
 
     Returns:
@@ -424,10 +424,10 @@ async def _poll_job_status(
         interval = min(interval * backoff_factor, max_interval)
 
 
-async def _hybrid_wait(
+async def hybrid_wait(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
-    websocket_timeout: float = 300.0,
+    websocket_timeout: float = 600.0,
 ) -> JobStatus:
     """Use websocket for initial period, then fall back to polling.
 
@@ -458,29 +458,29 @@ async def _hybrid_wait(
             job.id,
             websocket_timeout,
         )
-        return await _poll_job_status(job=job, wait_for_status=wait_for_status)
+        return await poll_job_status(job=job, wait_for_status=wait_for_status)
 
 
 def wait_for(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
-    timeout: float | None = 900.0,
+    timeout: float | None = None,
     strategy: WaitStrategy = WaitStrategy.AUTO,
-    websocket_timeout: float = 300.0,
+    websocket_timeout: float = 600.0,
 ) -> JobStatus:
     """Check job status until the job is complete (or a specified status).
 
     Args:
         job: The job to monitor.
         wait_for_status: The status to wait for (default: COMPLETED).
-        timeout: Overall timeout in seconds. None for no timeout (default: 900).
+        timeout: Overall timeout in seconds. None for no timeout (default: None).
         strategy: How to monitor the job:
-            - WEBSOCKET: Real-time updates via websocket. Best for short jobs (<5 minutes).
-            - POLLING: Exponential backoff polling. Robust for long jobs (>5 minutes).
+            - WEBSOCKET: Real-time updates via websocket. Best for short jobs (<10 minutes).
+            - POLLING: Exponential backoff polling. Robust for long jobs (>10 minutes).
             - AUTO: Websocket first, then polling fallback (default).
               Recommended for most use cases.
         websocket_timeout: For AUTO strategy, how long to use websocket
-            before switching to polling (default: 300 seconds).
+            before switching to polling (default: 600 seconds).
 
     Returns:
         The final JobStatus.
@@ -502,9 +502,9 @@ def wait_for(
         case WaitStrategy.WEBSOCKET:
             coro = listen_job_status(job=job, wait_for_status=wait_for_status)
         case WaitStrategy.POLLING:
-            coro = _poll_job_status(job=job, wait_for_status=wait_for_status)
+            coro = poll_job_status(job=job, wait_for_status=wait_for_status)
         case WaitStrategy.AUTO:
-            coro = _hybrid_wait(
+            coro = hybrid_wait(
                 job=job,
                 wait_for_status=wait_for_status,
                 websocket_timeout=websocket_timeout,
