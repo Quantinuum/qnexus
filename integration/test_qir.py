@@ -142,7 +142,7 @@ def test_execution(
         qir_name,
         qa_qir_bitcode,
     ) as qir_program_ref:
-        device_name = "H1-1SC"  # Syntax checker - no results
+        device_name = "H2-1SC"  # Syntax checker - no results
 
         project_ref = qnx.projects.get_or_create(name=project_name)
 
