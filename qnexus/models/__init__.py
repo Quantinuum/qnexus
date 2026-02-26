@@ -384,7 +384,7 @@ def to_pytket_backend_info(backend: StoredBackendInfo) -> BackendInfo:
             gate_set.add(getattr(OpType, gate))
         except AttributeError:
             logger.warning(
-                "Unknown OpType in BackendInfo: `%`, will omit from BackendInfo."
+                "Unknown OpType in BackendInfo: `%s`, will omit from BackendInfo."
                 " Consider updating your pytket version.",
                 gate,
             )
