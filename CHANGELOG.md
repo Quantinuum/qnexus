@@ -2,6 +2,13 @@
 
 # `qnexus` Release Notes
 
+## v0.41.0 (2026-02-26)
+
+
+### Added
+
+-  pass n_qubits or max_cost through job item params (#317).
+
 ## v0.40.1 (2026-02-19)
 
 
