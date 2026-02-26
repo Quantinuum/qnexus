@@ -2620,7 +2620,7 @@ wheels = [
 
 [[package]]
 name = "qiskit-ibm-runtime"
-version = "0.40.1"
+version = "0.41.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ibm-platform-services" },
@@ -2640,7 +2640,7 @@ wheels = [
 
 [[package]]
 name = "qnexus"
-version = "0.40.1"
+version = "0.41.0"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
