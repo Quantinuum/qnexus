@@ -28,7 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 qiskit = [
-    "pytket-qiskit >=0.70",
+    "pytket-qiskit >=0.75",
 ]
 
 [dependency-groups]

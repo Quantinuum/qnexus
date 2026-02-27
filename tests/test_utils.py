@@ -67,6 +67,13 @@ def test_compile_circuit_with_wrapper() -> None:
                         "created": dt.datetime.now(),
                         "modified": dt.datetime.now(),
                     },
+                    "status": {
+                        "status": "COMPLETED",
+                        "message": "The job is completed.",
+                        "completed_time": "2026-02-27T09:11:14.478969+00:00",
+                        "queued_time": "2026-02-27T09:11:14.398557+00:00",
+                        "submitted_time": "2026-02-27T09:11:03.491972+00:00",
+                    },
                 },
             }
         }

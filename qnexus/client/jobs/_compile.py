@@ -113,6 +113,7 @@ def start_compile_job(
         job_type=JobType.COMPILE,
         last_status=JobStatusEnum.SUBMITTED,
         last_message="",
+        last_status_detail=JobStatus.from_dict(res_data_dict["attributes"]["status"]),
         project=project,
         backend_config_store=backend_config,
     )
