@@ -155,6 +155,9 @@ def start_execute_job(
         job_type=JobType.EXECUTE,
         last_status=JobStatusEnum.SUBMITTED,
         last_message="",
+        last_status_detail=JobStatus.from_dict(
+            resp.json()["data"]["attributes"]["status"]
+        ),
         project=project,
         backend_config_store=backend_config,
     )
