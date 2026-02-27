@@ -87,7 +87,7 @@ def test_gpu_decoder_config_flow(
             n_shots=[100],
             max_cost=[10.0],
             backend_config=qnx.QuantinuumConfig(
-                device_name="H1-1E",
+                device_name="H2-1E",
             ),
             gpu_decoder_config=gpu_decoder_config_ref,
             project=proj_ref,

@@ -526,7 +526,7 @@ def get_backend_config_name(backend_config: qnx.BackendConfig) -> str:
                 "37bf946a-6349-47df-a092-3fbd5b92dbf2::"
             ),
         ),
-        qnx.QuantinuumConfig(device_name="H1-1SC"),  # Cluster-hosted
+        qnx.QuantinuumConfig(device_name="H2-1SC"),  # Cluster-hosted
     ],
     ids=get_backend_config_name,
 )

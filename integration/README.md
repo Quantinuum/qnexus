@@ -41,6 +41,5 @@ runs, the tests that require unique names might fail.
 
 ### Purge projects
 
-By default projects created during the test run will not not be purged (archived and deleted). Specifying the
+By default projects created during the test run will not be purged (archived and deleted). Specifying the
 flag `--purge-projects` will make it so all the projects are purged immediately after a test finishes.
-

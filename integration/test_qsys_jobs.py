@@ -31,6 +31,7 @@ from qnexus.models.references import (
             emulator_config=HeliosEmulatorConfig(),
         ),
     ],
+    ids=["SeleneConfig", "Helios-1E-lite"],
 )
 def test_guppy_execution(
     test_case_name: str,
@@ -57,6 +58,7 @@ def test_guppy_execution(
             project=project_ref,
             name=f"selene job for {test_case_name}",
             n_qubits=[5],
+            max_cost=[10.0],
         )
 
         qnx.jobs.wait_for(job_ref)
