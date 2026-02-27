@@ -2,6 +2,13 @@
 
 # `qnexus` Release Notes
 
+## v0.41.1 (2026-02-19)
+
+
+### Fixed
+
+- Error caused by string formatting in a warning message.
+
 ## v0.41.0 (2026-02-26)
 
 
