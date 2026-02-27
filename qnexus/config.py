@@ -29,8 +29,6 @@ class Config(BaseSettings):
     qa_user_email: str = ""
     qa_user_password: str = ""
 
-    log_level: str | None = None  # e.g., "DEBUG", "INFO", or None (default)
-
     def __str__(self) -> str:
         """String representation of current config."""
         return self.model_dump_json()
