@@ -166,7 +166,7 @@ def start_execute_job(
 @merge_scope_from_context
 def _results(
     execute_job: ExecuteJobRef,
-    allow_incomplete: bool = False,
+    allow_incomplete: bool = True,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> DataframableList[ExecutionResultRef | IncompleteJobItemRef]:
     """Get the results from an execute job."""

@@ -122,7 +122,7 @@ def start_compile_job(
 @merge_scope_from_context
 def _results(
     compile_job: CompileJobRef,
-    allow_incomplete: bool = False,
+    allow_incomplete: bool = True,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> DataframableList[CompilationResultRef | IncompleteJobItemRef]:
     """Get the results from a compile job."""
