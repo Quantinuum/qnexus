@@ -308,6 +308,7 @@ def test_get_results_for_incomplete_compile(
         assert isinstance(compile_item, IncompleteJobItemRef)
         assert isinstance(compile_item.job_item_integer_id, int)
         assert compile_item.last_status != JobStatusEnum.COMPLETED
+        assert compile_item.get_input().id == circ_ref.id
 
         # check the job after completion
         qnx.jobs.wait_for(compile_job_ref)
@@ -477,6 +478,7 @@ def test_get_results_for_incomplete_execute(
         assert first_item.id == UUID(int=0)
         assert isinstance(first_item.job_item_integer_id, int)
         assert first_item.last_status == JobStatusEnum.ERROR
+        assert first_item.get_input().id == circ_ref.id
 
         assert isinstance(second_item, ExecutionResultRef)
         assert isinstance(second_item.get_input(), CircuitRef)
