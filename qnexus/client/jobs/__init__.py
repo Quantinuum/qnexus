@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import ssl
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Type, Union, cast, overload
@@ -82,20 +83,49 @@ class RemoteRetryStrategy(str, Enum):
     FULL_RESTART = "FULL_RESTART"
 
 
-class WaitStrategy(str, Enum):
-    """Strategy for waiting on job completion.
+@dataclass
+class WebsocketStrategy:
+    """Use a websocket connection for real-time updates.
 
-    WEBSOCKET: Use a websocket connection for real-time updates.
-        Best for short-running jobs (<5 minutes).
-    POLLING: Use exponential backoff polling.
-        More robust for long-running jobs.
-    AUTO: Start with websocket, fall back to polling after 5 minutes.
-        Recommended for most use cases.
+    Best for short-running jobs (<10 minutes).
     """
 
-    WEBSOCKET = "websocket"
-    POLLING = "polling"
-    AUTO = "auto"
+
+@dataclass
+class PollingStrategy:
+    """Use exponential backoff polling.
+
+    More robust for long-running jobs (>10 minutes).
+
+    Attributes:
+        initial_interval: Starting poll interval in seconds.
+        max_interval_queued: Maximum poll interval when job is queued.
+        max_interval_running: Maximum poll interval when job is running/submitted.
+        backoff_factor: Multiplier for interval after each poll.
+    """
+
+    initial_interval: float = 1.0
+    max_interval_queued: float = 1200.0
+    max_interval_running: float = 180.0
+    backoff_factor: float = 2.0
+
+
+@dataclass
+class HybridStrategy:
+    """Start with websocket, fall back to polling.
+
+    Recommended for most use cases.
+
+    Attributes:
+        websocket_timeout: How long to use websocket before switching to polling.
+        polling: Configuration for the polling fallback.
+    """
+
+    websocket_timeout: float = 600.0
+    polling: PollingStrategy = field(default_factory=PollingStrategy)
+
+
+WaitStrategy = WebsocketStrategy | PollingStrategy | HybridStrategy
 
 
 class Params(
@@ -359,10 +389,7 @@ def _fetch_by_id(
 async def poll_job_status(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
-    initial_interval: float = 1.0,
-    max_interval_queued: float = 1200.0,
-    max_interval_running: float = 180.0,
-    backoff_factor: float = 2.0,
+    strategy: PollingStrategy = PollingStrategy(),
 ) -> JobStatus:
     """Poll job status with exponential backoff and adaptive intervals.
 
@@ -373,23 +400,20 @@ async def poll_job_status(
     Args:
         job: The job to monitor.
         wait_for_status: The status to wait for.
-        initial_interval: Starting poll interval in seconds.
-        max_interval_queued: Maximum poll interval when job is queued (default: 1200s).
-        max_interval_running: Maximum poll interval when job is running (default: 180s).
-        backoff_factor: Multiplier for interval after each poll.
+        strategy: Polling configuration.
 
     Returns:
         The final JobStatus when the target status is reached or job terminates.
     """
-    interval = initial_interval
+    interval = strategy.initial_interval
     logger.debug(
         "Starting polling for job %s (target: %s, interval: %.1fs, "
         "max queued: %.1fs, max running: %.1fs)",
         job.id,
         wait_for_status.value,
-        initial_interval,
-        max_interval_queued,
-        max_interval_running,
+        strategy.initial_interval,
+        strategy.max_interval_queued,
+        strategy.max_interval_running,
     )
 
     while True:
@@ -397,9 +421,9 @@ async def poll_job_status(
 
         # Adapt max interval based on job state
         if job_status.status == JobStatusEnum.QUEUED:
-            max_interval = max_interval_queued
+            max_interval = strategy.max_interval_queued
         else:
-            max_interval = max_interval_running
+            max_interval = strategy.max_interval_running
 
         # Clamp interval to current max (allows faster polling when transitioning
         # from QUEUED to RUNNING)
@@ -421,20 +445,20 @@ async def poll_job_status(
             return job_status
 
         await asyncio.sleep(interval)
-        interval = min(interval * backoff_factor, max_interval)
+        interval = min(interval * strategy.backoff_factor, max_interval)
 
 
 async def hybrid_wait(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
-    websocket_timeout: float = 600.0,
+    strategy: HybridStrategy = HybridStrategy(),
 ) -> JobStatus:
     """Use websocket for initial period, then fall back to polling.
 
     Args:
         job: The job to monitor.
         wait_for_status: The status to wait for.
-        websocket_timeout: How long to use websocket before switching to polling.
+        strategy: Hybrid strategy configuration.
 
     Returns:
         The final JobStatus when the target status is reached or job terminates.
@@ -442,13 +466,13 @@ async def hybrid_wait(
     logger.debug(
         "Using hybrid strategy for job %s (websocket timeout: %.1fs)",
         job.id,
-        websocket_timeout,
+        strategy.websocket_timeout,
     )
     try:
         # Try websocket first with a timeout
         job_status = await asyncio.wait_for(
             listen_job_status(job=job, wait_for_status=wait_for_status),
-            timeout=websocket_timeout,
+            timeout=strategy.websocket_timeout,
         )
         return job_status
     except asyncio.TimeoutError:
@@ -456,17 +480,18 @@ async def hybrid_wait(
         logger.debug(
             "Job %s: websocket timeout after %.1fs, switching to polling",
             job.id,
-            websocket_timeout,
+            strategy.websocket_timeout,
         )
-        return await poll_job_status(job=job, wait_for_status=wait_for_status)
+        return await poll_job_status(
+            job=job, wait_for_status=wait_for_status, strategy=strategy.polling
+        )
 
 
 def wait_for(
     job: JobRef,
     wait_for_status: JobStatusEnum = JobStatusEnum.COMPLETED,
     timeout: float | None = None,
-    strategy: WaitStrategy = WaitStrategy.AUTO,
-    websocket_timeout: float = 600.0,
+    strategy: WaitStrategy = HybridStrategy(),
 ) -> JobStatus:
     """Check job status until the job is complete (or a specified status).
 
@@ -475,12 +500,12 @@ def wait_for(
         wait_for_status: The status to wait for (default: COMPLETED).
         timeout: Overall timeout in seconds. None for no timeout (default: None).
         strategy: How to monitor the job:
-            - WEBSOCKET: Real-time updates via websocket. Best for short jobs (<10 minutes).
-            - POLLING: Exponential backoff polling. Robust for long jobs (>10 minutes).
-            - AUTO: Websocket first, then polling fallback (default).
+            - WebsocketStrategy(): Real-time updates via websocket.
+              Best for short jobs (<10 minutes).
+            - PollingStrategy(): Exponential backoff polling.
+              Robust for long jobs (>10 minutes).
+            - HybridStrategy(): Websocket first, then polling fallback (default).
               Recommended for most use cases.
-        websocket_timeout: For AUTO strategy, how long to use websocket
-            before switching to polling (default: 600 seconds).
 
     Returns:
         The final JobStatus.
@@ -489,25 +514,38 @@ def wait_for(
         JobError: If the job errors, is cancelled, depleted, or terminated
             (unless that was the status being waited for).
         asyncio.TimeoutError: If the overall timeout is exceeded.
+
+    Examples:
+        # Use defaults (hybrid strategy)
+        wait_for(job)
+
+        # Custom polling configuration
+        wait_for(job, strategy=PollingStrategy(initial_interval=5.0, backoff_factor=1.5))
+
+        # Custom hybrid with polling fallback config
+        wait_for(job, strategy=HybridStrategy(
+            websocket_timeout=300.0,
+            polling=PollingStrategy(max_interval_running=60.0)
+        ))
     """
     logger.debug(
         "Waiting for job %s with strategy=%s, timeout=%s, target=%s",
         job.id,
-        strategy.value,
+        type(strategy).__name__,
         timeout,
         wait_for_status.value,
     )
 
     match strategy:
-        case WaitStrategy.WEBSOCKET:
+        case WebsocketStrategy():
             coro = listen_job_status(job=job, wait_for_status=wait_for_status)
-        case WaitStrategy.POLLING:
-            coro = poll_job_status(job=job, wait_for_status=wait_for_status)
-        case WaitStrategy.AUTO:
+        case PollingStrategy():
+            coro = poll_job_status(
+                job=job, wait_for_status=wait_for_status, strategy=strategy
+            )
+        case HybridStrategy():
             coro = hybrid_wait(
-                job=job,
-                wait_for_status=wait_for_status,
-                websocket_timeout=websocket_timeout,
+                job=job, wait_for_status=wait_for_status, strategy=strategy
             )
         case _:
             assert_never(strategy)

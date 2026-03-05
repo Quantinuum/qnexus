@@ -17,7 +17,7 @@ from quantinuum_schemas.models.hypertket_config import HyperTketConfig
 
 import qnexus as qnx
 import qnexus.exceptions as qnx_exc
-from qnexus.client.jobs import WaitStrategy
+from qnexus.client.jobs import HybridStrategy, PollingStrategy
 from qnexus.models.job_status import JobStatusEnum
 from qnexus.models.references import (
     CircuitRef,
@@ -727,7 +727,7 @@ def test_wait_for_with_polling_strategy(
 
         job_status = qnx.jobs.wait_for(
             execute_job_ref,
-            strategy=WaitStrategy.POLLING,
+            strategy=PollingStrategy(),
             timeout=120.0,
         )
 
@@ -757,8 +757,7 @@ def test_wait_for_with_auto_strategy(
         # (though the job will likely complete before the timeout)
         job_status = qnx.jobs.wait_for(
             execute_job_ref,
-            strategy=WaitStrategy.AUTO,
-            websocket_timeout=5.0,
+            strategy=HybridStrategy(websocket_timeout=5.0),
             timeout=120.0,
         )
 
