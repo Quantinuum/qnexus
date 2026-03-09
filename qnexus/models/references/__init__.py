@@ -481,6 +481,14 @@ class ResultType(str, Enum):
     QSYS = "QSYS"
 
 
+class ProgramType(str, Enum):
+    """Enum for a program's type."""
+
+    CIRCUIT = "circuit"
+    HUGR = "hugr"
+    QIR = "qir"
+
+
 class ResultVersions(int, Enum):
     """Enumerate the valid values for requesting results in a specific format"""
 
@@ -608,12 +616,23 @@ class IncompleteJobItemRef(BaseRef):
     id: UUID = UUID(int=0)  # Incomplete items have no result ID
     job_item_id: UUID | None = None
     job_item_integer_id: int | None = None
+    program_type: ProgramType = ProgramType.CIRCUIT
+    program_id: UUID | None = None
+    _input_program: ExecutionProgram | None = None
     project: ProjectRef
     job_type: JobType
     last_status: JobStatusEnum
     last_message: str
     last_status_detail: JobStatus | None = None
     type: Literal["IncompleteJobItemRef"] = "IncompleteJobItemRef"
+
+    def get_input(self) -> ExecutionProgram:
+        """Get the Program Ref of the input program."""
+        if self._input_program:
+            return self._input_program
+
+        self._input_program = self._get_input_program()
+        return copy(self._input_program)
 
     def df(self) -> pd.DataFrame:
         """Present in a pandas DataFrame."""
@@ -629,6 +648,31 @@ class IncompleteJobItemRef(BaseRef):
                 index=[0],
             )
         )
+
+    def _get_input_program(
+        self,
+    ) -> ExecutionProgram:
+        """Utility method to retrieve the input program for an
+        incomplete job item.
+        """
+        from qnexus.client.circuits import _fetch_by_id as _fetch_circuit_by_id
+        from qnexus.client.hugr import _fetch_by_id as _fetch_hugr_by_id
+        from qnexus.client.qir import _fetch_by_id as _fetch_qir_by_id
+
+        if not self.program_id:
+            raise ValueError(
+                "Cannot fetch input program for incomplete job item without a program_id"
+            )
+
+        match self.program_type:
+            case ProgramType.CIRCUIT:
+                return _fetch_circuit_by_id(self.program_id)
+            case ProgramType.QIR:
+                return _fetch_qir_by_id(self.program_id)
+            case ProgramType.HUGR:
+                return _fetch_hugr_by_id(self.program_id)
+            case _:
+                assert_never(self.program_type)
 
 
 class CompilationPassRef(BaseRef):

@@ -189,6 +189,9 @@ def _results(
         DataframableList([])
     )
 
+    program_types = resp_data["relationships"]["programs"]["data"]
+    program_type_dict = {p["id"]: p["type"] for p in program_types}
+
     for item in resp_data["attributes"]["definition"]["items"]:
         result_type: ResultType | None = None
 
@@ -232,11 +235,16 @@ def _results(
 
         elif allow_incomplete is True:
             # Job item is not complete, return an IncompleteJobItemRef
+            program_id = item.get("program_id", None)
+            program_type = program_type_dict[program_id]
+
             incomplete_ref = IncompleteJobItemRef(
                 job_item_id=item.get("external_handle", None),
                 job_item_integer_id=item.get("item_id", None),
                 annotations=execute_job.annotations,
                 project=execute_job.project,
+                program_type=program_type,
+                program_id=program_id,
                 job_type=JobType.EXECUTE,
                 last_status=JobStatusEnum[item["status"]["status"]],
                 last_message=item["status"].get("message", ""),

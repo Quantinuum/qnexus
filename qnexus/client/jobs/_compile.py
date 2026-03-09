@@ -146,6 +146,8 @@ def _results(
     compilation_refs: DataframableList[CompilationResultRef | IncompleteJobItemRef] = (
         DataframableList([])
     )
+    program_types = resp_data["relationships"]["programs"]["data"]
+    program_type_dict = {p["id"]: p["type"] for p in program_types}
 
     for item in resp_data["attributes"]["definition"]["items"]:
         if item["status"]["status"] == "COMPLETED":
@@ -185,10 +187,15 @@ def _results(
             )
         elif allow_incomplete is True:
             # Job item is not complete, return an IncompleteJobItemRef
+            program_id = item.get("program_id", None)
+            program_type = program_type_dict[program_id]
+
             incomplete_ref = IncompleteJobItemRef(
                 job_item_integer_id=item.get("item_id"),
                 annotations=compile_job.annotations,
                 project=compile_job.project,
+                program_type=program_type,
+                program_id=program_id,
                 job_type=JobType.COMPILE,
                 last_status=JobStatusEnum(item["status"]["status"]),
                 last_message=item["status"].get("message", ""),
