@@ -73,6 +73,3 @@ package = true
 plugins = ["pydantic.mypy"]
 strict = true
 allow_redefinition = true
-
-[tool.hatch.metadata]
-allow-direct-references = true
