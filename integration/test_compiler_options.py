@@ -18,13 +18,13 @@ def assert_op_count_in_circuit(
     """Assert that the number of `op` gates in the `circuit` is 0 or >0."""
     total_ops = sum([1 for circ_op in circuit.get_commands() if circ_op.op.type == op])
     if should_be_gt_0:
-        assert (
-            total_ops > 0
-        ), f"Expected >0 {op} gates in the circuit, but found {total_ops}."
+        assert total_ops > 0, (
+            f"Expected >0 {op} gates in the circuit, but found {total_ops}."
+        )
     else:
-        assert (
-            total_ops == 0
-        ), f"Expected 0 {op} gates in the circuit, but found {total_ops}."
+        assert total_ops == 0, (
+            f"Expected 0 {op} gates in the circuit, but found {total_ops}."
+        )
 
 
 @pytest.mark.parametrize(
