@@ -51,6 +51,7 @@ dev = [
     "pytest-xdist>=3.6.1",
     "guppylang >=0.21.0, <1.0.0",
     "pytket-qir>=0.22.0",
+    "scipy-stubs>=1.15.3.0",
 ]
 
 

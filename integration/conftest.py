@@ -5,10 +5,11 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, ContextManager, Generator, Literal, Union, cast
 
+import numpy as np
 import pandas as pd
 import pytest
 from hugr.package import Package
-from pytket.circuit import Circuit
+from pytket.circuit import CircBox, Circuit, Unitary2qBox
 from pytket.qir import pytket_to_qir  # type: ignore[attr-defined]
 from pytket.wasm.wasm import WasmFileHandler, WasmModuleHandler
 from quantinuum_schemas.models.backend_config import (
@@ -24,6 +25,7 @@ from quantinuum_schemas.models.backend_config import (
     SeleneConfig,
     SelenePlusConfig,
 )
+from scipy.stats import unitary_group
 
 import qnexus as qnx
 from qnexus.client.auth import login_no_interaction
@@ -545,6 +547,35 @@ def test_circuit() -> Circuit:
         circuit.CX(i, j)
     circuit.measure_all()
     return circuit
+
+
+@pytest.fixture()
+def test_qv_circuit() -> Circuit:
+    """A Quantum Volume pytket circuit.
+
+    Note: see https://docs.quantinuum.com/systems/trainings/h2/getting_started/parameterized_angle_2_qubit_gates.html#quantum-volume-test
+    """
+
+    def haar_random_su4_box() -> CircBox:
+        """Returns a CircBox that decomposes a random general SU(4) unitary
+        into a circuit of 2 qubits distributed with the Haar Measure."""
+        r = unitary_group.rvs(dim=4)
+        r[0, :] /= np.linalg.det(r)
+        circuit = Circuit(2)
+        box = Unitary2qBox(r)
+        circuit.add_unitary2qbox(box, 0, 1)
+        return CircBox(circuit)
+
+    qv_circuit_size = 6
+    qv_circuit = Circuit(qv_circuit_size)
+    for _ in range(qv_circuit_size):
+        permutation = np.random.permutation(len(qv_circuit.qubits))
+        for i in range(0, qv_circuit_size, 2):
+            box = haar_random_su4_box()
+            qv_circuit.add_circbox(box, [permutation[i], permutation[i + 1]])
+    qv_circuit.measure_all()
+
+    return qv_circuit
 
 
 def _get_or_create_circuit(
