@@ -2,6 +2,22 @@
 
 # `qnexus` Release Notes
 
+## v0.42.0 (2026-03-31)
+
+
+### Added
+
+- Improved job wait_for strategies (#318).
+- Ability to fetch input programs for incompletejobitemrefs (#325).
+- Job results will now return partial results by default (allow_incomplete=true) (#324).
+
+
+### Fixed
+
+- Validation error for quota model (#311).
+- Add last_status_detail to jobrefs after submission (#321).
+
+
 ## v0.41.1 (2026-02-19)
 
 

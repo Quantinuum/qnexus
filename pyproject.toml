@@ -1,6 +1,6 @@
 [project]
 name = "qnexus"
-version = "0.41.1"
+version = "0.42.0"
 description = "Quantinuum Nexus python client."
 authors = [
     {name = "Vanya Eccles", email = "vanya.eccles@quantinuum.com"},
