@@ -18,7 +18,7 @@ from websockets.asyncio.client import connect, process_exception
 from websockets.exceptions import ConnectionClosed
 
 import qnexus.exceptions as qnx_exc
-from qnexus.client import get_nexus_client
+from qnexus.client import AuthHandler, get_nexus_client
 from qnexus.client.jobs import _compile, _execute
 from qnexus.client.nexus_iterator import NexusIterator
 from qnexus.client.utils import accept_circuits_for_programs, handle_fetch_errors
@@ -128,41 +128,49 @@ class WebsocketStrategy(WaitStrategy):
                 return exc
             return process_exception(exc)
 
-        additional_headers = {
-            # TODO, this cookie will expire frequently
-            "Cookie": f"myqos_id={get_nexus_client().auth.cookies.get('myqos_id')}"  # type: ignore
-        }
-        logger.debug("Job %s: opening websocket connection", job.id)
-        async for websocket in connect(
-            f"{CONFIG.websockets_url}/api/jobs/v1beta3/{job.id}/attributes/status/ws",
-            ssl=ssl_context,
-            additional_headers=additional_headers,
-            process_exception=_process_exception,
-            logger=logger,
-        ):
-            try:
-                async for status_json in websocket:
-                    job_status = JobStatus.from_dict(json.loads(status_json))
-                    logger.debug(
-                        "Job %s websocket update: %s",
-                        job.id,
-                        job_status.status.value,
-                    )
+        auth_handler = cast(AuthHandler, get_nexus_client().auth)
 
-                    if self._finished(job_status):
-                        break
+        def _get_headers() -> dict[str, str]:
+            token = auth_handler.cookies.get("myqos_id")
+            return {"Cookie": f"myqos_id={token}"}
+
+        logger.debug("Job %s: opening websocket connection", job.id)
+        while True:
+            try:
+                async with connect(
+                    f"{CONFIG.websockets_url}/api/jobs/v1beta3/{job.id}/attributes/status/ws",
+                    ssl=ssl_context,
+                    additional_headers=_get_headers(),
+                    process_exception=_process_exception,
+                    logger=logger,
+                ) as websocket:
+                    async for status_json in websocket:
+                        job_status = JobStatus.from_dict(json.loads(status_json))
+                        logger.debug(
+                            "Job %s websocket update: %s",
+                            job.id,
+                            job_status.status.value,
+                        )
+
+                        if self._finished(job_status):
+                            break
                 break
             except ConnectionClosed:
                 logger.debug(
-                    "Job %s: websocket connection closed, attempting to reconnect",
+                    "Job %s: websocket connection closed, refreshing token "
+                    "and attempting to reconnect",
                     job.id,
                 )
-                continue
-            finally:
                 try:
-                    await websocket.close(code=1000, reason="Client closed connection")
-                except GeneratorExit:
-                    pass
+                    auth_handler.refresh_id_token()
+                except Exception:
+                    logger.warning(
+                        "Job %s: token refresh failed, reconnecting with "
+                        "existing token",
+                        job.id,
+                        exc_info=True,
+                    )
+                continue
 
         return job_status
 
