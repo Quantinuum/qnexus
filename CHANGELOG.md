@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.42.1 (2026-04-08)
+
+
+### Fixed
+
+- Refresh auth tokens in the websocket flow (#330).
+
+
 ## v0.42.0 (2026-03-31)
 
 
