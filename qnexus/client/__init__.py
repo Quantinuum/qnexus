@@ -99,6 +99,47 @@ class AuthHandler(httpx.Auth):
             headers={VERSION_HEADER: VERSION},
         )
 
+    def refresh_id_token(self) -> None:
+        """Refresh the myqos_id token using the refresh token.
+
+        Sends a refresh request to the auth endpoint using the stored
+        myqos_oat cookie, updates the in-memory cookies and persists
+        the new access token to the filesystem.
+
+        Returns:
+            The new myqos_id token value.
+
+        Raises:
+            AuthenticationError: If no refresh token is available or
+                the refresh request fails.
+        """
+        if self.cookies.get("myqos_oat") is None:
+            try:
+                token = read_token("refresh_token")
+                self.cookies.set("myqos_oat", token, domain=CONFIG.domain)
+            except FileNotFoundError as exc:
+                raise AuthenticationError(
+                    "Not authenticated. Please run `qnx login` in your terminal."
+                ) from exc
+
+        response = httpx.post(
+            f"{CONFIG.url}/auth/tokens/refresh",
+            cookies=self.cookies,
+            headers={VERSION_HEADER: VERSION},
+            verify=CONFIG.httpx_verify,
+        )
+
+        if response.status_code == 401:
+            raise AuthenticationError(
+                "Not authenticated. Please run `qnx login` in your terminal."
+            )
+        response.raise_for_status()
+
+        self.cookies.extract_cookies(response)
+
+        new_token = self.cookies.get("myqos_id", domain=CONFIG.domain) or ""
+        write_token("access_token", new_token)
+
 
 _nexus_client: httpx.Client | None = None
 
