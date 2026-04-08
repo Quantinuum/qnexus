@@ -14,8 +14,8 @@ from uuid import UUID
 import httpx
 from quantinuum_schemas.models.backend_config import config_name_to_class
 from quantinuum_schemas.models.hypertket_config import HyperTketConfig
-from websockets.asyncio.client import connect, process_exception
-from websockets.exceptions import ConnectionClosed
+from websockets.asyncio.client import connect
+from websockets.exceptions import ConnectionClosed, InvalidMessage, InvalidStatus
 
 import qnexus.exceptions as qnx_exc
 from qnexus.client import AuthHandler, get_nexus_client
@@ -69,6 +69,7 @@ from qnexus.models.utils import assert_never
 logger = logging.getLogger(__name__)
 
 EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
+WS_SERVER_RETRY_TIMEOUT = 5
 
 
 class RemoteRetryStrategy(str, Enum):
@@ -117,22 +118,21 @@ class WebsocketStrategy(WaitStrategy):
 
         ssl_context = httpx.create_ssl_context(verify=CONFIG.httpx_verify)
 
-        def _process_exception(exc: Exception) -> Exception | None:
-            """Utility wrapper around process_exception that tells the websockets
-            library not to auto-retry SSLErrors as they are usually not recoverable.
-
-            Unfortunately SSLError inherits from OSError which websockets will always
-            retried when `connect` is used in an async for loop.
-            """
-            if isinstance(exc, ssl.SSLError):
-                return exc
-            return process_exception(exc)
-
         auth_handler = cast(AuthHandler, get_nexus_client().auth)
 
         def _get_headers() -> dict[str, str]:
             token = auth_handler.cookies.get("myqos_id")
             return {"Cookie": f"myqos_id={token}"}
+
+        def _refresh_token() -> None:
+            try:
+                auth_handler.refresh_id_token()
+            except Exception:
+                logger.warning(
+                    "Job %s: token refresh failed, reconnecting with existing token",
+                    job.id,
+                    exc_info=True,
+                )
 
         logger.debug("Job %s: opening websocket connection", job.id)
         while True:
@@ -141,7 +141,6 @@ class WebsocketStrategy(WaitStrategy):
                     f"{CONFIG.websockets_url}/api/jobs/v1beta3/{job.id}/attributes/status/ws",
                     ssl=ssl_context,
                     additional_headers=_get_headers(),
-                    process_exception=_process_exception,
                     logger=logger,
                 ) as websocket:
                     async for status_json in websocket:
@@ -156,21 +155,39 @@ class WebsocketStrategy(WaitStrategy):
                             break
                 break
             except ConnectionClosed:
-                logger.debug(
-                    "Job %s: websocket connection closed, refreshing token "
-                    "and attempting to reconnect",
-                    job.id,
-                )
-                try:
-                    auth_handler.refresh_id_token()
-                except Exception:
-                    logger.warning(
-                        "Job %s: token refresh failed, reconnecting with "
-                        "existing token",
+                logger.debug("Job %s: connection closed, refreshing token", job.id)
+                _refresh_token()
+            except InvalidStatus as exc:
+                if exc.response.status_code in (401, 403):
+                    logger.debug(
+                        "Job %s: auth rejected (HTTP %s), refreshing token",
                         job.id,
-                        exc_info=True,
+                        exc.response.status_code,
                     )
-                continue
+                    _refresh_token()
+                elif exc.response.status_code in (500, 502, 503, 504):
+                    logger.debug(
+                        "Job %s: server error (HTTP %s), retrying",
+                        job.id,
+                        exc.response.status_code,
+                    )
+                    await asyncio.sleep(WS_SERVER_RETRY_TIMEOUT)
+                else:
+                    raise
+            except (OSError, TimeoutError) as exc:
+                if isinstance(exc, ssl.SSLError):
+                    raise
+                logger.debug(
+                    "Job %s: connection failed (%s), retrying",
+                    job.id,
+                    exc,
+                )
+                await asyncio.sleep(WS_SERVER_RETRY_TIMEOUT)
+            except InvalidMessage as exc:
+                if not isinstance(exc.__cause__, EOFError):
+                    raise
+                logger.debug("Job %s: incomplete response, retrying", job.id)
+                await asyncio.sleep(WS_SERVER_RETRY_TIMEOUT)
 
         return job_status
 
