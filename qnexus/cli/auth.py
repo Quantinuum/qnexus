@@ -1,14 +1,16 @@
 """CLI for qnexus."""
 
+from typing import Any
+
 import click
 
 from ..client import auth as _auth
 
 
 @click.command()
-def login() -> None:
+def login(**kwargs: Any) -> None:
     """Log in to quantinuum nexus using your web browser."""
-    click.echo(_auth.login())  # type: ignore[func-returns-value]
+    click.echo(_auth.login(**kwargs))  # type: ignore[func-returns-value]
 
 
 @click.command()
