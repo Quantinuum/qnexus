@@ -23,6 +23,7 @@ from qnexus.client import (
 )
 from qnexus.client.utils import consolidate_error, read_token, remove_token, write_token
 from qnexus.config import CONFIG
+from qnexus.models.region import Region, get_hostname
 
 console = Console()
 
@@ -76,13 +77,20 @@ def _get_auth_client() -> httpx.Client:
     )
 
 
-def login(force: bool = False) -> None:
+def login(force: bool = False, region: Region | None = None) -> None:
     """
     Log in to Quantinuum Nexus using the web browser.
 
     (if web browser can't be launched, displays the link)
     """
-    if not force and is_logged_in():
+    different_domain = False
+    if region is not None:
+        domain = get_hostname(region)
+        if domain != CONFIG.domain:
+            different_domain = True
+            CONFIG.domain = domain
+
+    if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
         return
 
@@ -165,9 +173,16 @@ def login(force: bool = False) -> None:
     raise qnx_exc.AuthenticationError("Browser login Failed, code has expired.")
 
 
-def login_with_credentials(force: bool = False) -> None:
+def login_with_credentials(force: bool = False, region: Region | None = None) -> None:
     """Log in to Nexus using a username and password."""
-    if not force and is_logged_in():
+    different_domain = False
+    if region is not None:
+        domain = get_hostname(region)
+        if domain != CONFIG.domain:
+            different_domain = True
+            CONFIG.domain = domain
+
+    if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
         return
     user_name = input("Enter your Nexus email: ")
@@ -178,11 +193,20 @@ def login_with_credentials(force: bool = False) -> None:
     print(f"✅ Successfully logged in as {user_name}.")
 
 
-def login_no_interaction(user: EmailStr, pwd: str, force: bool = False) -> None:
+def login_no_interaction(
+    user: EmailStr, pwd: str, force: bool = False, region: Region | None = None
+) -> None:
     """Log in to Nexus using a username and password.
     Please be careful with storing credentials in plain text or source code.
     """
-    if not force and is_logged_in():
+    different_domain = False
+    if region is not None:
+        domain = get_hostname(region)
+        if domain != CONFIG.domain:
+            different_domain = True
+            CONFIG.domain = domain
+
+    if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
         return
     _request_tokens(user=user, pwd=pwd)
