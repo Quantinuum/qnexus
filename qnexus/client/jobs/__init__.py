@@ -774,7 +774,6 @@ def compile(
     optimisation_level: int = 2,
     credential_name: str | None = None,
     user_group: str | None = None,
-    target_region: Region | None = None,
     hypertket_config: HyperTketConfig | None = None,
     timeout: float | None = 300.0,
 ) -> DataframableList[CircuitRef]:
@@ -795,7 +794,6 @@ def compile(
         optimisation_level=optimisation_level,
         credential_name=credential_name,
         user_group=user_group,
-        target_region=target_region,
         hypertket_config=hypertket_config,
     )
 
