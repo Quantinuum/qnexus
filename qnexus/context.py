@@ -9,6 +9,7 @@ from typing import Any, Callable, Generator, ParamSpec, TypeVar
 
 from qnexus.models.annotations import PropertiesDict
 from qnexus.models.references.projects import ProjectRef
+from qnexus.models.region import Region
 from qnexus.models.scope import ScopeFilterEnum
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,9 @@ _QNEXUS_PROPERTIES: ContextVar[PropertiesDict | None] = ContextVar(
 )
 _QNEXUS_SCOPE: ContextVar[ScopeFilterEnum] = ContextVar(
     "qnexus_scope", default=ScopeFilterEnum.USER
+)
+_QNEXUS_TARGET_REGION: ContextVar[Region | None] = ContextVar(
+    "qnexus_target_region", default=None
 )
 
 
@@ -37,6 +41,11 @@ def deactivate_properties(token: Token[PropertiesDict | None]) -> None:
 def deactivate_scope(token: Token[ScopeFilterEnum]) -> None:
     """Deactivate the current API Scope filter."""
     _QNEXUS_SCOPE.reset(token)
+
+
+def deactivate_target_region(token: Token[Region | None]) -> None:
+    """Deactivate the current target region."""
+    _QNEXUS_TARGET_REGION.reset(token)
 
 
 def get_active_project(project_required: bool = False) -> ProjectRef | None:
@@ -99,6 +108,11 @@ def get_active_scope() -> ScopeFilterEnum:
     return _QNEXUS_SCOPE.get()
 
 
+def get_active_target_region() -> Region | None:
+    """Get the currently active target region."""
+    return _QNEXUS_TARGET_REGION.get()
+
+
 def set_active_project_token(project: ProjectRef) -> Token[ProjectRef | None]:
     """Globally set a project as active,
     returning a Token to the ProjectRef in the context."""
@@ -123,6 +137,21 @@ def set_active_scope(
 ) -> None:
     """Globally set an API Scope filter as active."""
     set_active_scope_token(scope)
+
+
+def set_active_target_region_token(
+    target_region: Region,
+) -> Token[Region | None]:
+    """Globally set a target region as active,
+    returning a Token to the Region in the context."""
+    return _QNEXUS_TARGET_REGION.set(target_region)
+
+
+def set_active_target_region(
+    target_region: Region,
+) -> None:
+    """Globally set a target region as active."""
+    set_active_target_region_token(target_region)
 
 
 def update_active_properties_token(
@@ -198,6 +227,18 @@ def using_scope(
         _QNEXUS_SCOPE.reset(token)
 
 
+@contextmanager
+def using_target_region(
+    target_region: Region,
+) -> Generator[None, None, None]:
+    """Attach a target region to the current context."""
+    token = _QNEXUS_TARGET_REGION.set(target_region)
+    try:
+        yield
+    finally:
+        _QNEXUS_TARGET_REGION.reset(token)
+
+
 P = ParamSpec("P")
 T = TypeVar("T")
 
@@ -247,3 +288,25 @@ def merge_scope_from_context(func: Callable[P, T]) -> Callable[P, T]:
         return func(*args, **kwargs)
 
     return get_scope_from_context
+
+
+def merge_target_region_from_context(func: Callable[P, T]) -> Callable[P, T]:
+    """Decorator to merge a target region from the context.
+    Target region in kwargs takes precedence (will be selected)."""
+
+    sig = inspect.signature(func)
+
+    @wraps(func)
+    def get_target_region_from_context(*args: Any, **kwargs: Any) -> T:
+        # Check if 'target_region' is already provided as positional or keyword
+        bound_args = sig.bind_partial(*args, **kwargs)
+        if (
+            "target_region" not in bound_args.arguments
+            or bound_args.arguments["target_region"] is None
+        ):
+            kwargs["target_region"] = kwargs.get("target_region", None)
+            if kwargs["target_region"] is None:
+                kwargs["target_region"] = get_active_target_region()
+        return func(*args, **kwargs)
+
+    return get_target_region_from_context

@@ -63,6 +63,7 @@ from qnexus.models.references import (
     SystemRef,
     WasmModuleRef,
 )
+from qnexus.models.region import Region
 from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never
 
@@ -830,6 +831,7 @@ def execute(
     language: Language = Language.AUTO,
     credential_name: str | None = None,
     user_group: str | None = None,
+    target_region: Region | None = None,
     timeout: float | None = 300.0,
     max_cost: float | list[float] | list[None] = list(),
     n_qubits: int | list[int] | list[None] = list(),
@@ -855,6 +857,7 @@ def execute(
         language=language,
         credential_name=credential_name,
         user_group=user_group,
+        target_region=target_region,
         max_cost=max_cost,
         n_qubits=n_qubits,
     )
