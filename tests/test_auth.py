@@ -4,6 +4,7 @@ N.B. these manipulate environment variables so currently run in isolation via sc
 """
 
 from typing import Any, Generator
+from unittest import mock
 from uuid import uuid4
 
 import httpx
@@ -117,6 +118,56 @@ def test_token_refresh_expired() -> None:
 
     assert list_project_route.called
     assert refresh_token_route.called
+
+
+@respx.mock
+def test_login_region_sg_uses_sg_domain_and_does_not_short_circuit() -> None:
+    """`login(region="sg")` should target SG auth endpoints and bypass already-logged-in short-circuit."""
+    original_domain = CONFIG.domain
+
+    try:
+        sg_domain = "nexus.quantinuum.sg"
+
+        device_auth_route = respx.post(
+            f"https://{sg_domain}:443/auth/device/device_authorization"
+        ).mock(
+            return_value=httpx.Response(
+                status_code=200,
+                json={
+                    "user_code": "ABC-123",
+                    "device_code": "device-code",
+                    "verification_uri_complete": "https://example.com/verify",
+                    "expires_in": 2,
+                    "interval": 1,
+                },
+            )
+        )
+        token_route = respx.post(f"https://{sg_domain}:443/auth/device/token").mock(
+            return_value=httpx.Response(
+                status_code=200,
+                json={
+                    "refresh_token": "dummy_oat",
+                    "access_token": "dummy_id",
+                    "email": "user@example.com",
+                },
+            )
+        )
+
+        with (
+            mock.patch(
+                "qnexus.client.auth.is_logged_in", return_value=True
+            ) as is_logged_in,
+            mock.patch("qnexus.client.auth.webbrowser.open", return_value=True),
+            mock.patch("qnexus.client.auth.time.sleep", return_value=None),
+        ):
+            qnx.login(region="sg")
+
+        assert CONFIG.domain == sg_domain
+        assert device_auth_route.called
+        assert token_route.called
+        assert is_logged_in.call_count == 0
+    finally:
+        CONFIG.domain = original_domain
 
 
 def test_nexus_client_reloads_tokens() -> None:

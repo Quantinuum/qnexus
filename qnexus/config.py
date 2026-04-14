@@ -1,7 +1,18 @@
 """Quantinuum Nexus API client configuration via pydantic-settings."""
 
+import os
+
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _resolve_env_file() -> str:
+    """Resolve the settings env file path.
+
+    Supports an explicit override via ``NEXUS_CONFIG_FILE`` and defaults to
+    ``~/.qnexus/config``.
+    """
+    return os.path.expanduser(os.getenv("NEXUS_CONFIG_FILE", "~/.qnexus/config"))
 
 
 class Config(BaseSettings):
@@ -9,7 +20,10 @@ class Config(BaseSettings):
 
     Uses pydantic-settings to read environment variables for qnexus configuration."""
 
-    model_config = SettingsConfigDict(env_prefix="NEXUS_")
+    model_config = SettingsConfigDict(
+        env_prefix="NEXUS_",
+        env_file=_resolve_env_file(),
+    )
 
     # web
     protocol: str = "https"
