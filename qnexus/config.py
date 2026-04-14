@@ -1,5 +1,6 @@
 """Quantinuum Nexus API client configuration via pydantic-settings."""
 
+from pathlib import Path
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -24,6 +25,14 @@ class Config(BaseSettings):
     # auth
     store_tokens: bool = True  # Not implemented
     token_path: str = ".qnx/auth"
+    absolute_token_path: str | None = None
+
+    @property
+    def resolved_token_path(self) -> Path:
+        """Resolve token path from token_path and absolute_token_path."""
+        if self.absolute_token_path is not None:
+            return Path(self.absolute_token_path)
+        return Path(Path.home(), self.token_path)
 
     # testing
     qa_user_email: str = ""
