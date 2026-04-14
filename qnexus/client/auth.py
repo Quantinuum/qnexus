@@ -77,18 +77,26 @@ def _get_auth_client() -> httpx.Client:
     )
 
 
+def _update_domain_for_region(region: Region | None) -> bool:
+    """Update configured domain for a region and report whether it changed."""
+    if region is None:
+        return False
+
+    domain = get_hostname(region)
+    if domain != CONFIG.domain:
+        CONFIG.domain = domain
+        return True
+
+    return False
+
+
 def login(force: bool = False, region: Region | None = None) -> None:
     """
     Log in to Quantinuum Nexus using the web browser.
 
     (if web browser can't be launched, displays the link)
     """
-    different_domain = False
-    if region is not None:
-        domain = get_hostname(region)
-        if domain != CONFIG.domain:
-            different_domain = True
-            CONFIG.domain = domain
+    different_domain = _update_domain_for_region(region)
 
     if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
@@ -175,12 +183,7 @@ def login(force: bool = False, region: Region | None = None) -> None:
 
 def login_with_credentials(force: bool = False, region: Region | None = None) -> None:
     """Log in to Nexus using a username and password."""
-    different_domain = False
-    if region is not None:
-        domain = get_hostname(region)
-        if domain != CONFIG.domain:
-            different_domain = True
-            CONFIG.domain = domain
+    different_domain = _update_domain_for_region(region)
 
     if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
@@ -199,12 +202,7 @@ def login_no_interaction(
     """Log in to Nexus using a username and password.
     Please be careful with storing credentials in plain text or source code.
     """
-    different_domain = False
-    if region is not None:
-        domain = get_hostname(region)
-        if domain != CONFIG.domain:
-            different_domain = True
-            CONFIG.domain = domain
+    different_domain = _update_domain_for_region(region)
 
     if not force and not different_domain and is_logged_in():
         print("Already logged in. Tokens are valid.")
