@@ -16,6 +16,7 @@ from qnexus.context import (
     get_active_project,
     merge_properties_from_context,
     merge_scope_from_context,
+    merge_target_region_from_context,
 )
 from qnexus.models import BackendConfig, StoredBackendInfo, to_pytket_backend_info
 from qnexus.models.annotations import Annotations, CreateAnnotations, PropertiesDict
@@ -38,12 +39,14 @@ from qnexus.models.references import (
     ResultVersions,
     WasmModuleRef,
 )
+from qnexus.models.region import Region
 from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never, truncate_to_2dp
 
 
 @accept_circuits_for_programs
 @merge_properties_from_context
+@merge_target_region_from_context
 def start_execute_job(
     programs: ExecutionProgram | list[ExecutionProgram],
     n_shots: int | list[int] | list[None],
@@ -58,6 +61,7 @@ def start_execute_job(
     wasm_module: WasmModuleRef | None = None,
     gpu_decoder_config: GpuDecoderConfigRef | None = None,
     user_group: str | None = None,
+    target_region: Region | None = None,
     max_cost: float | list[float] | list[None] = list(),
     n_qubits: int | list[int] | list[None] = list(),
 ) -> ExecuteJobRef:
@@ -116,6 +120,7 @@ def start_execute_job(
                 "job_definition_type": "execute_job_definition",
                 "backend_config": backend_config.model_dump(exclude_none=True),
                 "user_group": user_group,
+                "target_region": target_region,
                 "valid_check": valid_check,
                 "language": (
                     language.value if isinstance(language, Language) else language

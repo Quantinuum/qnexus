@@ -9,20 +9,26 @@ import pytest
 from qnexus.context import (
     deactivate_project,
     deactivate_scope,
+    deactivate_target_region,
     get_active_project,
     get_active_properties,
     get_active_scope,
+    get_active_target_region,
     merge_project_from_context,
     merge_properties_from_context,
     merge_scope_from_context,
+    merge_target_region_from_context,
     set_active_project_token,
     set_active_scope_token,
+    set_active_target_region_token,
     using_project,
     using_properties,
     using_scope,
+    using_target_region,
 )
 from qnexus.models.annotations import Annotations, PropertiesDict
 from qnexus.models.references import ProjectRef
+from qnexus.models.region import Region
 from qnexus.models.scope import ScopeFilterEnum
 
 
@@ -246,3 +252,57 @@ def test_merge_scope_from_context() -> None:
         # kwarg takes precedence
         returned_scope = func_wants_scope(scope=other_scope)
         assert returned_scope == other_scope
+
+
+def test_attach_target_region() -> None:
+    """Test that we can set a target region in the global context."""
+
+    chosen_region: Region = "sg"
+    token = set_active_target_region_token(chosen_region)
+
+    ctx_region = get_active_target_region()
+
+    assert chosen_region == ctx_region
+
+    deactivate_target_region(token)
+
+    assert get_active_target_region() is None
+
+
+def test_attach_target_region_context_manager() -> None:
+    """Test that we can set a target region via a context manager."""
+
+    chosen_region: Region = "sg"
+
+    with using_target_region(target_region=chosen_region):
+        ctx_region = get_active_target_region()
+
+        assert chosen_region == ctx_region
+
+    assert get_active_target_region() is None
+
+
+def test_merge_target_region_from_context() -> None:
+    """Test the decorator for merging a target region from context or function arguments."""
+
+    chosen_region: Region = "sg"
+
+    @merge_target_region_from_context
+    def func_wants_target_region(target_region: Region | None = None) -> Region | None:
+        """Dummy function for testing target region merge behavior."""
+        return target_region
+
+    default_region = func_wants_target_region()
+    assert default_region is None
+
+    returned_region = func_wants_target_region(target_region=chosen_region)
+    assert returned_region == chosen_region
+
+    with using_target_region(target_region=chosen_region):
+        returned_region = func_wants_target_region()
+        assert returned_region == chosen_region
+
+    with using_target_region(target_region="sg"):
+        # kwarg takes precedence
+        returned_region = func_wants_target_region(target_region="us")
+        assert returned_region == "us"
