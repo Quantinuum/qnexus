@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.43.0 (2026-04-14)
+
+
+### Added
+
+- Add target region support in job execution and context management (#334).
+- Add region support for login and configuration management (#333).
+
 ## v0.42.1 (2026-04-08)
 
 
