@@ -21,7 +21,7 @@ dependencies = [
     "pytket >=2.3.1, <3.0",
     "websockets >11, <16",
     "pydantic-settings >=2, <3.0",
-    "quantinuum-schemas>=7.6.0, <8.0",
+    "quantinuum-schemas @ git+https://github.com/quantinuum-dev/quantinuum-schemas.git@main",
     "hugr >=0.14.0, <1.0.0",
     "pyjwt>=2.10.1,<3.0.0",
 ]
@@ -67,8 +67,8 @@ qnx = "qnexus.cli:entrypoint"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-package = true
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
