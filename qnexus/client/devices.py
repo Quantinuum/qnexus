@@ -170,7 +170,7 @@ def _get_backend_property(
     res = get_nexus_client().post(
         "/api/v5/backend_info/backend_property",
         json={
-            "backend_config": backend_config.model_dump(),
+            "backend_config": backend_config.model_dump(mode="json"),
             "property": backend_property,
         },
     )
