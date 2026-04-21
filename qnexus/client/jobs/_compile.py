@@ -70,7 +70,7 @@ def start_compile_job(
             "job_type": "compile",
             "definition": {
                 "job_definition_type": "compile_job_definition",
-                "backend_config": backend_config.model_dump(),
+                "backend_config": backend_config.model_dump(mode="json"),
                 "user_group": user_group,
                 "hypertket_config": hypertket_config.model_dump()
                 if hypertket_config is not None
