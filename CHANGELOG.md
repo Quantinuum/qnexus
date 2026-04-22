@@ -2,6 +2,15 @@
 
 # `qnexus` Release Notes
 
+## v0.43.1 (2026-04-22)
+
+
+### Fixed
+
+- Avoid crashes when serialising backend configs (#338).
+- Don't crash when encoding configs with attribs that are uuids (#337).
+
+
 ## v0.43.0 (2026-04-14)
 
 
