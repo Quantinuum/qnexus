@@ -1,0 +1,3 @@
+# use linguist generated to ignore wasm and hugr files
+*.wasm linguist-generated=true
+*.hugr linguist-generated=true
