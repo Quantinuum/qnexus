@@ -484,9 +484,7 @@ def qa_qir_bitcode_fixture(test_circuit: Circuit, test_case_name: str) -> bytes:
 
 @pytest.fixture(name="qa_gpu_decoder_config")
 def qa_gpu_decoder_config_fixture() -> str:
-    gpu_decoder_config_path = Path(
-        "tests/data/gpu_decoder_config.yaml"
-    ).resolve()
+    gpu_decoder_config_path = Path("tests/data/gpu_decoder_config.yaml").resolve()
     with open(gpu_decoder_config_path) as fp:
         return fp.read()
 
