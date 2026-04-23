@@ -471,7 +471,7 @@ def qa_hugr_package_fixture() -> Package:
 
 @pytest.fixture(name="qa_wasm_module")
 def qa_wasm_module_fixture() -> WasmFileHandler:
-    wasm_path = Path("examples/basics/data/add_one.wasm").resolve()
+    wasm_path = Path("tests/data/add_one.wasm").resolve()
     return WasmFileHandler(filepath=str(wasm_path))
 
 
@@ -484,9 +484,7 @@ def qa_qir_bitcode_fixture(test_circuit: Circuit, test_case_name: str) -> bytes:
 
 @pytest.fixture(name="qa_gpu_decoder_config")
 def qa_gpu_decoder_config_fixture() -> str:
-    gpu_decoder_config_path = Path(
-        "examples/basics/data/gpu_decoder_config.yaml"
-    ).resolve()
+    gpu_decoder_config_path = Path("tests/data/gpu_decoder_config.yaml").resolve()
     with open(gpu_decoder_config_path) as fp:
         return fp.read()
 
