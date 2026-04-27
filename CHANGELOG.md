@@ -2,6 +2,18 @@
 
 # `qnexus` Release Notes
 
+## v0.43.1 (2026-04-27)
+
+### Added
+
+- `batch_id` attribute added to `QuantinuumConfig` and `HeliosConfig` to allow jobs' items to be put into batches on Quantinuum Systems hardware.
+
+### Fixed
+
+- Avoid crashes when serialising backend configs (#338).
+- Don't crash when encoding configs with attribs that are uuids (#337).
+- `max_batch_cost` no longer defaults to 2000 HQC.
+
 ## v0.43.0 (2026-04-14)
 
 
