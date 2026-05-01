@@ -36,7 +36,7 @@ class Config(BaseSettings):
     httpx_verify: bool = True
 
     # auth
-    store_tokens: bool = True  # Not implemented
+    store_tokens: bool = True
     token_path: str = ".qnx/auth"
 
     # testing

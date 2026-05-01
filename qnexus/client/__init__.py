@@ -48,6 +48,30 @@ class AuthHandler(httpx.Auth):
         except FileNotFoundError:
             pass
 
+    def set_tokens(self, refresh_token: str) -> None:
+        """Inject a refresh token and obtain an access token in-memory.
+
+        The refresh token is set on the handler's cookies and immediately
+        exchanged for a fresh access token via the server.  No tokens are
+        written to disk regardless of ``CONFIG.store_tokens``.
+
+        Raises:
+            AuthenticationError: If the refresh token is invalid or expired.
+        """
+        self.cookies.clear()
+        self.cookies.set("myqos_oat", refresh_token, domain=CONFIG.domain)
+
+        response = httpx.post(
+            f"{CONFIG.url}/auth/tokens/refresh",
+            cookies=self.cookies,
+            headers={VERSION_HEADER: VERSION},
+            verify=CONFIG.httpx_verify,
+        )
+        if response.status_code == 401:
+            raise AuthenticationError("Refresh token is invalid or expired.")
+        response.raise_for_status()
+        self.cookies.extract_cookies(response)
+
     def auth_flow(
         self, request: httpx.Request
     ) -> typing.Generator[httpx.Request, httpx.Response, None]:
