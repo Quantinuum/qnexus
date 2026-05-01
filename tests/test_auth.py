@@ -222,3 +222,75 @@ def test_nexus_client_reloads_domain() -> None:
     assert domain_two not in str(client_one.base_url)
     # client_two getter should reload the client
     assert domain_two in str(client_two.base_url)
+
+
+@respx.mock
+def test_login_with_token_sets_cookies_in_memory() -> None:
+    """Test that login_with_token injects the refresh token and exchanges it
+    for an access token, all held in memory on the client's auth handler."""
+
+    alice_refresh = "alice_refresh"
+    alice_access = "alice_access"
+
+    # Mock the refresh endpoint to return an access token cookie
+    refresh_route = respx.post(f"{CONFIG.url}/auth/tokens/refresh").mock(
+        return_value=httpx.Response(
+            200,
+            headers={
+                "set-cookie": f"myqos_id={alice_access}; "
+                "HttpOnly; Path=/; SameSite=Lax; Secure"
+            },
+        )
+    )
+
+    qnx.login_with_token(alice_refresh)
+
+    client = get_nexus_client()
+    assert refresh_route.called
+    assert client.auth.cookies.get("myqos_oat") == alice_refresh  # type: ignore
+    assert client.auth.cookies.get("myqos_id") == alice_access  # type: ignore
+
+
+@respx.mock
+def test_login_with_token_swap_between_accounts() -> None:
+    """Test hot-swapping between two accounts using login_with_token.
+
+    After each swap the client should hold only the most recent account's tokens."""
+
+    alice_refresh = "alice_refresh"
+    alice_access = "alice_access"
+    bob_refresh = "bob_refresh"
+    bob_access = "bob_access"
+
+    refresh_route = respx.post(f"{CONFIG.url}/auth/tokens/refresh").mock(
+        side_effect=[
+            httpx.Response(
+                200,
+                headers={
+                    "set-cookie": f"myqos_id={alice_access}; "
+                    "HttpOnly; Path=/; SameSite=Lax; Secure"
+                },
+            ),
+            httpx.Response(
+                200,
+                headers={
+                    "set-cookie": f"myqos_id={bob_access}; "
+                    "HttpOnly; Path=/; SameSite=Lax; Secure"
+                },
+            ),
+        ]
+    )
+
+    # Swap to alice
+    qnx.login_with_token(alice_refresh)
+    client = get_nexus_client()
+    assert client.auth.cookies.get("myqos_oat") == alice_refresh  # type: ignore
+    assert client.auth.cookies.get("myqos_id") == alice_access  # type: ignore
+
+    # Swap to bob
+    qnx.login_with_token(bob_refresh)
+    client = get_nexus_client()
+    assert client.auth.cookies.get("myqos_oat") == bob_refresh  # type: ignore
+    assert client.auth.cookies.get("myqos_id") == bob_access  # type: ignore
+
+    assert refresh_route.call_count == 2
