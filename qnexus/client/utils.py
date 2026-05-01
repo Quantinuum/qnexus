@@ -42,7 +42,11 @@ def normalize_included(included: list[Any]) -> dict[str, dict[str, Any]]:
 
 def remove_token(token_type: TokenTypes) -> None:
     """Delete a token file."""
+    if not CONFIG.store_tokens:
+        return
 
+    # Don't try to delete refresh token in Jupyterhub
+    # these get mounted in automatically and managed externally
     if is_managed_token_environment() and token_type == "refresh_token":
         return
     token_file_path = Path.home() / CONFIG.token_path / token_file_from_type[token_type]
@@ -89,7 +93,11 @@ def read_token(token_type: TokenTypes) -> str:
 
 def write_token(token_type: TokenTypes, token: str) -> None:
     """Write a token to a file."""
+    if not CONFIG.store_tokens:
+        return
 
+    # Don't allow writing of refresh token in Jupyterhub
+    # these get mounted in automatically and managed externally
     if is_managed_token_environment() and token_type == "refresh_token":
         return
 
