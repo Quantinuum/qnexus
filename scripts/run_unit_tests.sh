@@ -9,6 +9,8 @@ uv run pytest tests/test_auth.py::test_nexus_client_reloads_tokens
 uv run pytest tests/test_auth.py::test_nexus_client_reloads_domain
 uv run pytest tests/test_auth.py::test_token_refresh_expired
 uv run pytest tests/test_auth.py::test_login_region_sg_uses_sg_domain_and_does_not_short_circuit
+uv run pytest tests/test_auth.py::test_login_with_token_sets_cookies_in_memory
+uv run pytest tests/test_auth.py::test_login_with_token_swap_between_accounts
 
 
 echo "Running non-auth tests"
