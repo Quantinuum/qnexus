@@ -51,10 +51,22 @@ def test_basic_backend_config_usage(
         qnx.jobs.wait_for(compile_job_ref)
 
         # Check the backend config as stored in Nexus matches the one specified
-        # QuantinuumConfig noisy_simulation flag getting reset in Nexus
-        assert backend_config.model_dump(exclude={"noisy_simulation"}) == qnx.jobs.get(
-            id=compile_job_ref.id
-        ).backend_config.model_dump(exclude={"noisy_simulation"})
+        # at job submission
+        stored_backend_config = qnx.jobs.get(id=compile_job_ref.id).backend_config
+
+        # NOTE: QuantinuumConfig noisy_simulation flag getting reset in Nexus
+        assert backend_config.model_dump(
+            exclude={"noisy_simulation", "max_batch_cost"}
+        ) == stored_backend_config.model_dump(
+            exclude={"noisy_simulation", "max_batch_cost"}
+        )
+        # NOTE: If we send `max_batch_cost=None` in the backend config,
+        #       then the org's value is used. We will only check that the
+        #       job's backend config is a float.
+        if isinstance(backend_config, qnx.QuantinuumConfig):
+            assert isinstance(
+                stored_backend_config.model_dump().get("max_batch_cost"), float
+            )
 
         execute_job_ref = qnx.start_execute_job(
             programs=[
