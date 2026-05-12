@@ -42,9 +42,8 @@ def normalize_included(included: list[Any]) -> dict[str, dict[str, Any]]:
 
 def remove_token(token_type: TokenTypes) -> None:
     """Delete a token file."""
-    # Don't try to delete refresh token in Jupyterhub
-    # these get mounted in automatically and managed externally
-    if is_jupyterhub_environment() and token_type == "refresh_token":
+
+    if is_managed_token_environment() and token_type == "refresh_token":
         return
     token_file_path = Path.home() / CONFIG.token_path / token_file_from_type[token_type]
     if token_file_path.exists():
@@ -91,9 +90,7 @@ def read_token(token_type: TokenTypes) -> str:
 def write_token(token_type: TokenTypes, token: str) -> None:
     """Write a token to a file."""
 
-    # Don't allow writing of refresh token in Jupyterhub
-    # these get mounted in automatically and managed externally
-    if is_jupyterhub_environment() and token_type == "refresh_token":
+    if is_managed_token_environment() and token_type == "refresh_token":
         return
 
     token_file_path = Path.home() / CONFIG.token_path
@@ -140,9 +137,9 @@ def handle_fetch_errors(res: Response) -> None:
         raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
 
 
-def is_jupyterhub_environment() -> bool:
-    """Check if the module is running in the Nexus JupyterHub."""
-    if os.environ.get("JUPYTERHUB_USER"):
+def is_managed_token_environment() -> bool:
+    """Check if the module is running in a managed token environment (e.g. Nexus JupyterHub)."""
+    if os.environ.get("NEXUS_MANAGED_TOKENS"):
         return True
     return False
 
