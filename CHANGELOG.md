@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.43.2 (2026-05-12)
+
+
+### Fixed
+
+- Use new `NEXUS_MANAGED_TOKENS` environment variable for managed token environments.
+
+
 ## v0.43.1 (2026-04-27)
 
 ### Added
