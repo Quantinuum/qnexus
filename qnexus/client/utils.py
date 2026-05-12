@@ -138,7 +138,8 @@ def handle_fetch_errors(res: Response) -> None:
 
 
 def is_managed_token_environment() -> bool:
-    """Check if the module is running in a managed token environment (e.g. Nexus JupyterHub)."""
+    """Check if the module is running in a managed token environment
+    (e.g. Nexus JupyterHub)."""
     if os.environ.get("NEXUS_MANAGED_TOKENS"):
         return True
     return False
