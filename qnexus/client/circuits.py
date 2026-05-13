@@ -314,6 +314,7 @@ def cost(
     backend_config: BackendConfig,
     syntax_checker: str | None = None,
     project: ProjectRef | None = None,
+    timeout: float | int | None = None,
 ) -> float | None:
     """Estimate the cost (in HQC) of running Circuit programs for n_shots
     number of shots on a Quantinuum H2 system.
@@ -371,6 +372,6 @@ def cost(
         project=project,
         name="Circuit cost estimation job",
     )
-    status = qnx.jobs.wait_for(job_ref)
+    status = qnx.jobs.wait_for(job_ref, timeout=timeout)
 
     return cast(float, status.cost)
