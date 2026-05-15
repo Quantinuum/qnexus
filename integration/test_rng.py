@@ -1,4 +1,4 @@
-"""Test submitting compiler options for compilation jobs."""
+"""Test RNG capabilities."""
 
 from typing import Callable, ContextManager
 
