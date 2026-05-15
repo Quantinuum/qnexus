@@ -3,14 +3,13 @@
 from typing import Callable, ContextManager
 
 import numpy as np
+from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Bit, Circuit
-from pytket.circuit.logic_exp import reg_eq
 
 import qnexus as qnx
 from qnexus.models.references import (
     CircuitRef,
     ExecutionResultRef,
-    BackendResult,
 )
 
 
@@ -57,7 +56,7 @@ def ints_from_pytket_shots(shots: np.ndarray) -> list[int]:
         List of integers, one per shot.
     """
     powers = 1 << np.arange(shots.shape[1])
-    return (shots @ powers).tolist()
+    return list(map(int, (shots @ powers).tolist()))
 
 
 def test_rng(
