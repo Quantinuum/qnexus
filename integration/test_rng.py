@@ -113,7 +113,7 @@ def test_rng(
                 )
                 execute_job_case3 = qnx.start_execute_job(
                     programs=[rng_circ_case3_ref],
-                    name=f"Same seed no index RNG job for {test_case_name}",
+                    name=f"Different seed no index RNG job for {test_case_name}",
                     project=my_proj,
                     backend_config=backend_config,
                     n_shots=[n_shots],
@@ -188,5 +188,5 @@ def test_rng(
                     )
 
                     assert rng1_A_numbers != rng3_numbers, (
-                        f"RNG numbers of {rng_reg_name} generated with a different seeds should be different."
+                        f"RNG numbers of {rng_reg_name} generated with a different seed should be different."
                     )
