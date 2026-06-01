@@ -69,6 +69,16 @@ def start_execute_job(
     Submit an execute job to be run in Nexus. Returns an ``ExecuteJobRef``
     object which can be used to check the job's status.  See ``qnexus.execute``
     for a utility method that waits for the results and returns them.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> execute_job_ref = qnx.jobs.execute(
+        ...     programs=hugr_ref,
+        ...     n_shots=1000,
+        ...     backend_config=qnx.models.HeliosConfig(system_name="Helios-1"),
+        ...     name="my-execute-job",
+        ...     max_cost=10.0,
+        ... )
     """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)

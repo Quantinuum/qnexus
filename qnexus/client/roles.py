@@ -51,7 +51,7 @@ def get(name: RoleName) -> Role:
 
     Examples:
         >>> import qnexus as qnx
-        >>> reader_role = qnx.roles.get("Reader")
+        >>> reader_role = qnx.roles.get("Maintainer")
     """
     for item in get_all():
         if item.name == name:
@@ -128,7 +128,7 @@ def assign_team(
 
     Examples:
         >>> import qnexus as qnx
-        >>> team = qnx.teams.get(name="my-team")
+        >>> team = qnx.teams.get(name="team-unobtainium")
         >>> qnx.roles.assign_team(project_ref, team=team, role="Contributor")
     """
     if isinstance(role, str):

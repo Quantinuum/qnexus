@@ -115,15 +115,7 @@ def get_active_target_region() -> Region | None:
 
 def set_active_project_token(project: ProjectRef) -> Token[ProjectRef | None]:
     """Globally set a project as active,
-    returning a Token to the ProjectRef in the context.
-
-    Examples:
-        >>> import qnexus as qnx
-        >>> project_ref = qnx.projects.get(name="my-project")
-        >>> token = qnx.context.set_active_project_token(project_ref)
-        >>> # Later, deactivate:
-        >>> qnx.context.deactivate_project(token)
-    """
+    returning a Token to the ProjectRef in the context."""
     return _QNEXUS_PROJECT.set(project)
 
 
@@ -142,15 +134,7 @@ def set_active_scope_token(
     scope: ScopeFilterEnum,
 ) -> Token[ScopeFilterEnum]:
     """Globally set an API Scope filter as active,
-    returning a Token to the ScopeFilterEnum in the context.
-
-    Examples:
-        >>> import qnexus as qnx
-        >>> from qnexus.models import ScopeFilterEnum
-        >>> token = qnx.context.set_active_scope_token(ScopeFilterEnum.ORG_ADMIN)
-        >>> # Later, deactivate:
-        >>> qnx.context.deactivate_scope(token)
-    """
+    returning a Token to the ScopeFilterEnum in the context."""
     return _QNEXUS_SCOPE.set(scope)
 
 
@@ -171,15 +155,7 @@ def set_active_target_region_token(
     target_region: Region,
 ) -> Token[Region | None]:
     """Globally set a target region as active,
-    returning a Token to the Region in the context.
-
-    Examples:
-        >>> import qnexus as qnx
-        >>> from qnexus.models.region import Region
-        >>> token = qnx.context.set_active_target_region_token(Region.US)
-        >>> # Later, deactivate:
-        >>> qnx.context.deactivate_target_region(token)
-    """
+    returning a Token to the Region in the context."""
     return _QNEXUS_TARGET_REGION.set(target_region)
 
 
@@ -200,14 +176,7 @@ def update_active_properties_token(
     **properties: int | float | str | bool,
 ) -> Token[PropertiesDict | None]:
     """Globally update and merge properties with the existing ones,
-    returning a token to the PropertiesDict in the context.
-
-    Examples:
-        >>> import qnexus as qnx
-        >>> token = qnx.context.update_active_properties_token(experiment="run_1", shots=100)
-        >>> # Later, deactivate:
-        >>> qnx.context.deactivate_properties(token)
-    """
+    returning a token to the PropertiesDict in the context."""
     current_properties = _QNEXUS_PROPERTIES.get()
     if current_properties is None:
         current_properties = PropertiesDict({})

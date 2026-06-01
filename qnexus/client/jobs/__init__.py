@@ -615,17 +615,26 @@ def wait_for(
         asyncio.TimeoutError: If the overall timeout is exceeded.
 
     Examples:
-        # Use defaults (hybrid strategy)
-        wait_for(job)
+        >>> import qnexus as qnx
+        >>> from qnexus.client.jobs import PollingStrategy, HybridStrategy
 
-        # Custom polling configuration
-        wait_for(job, strategy=PollingStrategy(initial_interval=5.0, backoff_factor=1.5))
+        >>> # Use defaults (hybrid strategy)
+        >>> qnx.jobs.wait_for(job_ref)
 
-        # Custom hybrid with polling fallback config
-        wait_for(job, strategy=HybridStrategy(
-            websocket_timeout=300.0,
-            polling=PollingStrategy(max_interval_running=60.0)
-        ))
+        >>> # Custom polling configuration
+        >>> qnx.jobs.wait_for(
+        ...     job_ref,
+        ...     strategy=PollingStrategy(initial_interval=5.0, backoff_factor=1.5),
+        ... )
+
+        >>> # Custom hybrid with polling fallback config
+        >>> qnx.jobs.wait_for(
+        ...     job_ref,
+        ...     strategy=HybridStrategy(
+        ...         websocket_timeout=300.0,
+        ...         polling=PollingStrategy(max_interval_running=60.0),
+        ...     ),
+        ... )
     """
     if strategy is None:
         strategy = HybridStrategy()

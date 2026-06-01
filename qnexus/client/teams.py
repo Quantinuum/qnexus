@@ -108,7 +108,7 @@ def create(name: str, description: str | None = None) -> TeamRef:
 
     Examples:
         >>> import qnexus as qnx
-        >>> team_ref = qnx.teams.create(name="team-unobtainium", description="Unobtanium team")
+        >>> team_ref = qnx.teams.create(name="team-unobtainium", description="Team studying novel materials")
     """
 
     resp = get_nexus_client().post(

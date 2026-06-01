@@ -153,7 +153,7 @@ def get(
 
     Examples:
         >>> import qnexus as qnx
-        >>> wasm_ref = qnx.wasm_modules.get(name="my_module")
+        >>> wasm_ref = qnx.wasm_modules.get(name="my_wasm_module")
     """
     if id:
         return _fetch_by_id(wasm_module_id=id, scope=scope)
@@ -188,10 +188,10 @@ def upload(
     Examples:
         >>> import qnexus as qnx
         >>> from pytket.wasm import WasmModuleHandler
-        >>> wasm_handler = WasmModuleHandler("my_module.wasm")
+        >>> wasm_handler = WasmModuleHandler("my_wasm_module.wasm")
         >>> wasm_ref = qnx.wasm_modules.upload(
         ...     wasm_handler,
-        ...     name="my_module",
+        ...     name="my_wasm_module",
         ...     project=my_project_ref,
         ... )
     """
