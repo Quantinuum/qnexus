@@ -61,7 +61,16 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[ProjectRef]:
-    """Get a NexusIterator over projects with optional filters."""
+    """Get a NexusIterator over projects with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> my_projects = qnx.projects.get_all(
+        ...     name_like="experiment",
+        ...     created_after=datetime(2026, 1, 1),
+        ... )
+        >>> my_projects.df()
+    """
 
     params = Params(
         name_like=name_like,
@@ -122,9 +131,13 @@ def get(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> ProjectRef:
-    """
-    Get a single project using filters. Throws an exception if the filters do
+    """Get a single project using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.get(name="MyProject")
+        >>> project_ref = qnx.projects.get(id="dca33f7f-9619-4cf7-a3fb-56256b117d6e")
     """
     if id:
         return _fetch_by_id(id, scope=scope)
@@ -151,7 +164,17 @@ def get_or_create(
     properties: PropertiesDict | None = None,
 ) -> ProjectRef:
     """Get a project reference if the projects exists (by name),
-    otherwise create a new project using the supplied description and properties."""
+    otherwise create a new project using the supplied description and properties.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.get_or_create(name="MyProject")
+        >>> project_ref = qnx.projects.get_or_create(
+        ...     name="MyProject",
+        ...     description="A new experiment",
+        ...     properties={"team": "quantum"},
+        ... )
+    """
     annotations = CreateAnnotations(
         name=name,
         description=description,
@@ -195,7 +218,15 @@ def create(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> ProjectRef:
-    """Create a new project in Nexus."""
+    """Create a new project in Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.create(
+        ...     name="ProjectUnobtanium",
+        ...     description="Chemistry experiments on unobtanium",
+        ... )
+    """
     attributes = {}
     annotations = CreateAnnotations(
         name=name,
@@ -236,7 +267,16 @@ def add_property(
     description: str | None = None,
     required: bool = False,
 ) -> None:
-    """Add a property definition to a project."""
+    """Add a property definition to a project.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.projects.add_property(
+        ...     name="iteration",
+        ...     property_type="int",
+        ...     project=project_ref,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     assert project, "ProjectRef required."
 
@@ -267,7 +307,12 @@ def add_property(
 
 
 def get_properties(project: ProjectRef | None = None) -> DataframableList[Property]:
-    """Get the property definitions for the Project."""
+    """Get the property definitions for the Project.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.projects.get_properties(project=project_ref).df()
+    """
     # This will get all the properties (even if there are more than the page size),
     # but could be refactored if needed.
 
@@ -301,7 +346,12 @@ def _to_property(data: dict[str, Any]) -> DataframableList[Property]:
 
 
 def summarize(project: ProjectRef | None = None) -> pd.DataFrame:
-    """Summarize the current state of a project."""
+    """Summarize the current state of a project.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.projects.summarize(project=project_ref)
+    """
     import qnexus.client.jobs as jobs_client
 
     project = project or get_active_project(project_required=True)
@@ -338,7 +388,13 @@ def update(  # this does not update properties, properties should be added using
     archive: bool = False,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> ProjectRef:
-    """Update the details of a project."""
+    """Update the details of a project.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated = qnx.projects.update(project_ref, name="NewName")
+        >>> qnx.projects.update(project_ref, archive=True)  # archive a project
+    """
     req_dict = {
         "data": {
             "attributes": {
@@ -377,6 +433,11 @@ def delete(project: ProjectRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -
     """Delete a project and all associated data in Nexus.
     Project must be archived first.
     WARNING: this will delete all data associated with the project.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.projects.update(project_ref, archive=True)
+        >>> qnx.projects.delete(project_ref)
     """
     res = get_nexus_client().delete(
         url=f"/api/projects/v1beta2/{project.id}",

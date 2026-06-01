@@ -18,7 +18,13 @@ RoleName = Literal["Administrator", "Contributor", "Reader", "Maintainer"]
 
 
 def get_all() -> DataframableList[Role]:
-    """Get the definitions of possible role-based access control assignments."""
+    """Get the definitions of possible role-based access control assignments.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> roles = qnx.roles.get_all()
+        >>> roles.df()
+    """
     res = get_nexus_client().get(
         "/api/roles/v1beta",
     )
@@ -42,6 +48,10 @@ def get_all() -> DataframableList[Role]:
 def get(name: RoleName) -> Role:
     """
     Get a single ``Role`` by name.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> reader_role = qnx.roles.get("Reader")
     """
     for item in get_all():
         if item.name == name:
@@ -54,7 +64,13 @@ def get(name: RoleName) -> Role:
 def assignments(
     resource_ref: BaseRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> DataframableList[RoleInfo]:
-    """Check the assignments on a particular resource."""
+    """Check the assignments on a particular resource.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> assignments = qnx.roles.assignments(project_ref)
+        >>> assignments.df()
+    """
 
     res = get_nexus_client().get(
         f"/api/resources/v1beta2/{resource_ref.id}/assignments",
@@ -108,7 +124,13 @@ def assign_team(
     role: RoleName | Role,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> None:
-    """Assign a role-based access control assignment to a team."""
+    """Assign a role-based access control assignment to a team.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> team = qnx.teams.get(name="my-team")
+        >>> qnx.roles.assign_team(project_ref, team=team, role="Contributor")
+    """
     if isinstance(role, str):
         role = get(role)
 
@@ -137,7 +159,16 @@ def assign_user(
     role: RoleName | Role,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> None:
-    """Assign a role-based access control assignment to a user."""
+    """Assign a role-based access control assignment to a user.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.roles.assign_user(
+        ...     project_ref,
+        ...     user_email="colleague@example.com",
+        ...     role="Reader",
+        ... )
+    """
     if isinstance(role, str):
         role = get(role)
     user_id_res = get_nexus_client().get(

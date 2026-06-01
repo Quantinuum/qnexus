@@ -77,7 +77,13 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[HUGRRef]:
-    """Get a NexusIterator over HUGRs with optional filters."""
+    """Get a NexusIterator over HUGRs with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_hugrs = qnx.hugr.get_all(project=project_ref)
+        >>> all_hugrs.df()
+    """
 
     params = Params(
         name_like=name_like,
@@ -152,6 +158,10 @@ def get(
     """
     Get a single HUGR using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> hugr_ref = qnx.hugr.get(name="my_hugr", project=project_ref)
     """
 
     if id:
@@ -186,6 +196,14 @@ def upload(
 
     N.B. HUGR support in Nexus is subject to change. Until full support is achieved any
     programs uploaded may not work in the future.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> hugr_ref = qnx.hugr.upload(
+        ...     hugr_package=my_package,
+        ...     name="my_hugr_program",
+        ...     project=project_ref,
+        ... )
     """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
@@ -240,7 +258,12 @@ def update(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> HUGRRef:
-    """Update the annotations on a HUGRRef."""
+    """Update the annotations on a HUGRRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated = qnx.hugr.update(hugr_ref, name="renamed_hugr")
+    """
     ref_annotations = ref.annotations.model_dump()
     annotations = Annotations(
         name=name,
@@ -322,6 +345,16 @@ def cost_confidence(
     NB: This will execute a costing job on a dedicated cost estimation device.
         Once run, the cost will be visible also in the Nexus web portal
         as part of the job.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> costs = qnx.hugr.cost_confidence(
+        ...     programs=[hugr_ref],
+        ...     n_shots=100,
+        ...     project=project_ref,
+        ... )
+        >>> for hqc_cost, confidence in costs:
+        ...     print(f"Cost: {hqc_cost}, Confidence: {confidence}")
     """
     import qnexus as qnx
 

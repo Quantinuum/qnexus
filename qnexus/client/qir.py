@@ -69,7 +69,13 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[QIRRef]:
-    """Get a NexusIterator over QIRs with optional filters."""
+    """Get a NexusIterator over QIRs with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_qirs = qnx.qir.get_all(project=project_ref)
+        >>> all_qirs.df()
+    """
 
     params = Params(
         name_like=name_like,
@@ -144,6 +150,10 @@ def get(
     """
     Get a single QIR using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qir_ref = qnx.qir.get(name="my_qir", project=project_ref)
     """
 
     if id:
@@ -174,7 +184,16 @@ def upload(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> QIRRef:
-    """Upload a QIR to Nexus."""
+    """Upload a QIR to Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qir_ref = qnx.qir.upload(
+        ...     qir=qir_bytes,
+        ...     name="my_qir_program",
+        ...     project=project_ref,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 
@@ -219,7 +238,12 @@ def update(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> QIRRef:
-    """Update the annotations on a QIRRef."""
+    """Update the annotations on a QIRRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated = qnx.qir.update(qir_ref, name="renamed_qir")
+    """
     ref_annotations = ref.annotations.model_dump()
     annotations = Annotations(
         name=name,

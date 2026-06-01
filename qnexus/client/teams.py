@@ -9,7 +9,13 @@ from qnexus.models.scope import ScopeFilterEnum
 
 @merge_scope_from_context
 def get_all(scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> DataframableList[TeamRef]:
-    """No fuzzy name matching."""
+    """Get all teams.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_teams = qnx.teams.get_all()
+        >>> all_teams.df()
+    """
     res = get_nexus_client().get(
         "/api/teams/v1beta2",
         params={"scope": scope.value},
@@ -35,6 +41,10 @@ def get(name: str, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> TeamRef:
     """
     Get a single team using filters. Throws an exception if the filters do not
     match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> team_ref = qnx.teams.get(name="my-team")
     """
     res = get_nexus_client().get(
         "/api/teams/v1beta2",
@@ -94,7 +104,12 @@ def _fetch_by_id(
 
 
 def create(name: str, description: str | None = None) -> TeamRef:
-    """Create a team in Nexus."""
+    """Create a team in Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> team_ref = qnx.teams.create(name="team-unobtainium", description="Unobtanium team")
+    """
 
     resp = get_nexus_client().post(
         "/api/teams/v1beta2",

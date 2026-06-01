@@ -10,7 +10,13 @@ from qnexus.models.scope import ScopeFilterEnum
 
 
 def get_self() -> UserRef:
-    """Get the logged in user."""
+    """Get the logged in user.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> me = qnx.users.get_self()
+        >>> me.display_name
+    """
 
     res = get_nexus_client().get("/api/users/v1beta2/me")
 

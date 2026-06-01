@@ -115,12 +115,26 @@ def get_active_target_region() -> Region | None:
 
 def set_active_project_token(project: ProjectRef) -> Token[ProjectRef | None]:
     """Globally set a project as active,
-    returning a Token to the ProjectRef in the context."""
+    returning a Token to the ProjectRef in the context.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.get(name="my-project")
+        >>> token = qnx.context.set_active_project_token(project_ref)
+        >>> # Later, deactivate:
+        >>> qnx.context.deactivate_project(token)
+    """
     return _QNEXUS_PROJECT.set(project)
 
 
 def set_active_project(project: ProjectRef) -> None:
-    """Globally set a project as active."""
+    """Globally set a project as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.get(name="my-project")
+        >>> qnx.context.set_active_project(project_ref)
+    """
     set_active_project_token(project)
 
 
@@ -128,14 +142,28 @@ def set_active_scope_token(
     scope: ScopeFilterEnum,
 ) -> Token[ScopeFilterEnum]:
     """Globally set an API Scope filter as active,
-    returning a Token to the ScopeFilterEnum in the context."""
+    returning a Token to the ScopeFilterEnum in the context.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models import ScopeFilterEnum
+        >>> token = qnx.context.set_active_scope_token(ScopeFilterEnum.ORG_ADMIN)
+        >>> # Later, deactivate:
+        >>> qnx.context.deactivate_scope(token)
+    """
     return _QNEXUS_SCOPE.set(scope)
 
 
 def set_active_scope(
     scope: ScopeFilterEnum,
 ) -> None:
-    """Globally set an API Scope filter as active."""
+    """Globally set an API Scope filter as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models import ScopeFilterEnum
+        >>> qnx.context.set_active_scope(ScopeFilterEnum.ORG_ADMIN)
+    """
     set_active_scope_token(scope)
 
 
@@ -143,14 +171,28 @@ def set_active_target_region_token(
     target_region: Region,
 ) -> Token[Region | None]:
     """Globally set a target region as active,
-    returning a Token to the Region in the context."""
+    returning a Token to the Region in the context.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.region import Region
+        >>> token = qnx.context.set_active_target_region_token(Region.US)
+        >>> # Later, deactivate:
+        >>> qnx.context.deactivate_target_region(token)
+    """
     return _QNEXUS_TARGET_REGION.set(target_region)
 
 
 def set_active_target_region(
     target_region: Region,
 ) -> None:
-    """Globally set a target region as active."""
+    """Globally set a target region as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.region import Region
+        >>> qnx.context.set_active_target_region(Region.US)
+    """
     set_active_target_region_token(target_region)
 
 
@@ -158,7 +200,14 @@ def update_active_properties_token(
     **properties: int | float | str | bool,
 ) -> Token[PropertiesDict | None]:
     """Globally update and merge properties with the existing ones,
-    returning a token to the PropertiesDict in the context."""
+    returning a token to the PropertiesDict in the context.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> token = qnx.context.update_active_properties_token(experiment="run_1", shots=100)
+        >>> # Later, deactivate:
+        >>> qnx.context.deactivate_properties(token)
+    """
     current_properties = _QNEXUS_PROPERTIES.get()
     if current_properties is None:
         current_properties = PropertiesDict({})
@@ -173,7 +222,12 @@ def update_active_properties_token(
 def update_active_properties(
     **properties: int | float | str | bool,
 ) -> None:
-    """Globally update and merge properties with the existing ones."""
+    """Globally update and merge properties with the existing ones.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.context.update_active_properties(experiment="run_1", shots=100)
+    """
     update_active_properties_token(**properties)
 
 
