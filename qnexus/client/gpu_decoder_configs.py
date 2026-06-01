@@ -62,7 +62,18 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[GpuDecoderConfigRef]:
-    """Get a NexusIterator over gpu decoder configs with optional filters."""
+    """Get a NexusIterator over gpu decoder configs with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_configs = qnx.gpu_decoder_configs.get_all()
+        >>> all_configs.df()
+
+        >>> project_configs = qnx.gpu_decoder_configs.get_all(
+        ...     name_like="my_config",
+        ...     project=my_project_ref,
+        ... )
+    """
 
     params = Params(
         name_like=name_like,
@@ -143,6 +154,10 @@ def get(
     """
     Get a single gpu_decoder_config using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> config_ref = qnx.gpu_decoder_configs.get(name="my_config")
     """
     if id:
         return _fetch_by_id(gpu_decoder_config_id=id, scope=scope)
@@ -172,7 +187,16 @@ def upload(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> GpuDecoderConfigRef:
-    """Upload a pytket GpuDecoderConfig to Nexus."""
+    """Upload a pytket GpuDecoderConfig to Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> config_ref = qnx.gpu_decoder_configs.upload(
+        ...     gpu_decoder_config=config_string,
+        ...     name="my_config",
+        ...     project=my_project_ref,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 
@@ -220,7 +244,15 @@ def update(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> GpuDecoderConfigRef:
-    """Update the annotations on a GpuDecoderConfigRef."""
+    """Update the annotations on a GpuDecoderConfigRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated_ref = qnx.gpu_decoder_configs.update(
+        ...     config_ref,
+        ...     name="renamed_config",
+        ... )
+    """
     ref_annotations = ref.annotations.model_dump()
     annotations = Annotations(
         name=name,

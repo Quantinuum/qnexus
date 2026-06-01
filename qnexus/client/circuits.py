@@ -71,7 +71,15 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[CircuitRef]:
-    """Get a NexusIterator over circuits with optional filters."""
+    """Get a NexusIterator over circuits with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_circuits = qnx.circuits.get_all(project=project_ref)
+        >>> all_circuits.df()
+
+        >>> qnx.circuits.get_all(name_like="bell", project=project_ref)
+    """
 
     params = Params(
         name_like=name_like,
@@ -146,6 +154,10 @@ def get(
     """
     Get a single circuit using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> circuit_ref = qnx.circuits.get(name="my_circuit", project=project_ref)
     """
     if id:
         return _fetch_by_id(circuit_id=id, scope=scope)
@@ -175,7 +187,18 @@ def upload(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> CircuitRef:
-    """Upload a pytket Circuit to Nexus."""
+    """Upload a pytket Circuit to Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from pytket.circuit import Circuit
+        >>> circuit = Circuit(2).H(0).CX(0, 1).measure_all()
+        >>> circuit_ref = qnx.circuits.upload(
+        ...     circuit=circuit,
+        ...     name="bell_state",
+        ...     project=project_ref,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 
@@ -224,7 +247,16 @@ def update(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> CircuitRef:
-    """Update the annotations on a CircuitRef."""
+    """Update the annotations on a CircuitRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated_ref = qnx.circuits.update(
+        ...     circuit_ref,
+        ...     name="renamed_circuit",
+        ...     properties={"version": 2},
+        ... )
+    """
     ref_annotations = ref.annotations.model_dump()
     annotations = Annotations(
         name=name,

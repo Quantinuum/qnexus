@@ -44,7 +44,17 @@ def start_compile_job(
     hypertket_config: HyperTketConfig | None = None,
     skip_intermediate_circuits: bool = True,
 ) -> CompileJobRef:
-    """Submit a compile job to be run in Nexus."""
+    """Submit a compile job to be run in Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> compile_job_ref = qnx.jobs.compile(
+        ...     programs=circuit_ref,
+        ...     backend_config=qnx.models.QuantinuumConfig(device_name="H1-1LE"),
+        ...     name="my-compile-job",
+        ...     optimisation_level=2,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 

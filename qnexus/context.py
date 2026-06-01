@@ -120,7 +120,13 @@ def set_active_project_token(project: ProjectRef) -> Token[ProjectRef | None]:
 
 
 def set_active_project(project: ProjectRef) -> None:
-    """Globally set a project as active."""
+    """Globally set a project as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> project_ref = qnx.projects.get(name="my-project")
+        >>> qnx.context.set_active_project(project_ref)
+    """
     set_active_project_token(project)
 
 
@@ -135,7 +141,13 @@ def set_active_scope_token(
 def set_active_scope(
     scope: ScopeFilterEnum,
 ) -> None:
-    """Globally set an API Scope filter as active."""
+    """Globally set an API Scope filter as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models import ScopeFilterEnum
+        >>> qnx.context.set_active_scope(ScopeFilterEnum.ORG_ADMIN)
+    """
     set_active_scope_token(scope)
 
 
@@ -150,7 +162,13 @@ def set_active_target_region_token(
 def set_active_target_region(
     target_region: Region,
 ) -> None:
-    """Globally set a target region as active."""
+    """Globally set a target region as active.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.region import Region
+        >>> qnx.context.set_active_target_region(Region.US)
+    """
     set_active_target_region_token(target_region)
 
 
@@ -173,7 +191,12 @@ def update_active_properties_token(
 def update_active_properties(
     **properties: int | float | str | bool,
 ) -> None:
-    """Globally update and merge properties with the existing ones."""
+    """Globally update and merge properties with the existing ones.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.context.update_active_properties(experiment="run_1", shots=100)
+    """
     update_active_properties_token(**properties)
 
 

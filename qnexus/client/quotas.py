@@ -21,7 +21,13 @@ NO_QUOTA_SET = "No quota set for user"
 
 
 def get_all() -> DataframableList[Quota]:
-    """Get all quotas, including usage."""
+    """Get all quotas, including usage.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> quotas = qnx.quotas.get_all()
+        >>> quotas.df()
+    """
     user = get_self()
 
     res = get_nexus_client().get(
@@ -57,7 +63,13 @@ def get_all() -> DataframableList[Quota]:
 
 
 def get(name: QuotaName) -> Quota:
-    """Get specific quota details by name."""
+    """Get specific quota details by name.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> sim_quota = qnx.quotas.get("simulation")
+        >>> sim_quota.df()
+    """
     user = get_self()
 
     res = get_nexus_client().get(
@@ -87,7 +99,13 @@ def get(name: QuotaName) -> Quota:
 
 
 def check_quota(name: QuotaName) -> bool:
-    """Check that the current user has available quota."""
+    """Check that the current user has available quota.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.quotas.check_quota("simulation")
+        True
+    """
     user = get_self()
     res = get_nexus_client().get(
         "/api/quotas/v1beta3/guard", params={"name": name, "user_id": str(user.id)}

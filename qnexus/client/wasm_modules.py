@@ -64,7 +64,18 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[WasmModuleRef]:
-    """Get a NexusIterator over wasm_modules with optional filters."""
+    """Get a NexusIterator over wasm_modules with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_wasm = qnx.wasm_modules.get_all()
+        >>> all_wasm.df()
+
+        >>> project_wasm = qnx.wasm_modules.get_all(
+        ...     name_like="my_module",
+        ...     project=my_project_ref,
+        ... )
+    """
 
     params = Params(
         name_like=name_like,
@@ -139,6 +150,10 @@ def get(
     """
     Get a single wasm_module using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> wasm_ref = qnx.wasm_modules.get(name="my_wasm_module")
     """
     if id:
         return _fetch_by_id(wasm_module_id=id, scope=scope)
@@ -168,7 +183,18 @@ def upload(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> WasmModuleRef:
-    """Upload a pytket WasmModule to Nexus."""
+    """Upload a pytket WasmModule to Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from pytket.wasm import WasmModuleHandler
+        >>> wasm_handler = WasmModuleHandler("my_wasm_module.wasm")
+        >>> wasm_ref = qnx.wasm_modules.upload(
+        ...     wasm_handler,
+        ...     name="my_wasm_module",
+        ...     project=my_project_ref,
+        ... )
+    """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
 
@@ -216,7 +242,15 @@ def update(
     description: str | None = None,
     properties: PropertiesDict | None = None,
 ) -> WasmModuleRef:
-    """Update the annotations on a WasmModuleRef."""
+    """Update the annotations on a WasmModuleRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> updated_ref = qnx.wasm_modules.update(
+        ...     wasm_ref,
+        ...     name="renamed_module",
+        ... )
+    """
     ref_annotations = ref.annotations.model_dump()
     annotations = Annotations(
         name=name,

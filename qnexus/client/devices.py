@@ -42,7 +42,16 @@ def get_all(
     credential_names: list[str] | None = None,
     nexus_hosted: bool | None = None,
 ) -> DataframableList[Device]:
-    """Get all available devices."""
+    """Get all available devices.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> from qnexus.models import IssuerEnum
+        >>> all_devices = qnx.devices.get_all()
+        >>> all_devices.df()
+
+        >>> quantinuum_devices = qnx.devices.get_all(issuers=[IssuerEnum.QUANTINUUM])
+    """
 
     issuer_config_names = (
         [

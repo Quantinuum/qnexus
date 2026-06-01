@@ -24,7 +24,12 @@ def _format_property(key: str, value: bool | int | float | str) -> str:
 
 
 class PropertiesFilter(BaseModel):
-    """Properties filters model."""
+    """Properties filters model.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> qnx.jobs.get_all(properties={"experiment": "vqe", "iteration": 5})
+    """
 
     properties: PropertiesDict | None = Field(
         default=OrderedDict(),
@@ -39,7 +44,16 @@ class PropertiesFilter(BaseModel):
 
 
 class TimeFilter(BaseModel):
-    """Resource time filters model."""
+    """Resource time filters model.
+
+    Example:
+        >>> from datetime import datetime
+        >>> import qnexus as qnx
+        >>> qnx.projects.get_all(
+        ...     created_after=datetime(2024, 1, 1),
+        ...     modified_before=datetime(2024, 6, 30),
+        ... )
+    """
 
     created_before: Annotated[datetime | None, AllowNone] = Field(
         default=None,
@@ -64,7 +78,12 @@ class TimeFilter(BaseModel):
 
 
 class PaginationFilter(BaseModel):
-    """Pagination model."""
+    """Pagination model.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> qnx.circuits.get_all(page_number=0, page_size=10)
+    """
 
     page_number: int | None = Field(
         default=0,
@@ -90,7 +109,13 @@ class CreatorFilter(BaseModel):
 
 
 class NameFilter(BaseModel):
-    """Name model."""
+    """Name model.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> qnx.projects.get_all(name_like="MyProject_")
+        >>> qnx.projects.get(name="MyProject_123")
+    """
 
     name_like: str | None = Field(
         default="",
@@ -216,7 +241,13 @@ jobstatusenum_to_string: dict[JobStatusEnum, JobStatusString] = {
 
 
 class JobStatusFilter(BaseModel):
-    """Job status filter"""
+    """Job status filter.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.job_status import JobStatusEnum
+        >>> qnx.jobs.get_all(job_status=[JobStatusEnum.RUNNING, JobStatusEnum.QUEUED])
+    """
 
     status: list[JobStatusString] | None = Field(
         default=[  # type: ignore
@@ -244,7 +275,13 @@ class JobStatusFilter(BaseModel):
 
 
 class JobTypeFilter(BaseModel):
-    """Filter by job type."""
+    """Filter by job type.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.references import JobType
+        >>> qnx.jobs.get_all(job_type=[JobType.EXECUTE])
+    """
 
     job_type: list[JobType] | None = Field(
         default=[JobType.EXECUTE, JobType.COMPILE],
@@ -256,7 +293,13 @@ class JobTypeFilter(BaseModel):
 
 
 class DevicesFilter(BaseModel):
-    """Filter by device details."""
+    """Filter by device details.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> from qnexus.models import IssuerEnum
+        >>> qnx.devices.get_all(issuers=[IssuerEnum.QUANTINUUM])
+    """
 
     backend: list[str] | None = None
     region: str | None = None
@@ -274,7 +317,13 @@ class CredentialsFilter(BaseModel):
 
 
 class ScopeFilter(BaseModel):
-    """Filter by scope."""
+    """Filter by scope.
+
+    Example:
+        >>> import qnexus as qnx
+        >>> from qnexus.models.scope import ScopeFilterEnum
+        >>> qnx.projects.get_all(scope=ScopeFilterEnum.ORG_ADMIN)
+    """
 
     scope: ScopeFilterEnum = ScopeFilterEnum.USER
 

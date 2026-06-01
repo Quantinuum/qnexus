@@ -13,7 +13,16 @@ class Params(CredentialsFilter):
 def get_all(
     issuer: CredentialIssuer | str | None = None,
 ) -> DataframableList[Credential]:
-    """Get saved credentials."""
+    """Get saved credentials.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_creds = qnx.credentials.get_all()
+        >>> all_creds.df()
+
+        >>> from qnexus.models import CredentialIssuer
+        >>> qnx.credentials.get_all(issuer=CredentialIssuer.IBMQ)
+    """
 
     params = Params(
         issuer=issuer,

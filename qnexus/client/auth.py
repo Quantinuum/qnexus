@@ -95,6 +95,12 @@ def login(force: bool = False, region: Region | None = None) -> None:
     Log in to Quantinuum Nexus using the web browser.
 
     (if web browser can't be launched, displays the link)
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.auth.login()
+
+        >>> qnx.auth.login(force=True)  # Force re-authentication
     """
     different_domain = _update_domain_for_region(region)
 
@@ -182,7 +188,12 @@ def login(force: bool = False, region: Region | None = None) -> None:
 
 
 def login_with_credentials(force: bool = False, region: Region | None = None) -> None:
-    """Log in to Nexus using a username and password."""
+    """Log in to Nexus using a username and password.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.auth.login_with_credentials()
+    """
     different_domain = _update_domain_for_region(region)
 
     if not force and not different_domain and is_logged_in():
@@ -212,7 +223,12 @@ def login_no_interaction(
 
 
 def logout() -> None:
-    """Clear tokens from file system and the client."""
+    """Clear tokens from file system and the client.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.auth.logout()
+    """
     remove_token("refresh_token")
     remove_token("access_token")
     get_nexus_client(reload=True)

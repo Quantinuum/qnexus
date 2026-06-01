@@ -347,7 +347,19 @@ def get_all(
     page_size: int | None = None,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
 ) -> NexusIterator[CompileJobRef | ExecuteJobRef]:
-    """Get a NexusIterator over jobs with optional filters."""
+    """Get a NexusIterator over jobs with optional filters.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> all_jobs = qnx.jobs.get_all(project=project_ref)
+        >>> all_jobs.df()
+
+        >>> from qnexus.models.job_status import JobStatusEnum
+        >>> errored = qnx.jobs.get_all(
+        ...     project=project_ref,
+        ...     job_status=[JobStatusEnum.ERROR],
+        ... )
+    """
     project = project or get_active_project(project_required=False)
     project = cast(ProjectRef, project)
 
@@ -465,6 +477,10 @@ def get(
     """
     Get a single job using filters. Throws an exception if the filters do
     not match exactly one object.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> job_ref = qnx.jobs.get(name="my_compile_job", project=project_ref)
     """
     if id:
         return _fetch_by_id(job_id=id, scope=scope)
@@ -599,17 +615,26 @@ def wait_for(
         asyncio.TimeoutError: If the overall timeout is exceeded.
 
     Examples:
-        # Use defaults (hybrid strategy)
-        wait_for(job)
+        >>> import qnexus as qnx
+        >>> from qnexus.client.jobs import PollingStrategy, HybridStrategy
 
-        # Custom polling configuration
-        wait_for(job, strategy=PollingStrategy(initial_interval=5.0, backoff_factor=1.5))
+        >>> # Use defaults (hybrid strategy)
+        >>> qnx.jobs.wait_for(job_ref)
 
-        # Custom hybrid with polling fallback config
-        wait_for(job, strategy=HybridStrategy(
-            websocket_timeout=300.0,
-            polling=PollingStrategy(max_interval_running=60.0)
-        ))
+        >>> # Custom polling configuration
+        >>> qnx.jobs.wait_for(
+        ...     job_ref,
+        ...     strategy=PollingStrategy(initial_interval=5.0, backoff_factor=1.5),
+        ... )
+
+        >>> # Custom hybrid with polling fallback config
+        >>> qnx.jobs.wait_for(
+        ...     job_ref,
+        ...     strategy=HybridStrategy(
+        ...         websocket_timeout=300.0,
+        ...         polling=PollingStrategy(max_interval_running=60.0),
+        ...     ),
+        ... )
     """
     if strategy is None:
         strategy = HybridStrategy()
@@ -656,7 +681,14 @@ def wait_for(
 
 @merge_scope_from_context
 def status(job: JobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> JobStatus:
-    """Get the status of a job."""
+    """Get the status of a job.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> job_status = qnx.jobs.status(job_ref)
+        >>> job_status.status
+        <JobStatusEnum.COMPLETED: 'COMPLETED'>
+    """
     resp = get_nexus_client().get(
         f"api/jobs/v1beta3/{job.id}/attributes/status",
         params={"scope": scope.value},
@@ -698,6 +730,16 @@ def results(
 ):
     """Get the ResultRefs from a JobRef, if the job is complete.
     To enable fetching results from Jobs with incomplete items, set allow_incomplete=True.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> compile_results = qnx.jobs.results(compile_job_ref)
+        >>> for result in compile_results:
+        ...     compiled_circuit = result.get_output()
+
+        >>> execute_results = qnx.jobs.results(execute_job_ref)
+        >>> for result in execute_results:
+        ...     backend_result = result.download_result()
     """
     match job:
         case CompileJobRef():
@@ -717,6 +759,16 @@ def retry_submission(
     """Retry a job in Nexus according to status(es) or retry strategy.
 
     By default, jobs with the ERROR status will be retried.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.jobs.retry_submission(job_ref)
+
+        >>> from qnexus.models.job_status import JobStatusEnum
+        >>> qnx.jobs.retry_submission(
+        ...     job_ref,
+        ...     retry_status=[JobStatusEnum.ERROR, JobStatusEnum.CANCELLED],
+        ... )
     """
     body: dict[str, str | list[str]] = {"remote_retry_strategy": remote_retry_strategy}
 
@@ -739,6 +791,10 @@ def cancel(job: JobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> None:
     """Attempt cancellation of a job in Nexus.
 
     If the job has been submitted to a backend, Nexus will request cancellation of the job.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.jobs.cancel(job_ref)
     """
     res = get_nexus_client().post(
         f"/api/jobs/v1beta3/{job.id}/rpc/cancel",
@@ -752,7 +808,12 @@ def cancel(job: JobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> None:
 
 @merge_scope_from_context
 def delete(job: JobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) -> None:
-    """Delete a job in Nexus."""
+    """Delete a job in Nexus.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> qnx.jobs.delete(job_ref)
+    """
     res = get_nexus_client().delete(
         f"/api/jobs/v1beta3/{job.id}",
         params={"scope": scope.value},
@@ -780,6 +841,16 @@ def compile(
     """
     Utility method to run a compile job on a program or programs and return a
     DataframableList of the compiled programs.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> compiled_circuits = qnx.compile(
+        ...     programs=[circuit_ref],
+        ...     backend_config=qnx.models.QuantinuumConfig(device_name="H2-1LE"),
+        ...     name="my_compile_job",
+        ...     project=project_ref,
+        ...     optimisation_level=2,
+        ... )
     """
     project = project or get_active_project(project_required=True)
     project = cast(ProjectRef, project)
@@ -841,6 +912,16 @@ def execute(
     the results are available. See ``qnexus.start_execute_job`` for a function
     that submits the job and returns immediately, rather than waiting for
     results.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> results = qnx.execute(
+        ...     programs=[compiled_circuit_ref],
+        ...     n_shots=[100],
+        ...     backend_config=qnx.models.QuantinuumConfig(device_name="H2-1LE"),
+        ...     name="my_execute_job",
+        ...     project=project_ref,
+        ... )
     """
 
     execute_job_ref = _execute.start_execute_job(
@@ -884,7 +965,12 @@ def execute(
 def cost(
     job: CompileJobRef | ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> float:
-    """Get the HQC cost of a job from a JobRef."""
+    """Get the HQC cost of a job from a JobRef.
+
+    Examples:
+        >>> import qnexus as qnx
+        >>> hqc_cost = qnx.jobs.cost(job_ref)
+    """
 
     resp = get_nexus_client().get(
         f"/api/jobs/v1beta3/{job.id}",
