@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.44.0 (2026-06-01)
+
+
+### Added
+
+- Add docstring examples (#347).
+
+
 ## v0.43.2 (2026-05-12)
 
 
