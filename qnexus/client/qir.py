@@ -257,6 +257,7 @@ def cost(
     n_shots: int | list[int],
     project: ProjectRef | None = None,
     system_name: Literal["Helios-1"] = "Helios-1",
+    timeout: float | int | None = None
 ) -> float:
     """Estimate the cost (in HQC) of running QIR programs for n_shots
     number of shots on a Quantinuum Helios system.
@@ -282,7 +283,7 @@ def cost(
         project=project,
         name="QIR cost estimation job",
     )
-    status = qnx.jobs.wait_for(job_ref)
+    status = qnx.jobs.wait_for(job_ref, timeout=timeout)
 
     return cast(float, status.cost)
 
