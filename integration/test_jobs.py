@@ -3,7 +3,7 @@
 from collections import Counter
 from datetime import datetime
 from time import sleep
-from typing import Any, Callable, ContextManager
+from typing import Any, Callable, ContextManager, cast
 from uuid import UUID
 
 import pandas as pd
@@ -372,9 +372,12 @@ def test_submit_execute(
         assert len(execute_results) == 1
 
         first_result = execute_results[0]
+        direct_fetched_result, _, _ = qnx.results.get(first_result.id)
         assert isinstance(first_result, ExecutionResultRef)
         assert isinstance(first_result.get_input(), CircuitRef)
-        assert isinstance(first_result.download_result(), BackendResult)
+        downloaded_result = first_result.download_result()
+        assert isinstance(downloaded_result, BackendResult)
+        assert downloaded_result == cast(BackendResult, direct_fetched_result)
         assert isinstance(first_result.download_backend_info(), BackendInfo)
 
         pj_ref = qnx.jobs.get(id=execute_job_ref.id)
