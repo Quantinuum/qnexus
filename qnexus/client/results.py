@@ -10,7 +10,6 @@
 # def get_only():
 #     pass
 
-import logging
 from uuid import UUID
 
 from hugr.qsystem.result import QsysResult
@@ -33,8 +32,6 @@ from qnexus.models.references import (
 )
 from qnexus.models.scope import ScopeFilterEnum
 
-logger = logging.getLogger(__name__)
-
 
 @merge_scope_from_context
 def get(
@@ -49,10 +46,8 @@ def get(
         CircuitRef | QIRRef | HUGRRef,
     ]
     try:  # try classical result
-        logger.info("attempting to find pytket result...")
         res = fetch_pytket_execution_result_by_id(id, scope)
     except qnx_exc.ResourceFetchFailed as ex:
-        logger.info("pytket result not found, attempting to find Qsys result...")
         if ex.status_code == 404:  # if status is not found, try qsys
             res = fetch_qsys_result_by_id(id, ResultVersions.DEFAULT, scope)
         else:
