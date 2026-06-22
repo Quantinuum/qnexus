@@ -74,7 +74,10 @@ def test_guppy_execution(
 
         assert result_ref.get_input().id == hugr_ref.id
 
+        direct_fetched_result, _, _ = qnx.results.get(result_ref.id)
+
         qsys_result = cast(QsysResult, result_ref.download_result())
+        assert qsys_result == cast(QsysResult, direct_fetched_result)
         assert len(qsys_result.results) == n_shots
         assert qsys_result.results[0].entries[0][0] == "teleported"
         assert qsys_result.results[0].entries[0][1] == 1
