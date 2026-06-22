@@ -2,6 +2,13 @@
 
 # `qnexus` Release Notes
 
+## v0.45.0 (2026-06-22)
+
+
+### Added
+
+- Fetching results by id (#349).
+
 ## v0.44.0 (2026-06-01)
 
 
