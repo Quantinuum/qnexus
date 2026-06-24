@@ -45,8 +45,6 @@ def remove_token(token_type: TokenTypes) -> None:
     if not CONFIG.store_tokens:
         return
 
-    # Don't try to delete refresh token in Jupyterhub
-    # these get mounted in automatically and managed externally
     if is_managed_token_environment() and token_type == "refresh_token":
         return
     token_file_path = Path.home() / CONFIG.token_path / token_file_from_type[token_type]
@@ -96,8 +94,6 @@ def write_token(token_type: TokenTypes, token: str) -> None:
     if not CONFIG.store_tokens:
         return
 
-    # Don't allow writing of refresh token in Jupyterhub
-    # these get mounted in automatically and managed externally
     if is_managed_token_environment() and token_type == "refresh_token":
         return
 
