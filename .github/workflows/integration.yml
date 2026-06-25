@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: "Pull request number (for external PRs)"
+        description: "Optional pull request number (for external PRs)"
         required: false
         type: number
+      release_tag:
+        description: "Optional release tag to run integration tests from"
+        required: false
+        type: string
   schedule:
     # everyday at 12:00
     - cron: "0 12 * * *"
@@ -29,6 +33,14 @@ jobs:
       NEXUS_QA_QSYS_DEVICE: ${{ secrets.NEXUS_QA_QSYS_DEVICE }}
 
     steps:
+      - name: Validate workflow dispatch inputs
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [[ -n "${{ github.event.inputs.pr_number }}" && -n "${{ github.event.inputs.release_tag }}" ]]; then
+            echo "Only one of pr_number or release_tag may be set. Leave both empty to run from main."
+            exit 1
+          fi
+
       - name: Comment action run link on PR
         if: ${{ github.event.inputs.pr_number && github.event.inputs.pr_number != '' }}
         uses: thollander/actions-comment-pull-request@v3
@@ -42,8 +54,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
-          # Use the pull request merge commit ref if one is provided
-          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/merge', github.event.inputs.pr_number) || 'main' }}
+          # Prefer a release tag when provided, otherwise use the PR merge ref or main.
+          ref: ${{ github.event.inputs.release_tag || (github.event.inputs.pr_number && format('refs/pull/{0}/merge', github.event.inputs.pr_number)) || 'main' }}
 
       - name: Set up uv & venv
         uses: astral-sh/setup-uv@v5
