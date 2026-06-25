@@ -21,6 +21,10 @@ from qnexus.exceptions import AuthenticationError
 @pytest.fixture(autouse=True)
 def clean_token_state() -> Generator[Any, Any, Any]:
     """Clean up token state before and after each test."""
+    # Ensure tokens are stored to disk for these tests
+    old_store_tokens = CONFIG.store_tokens
+    CONFIG.store_tokens = True
+
     # Setup - clean token files
     remove_token("refresh_token")
     remove_token("access_token")
@@ -40,6 +44,7 @@ def clean_token_state() -> Generator[Any, Any, Any]:
     remove_token("access_token")
     get_nexus_client(reload=True)
     CONFIG.token_path = old_token_path
+    CONFIG.store_tokens = old_store_tokens
 
 
 @respx.mock

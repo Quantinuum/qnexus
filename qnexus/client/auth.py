@@ -40,23 +40,26 @@ def is_logged_in() -> bool:
         if not refresh_token or not access_token:
             return False
     except FileNotFoundError:
-        return False
-    # Check expiry of refresh token (assume JWT)
-    try:
-        payload = jwt.decode(refresh_token, options={"verify_signature": False})
-        exp = payload.get("exp")
-        if exp:
-            expiry_dt = datetime.datetime.fromtimestamp(exp)
-            now = datetime.datetime.now()
-            hours_left = (expiry_dt - now).total_seconds() / 3600
-            if hours_left < 24:
-                msg = (
-                    f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
-                    "You will need to login again after this time or use force=True to refresh now."
-                )
-                warnings.warn(msg, category=UserWarning)
-    except jwt.PyJWTError:
+        # If tokens aren't on disk, fall through to the network check
+        # in case we have valid in-memory tokens (e.g. store_tokens=False).
         pass
+    else:
+        # Check expiry of refresh token (assume JWT)
+        try:
+            payload = jwt.decode(refresh_token, options={"verify_signature": False})
+            exp = payload.get("exp")
+            if exp:
+                expiry_dt = datetime.datetime.fromtimestamp(exp)
+                now = datetime.datetime.now()
+                hours_left = (expiry_dt - now).total_seconds() / 3600
+                if hours_left < 24:
+                    msg = (
+                        f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
+                        "You will need to login again after this time or use force=True to refresh now."
+                    )
+                    warnings.warn(msg, category=UserWarning)
+        except jwt.PyJWTError:
+            pass
     # Try a lightweight authenticated request to check validity
     try:
         client = get_nexus_client()
@@ -323,7 +326,11 @@ def _request_tokens(user: EmailStr, pwd: str) -> None:
 
         write_token("refresh_token", myqos_oat)
         write_token("access_token", myqos_id)
-        get_nexus_client(reload=True)
+        client = get_nexus_client(reload=True)
+        # Set tokens directly in memory so auth works even when
+        # store_tokens=False (where write_token is a no-op).
+        client.auth.cookies.set("myqos_oat", myqos_oat, domain=CONFIG.domain)  # type: ignore[union-attr]
+        client.auth.cookies.set("myqos_id", myqos_id, domain=CONFIG.domain)  # type: ignore[union-attr]
 
         _check_version_headers(resp)
 

@@ -24,9 +24,11 @@ def test_credential_login_full_flow(
     pwd = CONFIG.qa_user_password
 
     qnx.logout()
-    with pytest.raises(FileNotFoundError):
-        read_token(token_type="access_token")
-        read_token(token_type="refresh_token")
+
+    if CONFIG.store_tokens:
+        with pytest.raises(FileNotFoundError):
+            read_token(token_type="access_token")
+            read_token(token_type="refresh_token")
 
     with pytest.raises(AuthenticationError):
         qnx.users.get_self()
@@ -37,24 +39,25 @@ def test_credential_login_full_flow(
 
     qnx.login_with_credentials()
 
-    assert read_token(token_type="access_token") != ""
-    assert read_token(token_type="refresh_token") != ""
+    if CONFIG.store_tokens:
+        assert read_token(token_type="access_token") != ""
+        assert read_token(token_type="refresh_token") != ""
 
+    # Verify authentication works regardless of token storage mode
     qnx.users.get_self()
 
     qnx.logout()
-    with pytest.raises(FileNotFoundError):
-        read_token(token_type="access_token")
-        read_token(token_type="refresh_token")
+
+    if CONFIG.store_tokens:
+        with pytest.raises(FileNotFoundError):
+            read_token(token_type="access_token")
+            read_token(token_type="refresh_token")
 
     with pytest.raises(AuthenticationError):
         qnx.users.get_self()
 
     # Login again to make sure credentials are in the system for the other tests
-    # fake user input from stdin
-    monkeypatch.setattr("sys.stdin", StringIO(username + "\n"))
-    monkeypatch.setattr("getpass.getpass", lambda prompt: pwd)
-    qnx.login_with_credentials()
+    login_no_interaction(username, pwd, force=True)
 
 
 @pytest.mark.skip(reason="Not implemented")
