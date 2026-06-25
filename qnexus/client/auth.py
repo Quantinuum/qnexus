@@ -244,17 +244,37 @@ def login_with_token(refresh_token: str) -> None:
     This is intended for programmatic use where the caller manages
     token storage externally (e.g. multiple accounts).
 
-    >>> import qnexus as qnx
-    >>> from qnexus.config import CONFIG
-    >>> CONFIG.store_tokens = False
-    >>>  alice_token = "foo"
-    >>>  bob_token = "bar"
+    **Multi-process usage:** Each Python process has its own client
+    instance, so separate processes can each call ``login_with_token``
+    with different user tokens without interfering with each other.
+    Set ``CONFIG.store_tokens = False`` to prevent other code paths
+    (e.g. automatic token refresh) from writing to the shared
+    ``~/.qnx/auth/`` directory.
 
-    >>> qnx.login_with_token(alice_token)
-    >>> qnx.projects.get_all()  # runs as alice
+    **Single-process token hot-swapping:** You can switch between
+    users sequentially within a single process. All subsequent API
+    calls will use the most recently set token::
 
-    >>> qnx.login_with_token(bob_token)
-    >>> qnx.projects.get_all()  # runs as bob
+        import qnexus as qnx
+        from qnexus.config import CONFIG
+        CONFIG.store_tokens = False
+
+        alice_token = "..."
+        bob_token = "..."
+
+        qnx.login_with_token(alice_token)
+        qnx.projects.get_all()  # runs as alice
+
+        qnx.login_with_token(bob_token)
+        qnx.projects.get_all()  # runs as bob
+
+    .. warning::
+        This function is **not thread-safe**. The client and its auth
+        cookies are shared process-wide without locking. If one thread
+        calls ``login_with_token(alice_token)`` while another thread is
+        mid-request as Bob, the cookies can be in an inconsistent state.
+        For concurrent multi-user workloads, use separate processes
+        rather than threads within a single process.
 
     """
 
