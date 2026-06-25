@@ -42,6 +42,8 @@ def normalize_included(included: list[Any]) -> dict[str, dict[str, Any]]:
 
 def remove_token(token_type: TokenTypes) -> None:
     """Delete a token file."""
+    if not CONFIG.store_tokens:
+        return
 
     if is_managed_token_environment() and token_type == "refresh_token":
         return
@@ -89,6 +91,8 @@ def read_token(token_type: TokenTypes) -> str:
 
 def write_token(token_type: TokenTypes, token: str) -> None:
     """Write a token to a file."""
+    if not CONFIG.store_tokens:
+        return
 
     if is_managed_token_environment() and token_type == "refresh_token":
         return

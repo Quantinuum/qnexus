@@ -235,6 +235,53 @@ def logout() -> None:
     print("Successfully logged out.")
 
 
+def login_with_token(refresh_token: str) -> None:
+    """Authenticate using a refresh token held in memory.
+
+    Sets the token on the current client's auth handler and exchanges
+    it for a fresh access token.  No tokens are written to disk.
+
+    This is intended for programmatic use where the caller manages
+    token storage externally (e.g. multiple accounts).
+
+    **Multi-process usage:** Each Python process has its own client
+    instance, so separate processes can each call ``login_with_token``
+    with different user tokens without interfering with each other.
+    Set ``CONFIG.store_tokens = False`` to prevent other code paths
+    (e.g. automatic token refresh) from writing to the shared
+    ``~/.qnx/auth/`` directory.
+
+    **Single-process token hot-swapping:** You can switch between
+    users sequentially within a single process. All subsequent API
+    calls will use the most recently set token::
+
+        import qnexus as qnx
+        from qnexus.config import CONFIG
+        CONFIG.store_tokens = False
+
+        alice_token = "..."
+        bob_token = "..."
+
+        qnx.login_with_token(alice_token)
+        qnx.projects.get_all()  # runs as alice
+
+        qnx.login_with_token(bob_token)
+        qnx.projects.get_all()  # runs as bob
+
+    .. warning::
+        This function is **not thread-safe**. The client and its auth
+        cookies are shared process-wide without locking. If one thread
+        calls ``login_with_token(alice_token)`` while another thread is
+        mid-request as Bob, the cookies can be in an inconsistent state.
+        For concurrent multi-user workloads, use separate processes
+        rather than threads within a single process.
+
+    """
+
+    client = get_nexus_client(reload=True)
+    client.auth.set_tokens(refresh_token)  # type: ignore[union-attr]
+
+
 def _request_tokens(user: EmailStr, pwd: str) -> None:
     """Method to send login request to Nexus auth api and save tokens."""
     body = {"email": user, "password": pwd}

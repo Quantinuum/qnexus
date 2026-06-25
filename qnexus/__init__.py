@@ -36,7 +36,7 @@ from qnexus.client import (
     users,
     wasm_modules,
 )
-from qnexus.client.auth import login, login_with_credentials, logout
+from qnexus.client.auth import login, login_with_credentials, login_with_token, logout
 from qnexus.client.jobs import compile, execute
 from qnexus.client.jobs._compile import start_compile_job
 from qnexus.client.jobs._execute import start_execute_job
@@ -74,6 +74,7 @@ __all__ = [
     "start_execute_job",
     "login",
     "login_with_credentials",
+    "login_with_token",
     "logout",
     "AerConfig",
     "AerStateConfig",
