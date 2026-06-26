@@ -235,7 +235,7 @@ def upload(
         }
     }
 
-    res = get_nexus_client().post("/api/hugr/v1beta", json=req_dict)
+    res = get_nexus_client().post("/api/hugr/v1beta2", json=req_dict)
 
     if res.status_code != 201:
         raise qnx_exc.ResourceCreateFailed(
