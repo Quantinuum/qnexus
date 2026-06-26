@@ -4,9 +4,11 @@ import time
 import typing
 import warnings
 from importlib.metadata import version
+from typing import Any, Generator
 from unittest import mock
 
 import httpx
+import pytest
 import respx
 
 import qnexus as qnx
@@ -18,6 +20,17 @@ from qnexus.client import (
 )
 from qnexus.client.auth import is_logged_in
 from qnexus.client.utils import write_token
+from qnexus.config import CONFIG
+
+
+@pytest.fixture(autouse=True)
+def ensure_store_tokens() -> Generator[Any, Any, Any]:
+    """Ensure store_tokens is True for tests that write tokens to disk."""
+    old_store_tokens = CONFIG.store_tokens
+    CONFIG.store_tokens = True
+    yield
+    CONFIG.store_tokens = old_store_tokens
+
 
 FAKE_LATEST_VERSION = "999.99.999-never-gonna-happen"
 FAKE_VERSION_STATUS = "really bad"
