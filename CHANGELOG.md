@@ -2,6 +2,15 @@
 
 # `qnexus` Release Notes
 
+## v0.46.0 (2026-06-30)
+
+
+### Added
+
+- Update the endpoint used for hugr upload (#353).
+- Enable in-memory tokens (#341).
+
+
 ## v0.45.0 (2026-06-22)
 
 
