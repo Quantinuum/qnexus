@@ -6,7 +6,6 @@ from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Circuit
 
 import qnexus as qnx
-from qnexus.models.job_status import JobStatusEnum
 from qnexus.models.references import (
     CompilationResultRef,
     ExecutionResultRef,
