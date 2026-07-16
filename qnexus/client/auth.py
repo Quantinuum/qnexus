@@ -8,7 +8,6 @@ import webbrowser
 from http import HTTPStatus
 
 import httpx
-import jwt
 from colorama import Fore
 from pydantic import EmailStr
 from rich.console import Console
@@ -44,22 +43,18 @@ def is_logged_in() -> bool:
         # in case we have valid in-memory tokens (e.g. store_tokens=False).
         pass
     else:
-        # Check expiry of refresh token (assume JWT)
-        try:
-            payload = jwt.decode(refresh_token, options={"verify_signature": False})
-            exp = payload.get("exp")
-            if exp:
-                expiry_dt = datetime.datetime.fromtimestamp(exp)
-                now = datetime.datetime.now()
-                hours_left = (expiry_dt - now).total_seconds() / 3600
-                if hours_left < 24:
-                    msg = (
-                        f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
-                        "You will need to login again after this time or use force=True to refresh now."
-                    )
-                    warnings.warn(msg, category=UserWarning)
-        except jwt.PyJWTError:
-            pass
+        # Check expiry of refresh token
+        exp = get_token_expiry()
+        if exp:
+            hours_left = exp / 3600
+            if hours_left < 24:
+                expiry_dt = datetime.datetime.now() + datetime.timedelta(seconds=exp)
+                msg = (
+                    f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
+                    "You will need to login again after this time or use qnx.login(force=True) to refresh now."
+                )
+                warnings.warn(msg, category=UserWarning)
+
     # Try a lightweight authenticated request to check validity
     try:
         client = get_nexus_client()
@@ -170,6 +165,7 @@ def login(force: bool = False, region: Region | None = None) -> None:
             continue
         if resp.status_code == HTTPStatus.OK:
             resp_json = resp.json()
+            print(resp_json)
             write_token("refresh_token", resp_json["refresh_token"])
             write_token(
                 "access_token",
@@ -355,3 +351,13 @@ def _response_check(res: httpx.Response, description: str) -> None:
         raise qnx_exc.AuthenticationError(
             f"HTTP error attempting: {description}.\n\nServer Response: {resp_json}"
         )
+
+
+def get_token_expiry() -> int:
+    """Get the time-to-live/expiry of the current refresh token (OAT) in seconds."""
+    resp = get_nexus_client().get("/auth/tokens")
+    ttl = resp.json()["token_status"]["ttl"]
+
+    if not isinstance(ttl, int):
+        raise RuntimeError(f"Expected integer TTL, got {type(ttl).__name__}: {ttl}")
+    return ttl
