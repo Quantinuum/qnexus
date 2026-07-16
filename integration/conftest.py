@@ -17,9 +17,6 @@ from quantinuum_schemas.models.backend_config import (
     AerStateConfig,
     AerUnitaryConfig,
     BackendConfig,
-    BraketConfig,
-    IBMQConfig,
-    IBMQEmulatorConfig,
     QuantinuumConfig,
     QulacsConfig,
     SeleneConfig,
@@ -58,9 +55,6 @@ AllBackendConfigs = Union[
     AerUnitaryConfig,
     BackendConfig,
     SeleneConfig,
-    BraketConfig,
-    IBMQConfig,
-    IBMQEmulatorConfig,
     QuantinuumConfig,
     QulacsConfig,
     SelenePlusConfig,
@@ -506,26 +500,9 @@ def get_backend_config_name(backend_config: qnx.BackendConfig) -> str:
         qnx.AerConfig(),
         qnx.AerStateConfig(),
         qnx.AerUnitaryConfig(),
-        qnx.BraketConfig(local=True),
         qnx.QuantinuumConfig(device_name="H1-1LE"),
         qnx.QulacsConfig(),
         # Non Nexus-hosted
-        qnx.IBMQConfig(
-            backend_name="ibm_fez",
-            instance=(
-                "crn:v1:bluemix:public:quantum-computing:us-east:"
-                "a/18f63f4565ef4a40851959792418cbf2:"
-                "8d532caa-3763-4aab-bb10-ecbcc8ff27cf::"
-            ),
-        ),
-        qnx.IBMQEmulatorConfig(
-            backend_name="ibm_fez",
-            instance=(
-                "crn:v1:bluemix:public:quantum-computing:us-east:"
-                "a/18f63f4565ef4a40851959792418cbf2:"
-                "8d532caa-3763-4aab-bb10-ecbcc8ff27cf::"
-            ),
-        ),
         qnx.QuantinuumConfig(device_name="H2-1SC"),  # Cluster-hosted
     ],
     ids=get_backend_config_name,
