@@ -1,6 +1,4 @@
 import base64
-import json
-import time
 import typing
 import warnings
 from importlib.metadata import version
@@ -188,23 +186,12 @@ def _base64url_encode(data: bytes) -> str:
 @respx.mock
 def test_refresh_token_expiry_warning_emitted() -> None:
     """Emits a warning when the refresh token expires in less than 24 hours."""
-    # Create an unsigned JWT with exp in the next hour
-    header = {"alg": "none", "typ": "JWT"}
-    payload = {"exp": int(time.time()) + 3600}
 
-    jwt_token = (
-        _base64url_encode(json.dumps(header).encode())
-        + "."
-        + _base64url_encode(json.dumps(payload).encode())
-        + "."
-    )
-
-    write_token("refresh_token", jwt_token)
+    write_token("refresh_token", "dummy_refresh")
     write_token("access_token", "dummy_id")
 
-    # Mock the lightweight authenticated request
-    me_route = respx.get(f"{get_nexus_client().base_url}/api/users/v1beta2/me").mock(
-        return_value=httpx.Response(200, json={"ok": True})
+    me_route = respx.get(f"{get_nexus_client().base_url}/auth/tokens").mock(
+        return_value=httpx.Response(200, json={"token_status": {"ttl": 42}})
     )
 
     with warnings.catch_warnings(record=True) as w:

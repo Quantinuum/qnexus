@@ -42,25 +42,20 @@ def is_logged_in() -> bool:
         # If tokens aren't on disk, fall through to the network check
         # in case we have valid in-memory tokens (e.g. store_tokens=False).
         pass
-    else:
-        # Check expiry of refresh token
-        exp = get_token_expiry()
-        if exp:
-            hours_left = exp / 3600
-            if hours_left < 24:
-                expiry_dt = datetime.datetime.now() + datetime.timedelta(seconds=exp)
-                msg = (
-                    f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
-                    "You will need to login again after this time or use qnx.login(force=True) to refresh now."
-                )
-                warnings.warn(msg, category=UserWarning)
 
-    # Try a lightweight authenticated request to check validity
     try:
-        client = get_nexus_client()
-        resp = client.get("/api/users/v1beta2/me")
-        if resp.status_code == HTTPStatus.OK:
-            return True
+        # Check expiry of refresh token, additionally checking authentication by making a request
+        exp = get_token_expiry()
+
+        hours_left = exp / 3600
+        if hours_left < 24:
+            expiry_dt = datetime.datetime.now() + datetime.timedelta(seconds=exp)
+            msg = (
+                f"Your refresh token expires in less than 24 hours (expires at {expiry_dt}). "
+                "You will need to login again after this time or use qnx.login(force=True) to refresh now."
+            )
+            warnings.warn(msg, category=UserWarning)
+        return True
     except (httpx.HTTPError, qnx_exc.AuthenticationError):
         pass
     return False
