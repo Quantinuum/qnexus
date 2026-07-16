@@ -165,7 +165,6 @@ def login(force: bool = False, region: Region | None = None) -> None:
             continue
         if resp.status_code == HTTPStatus.OK:
             resp_json = resp.json()
-            print(resp_json)
             write_token("refresh_token", resp_json["refresh_token"])
             write_token(
                 "access_token",
