@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.47.0 (2026-07-24)
+
+
+### Added
+
+- Enable feching the TTL of auth refresh tokens (#356).
+
+
 ## v0.46.0 (2026-06-30)
 
 
