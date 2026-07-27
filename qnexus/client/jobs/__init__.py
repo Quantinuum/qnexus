@@ -60,6 +60,7 @@ from qnexus.models.references import (
     JobRef,
     JobType,
     ProjectRef,
+    ShotplotRef,
     SystemRef,
     WasmModuleRef,
 )
@@ -1016,3 +1017,13 @@ def cost_confidence(
         )
 
     return cost_confidence_items
+
+
+@merge_scope_from_context
+def shotplots(
+    job: ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
+) -> list[ShotplotRef]:
+    assert isinstance(job, ExecuteJobRef), (
+        "Shotplots are only available for Execute jobs."
+    )
+    return _execute._shotplots(job, scope)

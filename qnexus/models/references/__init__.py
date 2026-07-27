@@ -28,6 +28,7 @@ from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Circuit
 from pytket.wasm.wasm import WasmModuleHandler
 from quantinuum_schemas.models.backend_config import BackendConfig
+from selene_core.trace import Trace
 
 from qnexus.context import merge_scope_from_context
 from qnexus.exceptions import IncompatibleResultVersion
@@ -705,6 +706,19 @@ class CompilationPassRef(BaseRef):
         )
 
 
+class ShotplotRef(BaseRef):
+    project: ProjectRef
+    job_item_id: UUID
+    job_item_integer_id: int | None = None
+    type: Literal["ShotplotRef"] = "ShotplotRef"
+
+    def download_shotplot(self) -> Trace:
+        """Given a shotplot ref, download and return to user"""
+        from qnexus.client.jobs._execute import _download_shotplot
+
+        return _download_shotplot(self.job_item_id)
+
+
 Ref = Annotated[
     Union[
         TeamRef,
@@ -723,6 +737,7 @@ Ref = Annotated[
         CompilationPassRef,
         SystemRef,
         IncompleteJobItemRef,
+        ShotplotRef,
     ],
     Field(discriminator="type"),
 ]
