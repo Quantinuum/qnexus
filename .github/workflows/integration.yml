@@ -77,7 +77,8 @@ jobs:
                         --timeout=600 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
-                        --purge-projects
+                        --purge-projects \
+                        --vv
 
       - name: Upload integration test results
         if: "!cancelled()"
