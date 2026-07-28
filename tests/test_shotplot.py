@@ -12,8 +12,8 @@ from qnexus.models.references import ExecuteJobRef
 from selene_core.trace import Trace
 
 
-def test_shotplot_get_and_download() -> None:
-    """Test that we can get shotplots for a job."""
+def test_runtime_traces_get_and_download() -> None:
+    """Test that we can get runtime traces for a job."""
 
     job_id = str(uuid.uuid4())
     job_item_uuid = str(uuid.uuid4())
@@ -71,7 +71,7 @@ def test_shotplot_get_and_download() -> None:
                                 "n_shots_completed": 10,
                             },
                             "result_type": "QSYS",
-                            "has_shotplot": True,
+                            "has_runtime_traces": True,
                         }
                     ],
                 },
@@ -113,14 +113,14 @@ def test_shotplot_get_and_download() -> None:
         ],
     }
 
-    with open("tests/data/shotplot_example.json", "r") as f:
-        shotplot_example = json.load(f)
+    with open("tests/data/runtime_traces_example.json", "r") as f:
+        runtime_traces_example = json.load(f)
 
     with (
         mock.patch("qnexus.client.jobs.get_nexus_client") as fetch_job_client_mock,
         mock.patch(
             "qnexus.client.jobs._execute.get_nexus_client"
-        ) as shotplot_client_mock,
+        ) as runtime_traces_client_mock,
     ):
         fetch_job_client = mock.MagicMock()
         mock_get_job_resp = mock.MagicMock()
@@ -129,19 +129,21 @@ def test_shotplot_get_and_download() -> None:
         fetch_job_client.get.return_value = mock_get_job_resp
 
         fetch_job_client_mock.return_value = fetch_job_client
-        shotplot_client_mock.return_value = fetch_job_client
+        runtime_traces_client_mock.return_value = fetch_job_client
 
         job_ref = qnx.jobs.get(id=job_id)
         job_ref = cast(ExecuteJobRef, job_ref)
-        shotplots = qnx.jobs.shotplots(job_ref)
-        assert len(shotplots) == 1
+        runtime_traces = qnx.jobs.runtime_tracess(job_ref)
+        assert len(runtime_traces) == 1
 
-        download_shotplot_client = mock.MagicMock()
-        mock_download_shotplot_resp = mock.MagicMock()
-        mock_download_shotplot_resp.status_code = 200
-        mock_download_shotplot_resp.json.return_value = shotplot_example
-        download_shotplot_client.get.return_value = mock_download_shotplot_resp
-        shotplot_client_mock.return_value = download_shotplot_client
+        download_runtime_traces_client = mock.MagicMock()
+        mock_download_runtime_traces_resp = mock.MagicMock()
+        mock_download_runtime_traces_resp.status_code = 200
+        mock_download_runtime_traces_resp.json.return_value = runtime_traces_example
+        download_runtime_traces_client.get.return_value = (
+            mock_download_runtime_traces_resp
+        )
+        runtime_traces_client_mock.return_value = download_runtime_traces_client
 
-        downloaded = shotplots[0].download_shotplot()
+        downloaded = runtime_traces[0].download_runtime_traces()
         assert isinstance(downloaded, Trace)

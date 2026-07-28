@@ -40,7 +40,7 @@ from qnexus.models.references import (
     QIRResult,
     ResultType,
     ResultVersions,
-    ShotplotRef,
+    RuntimeTracesRef,
     WasmModuleRef,
 )
 from qnexus.models.region import Region
@@ -300,28 +300,26 @@ def _fetch_qsys_execution_result(
 
 
 @merge_scope_from_context
-def _download_shotplot(
+def _download_runtime_traces(
     job_item_id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> Trace:
     resp = get_nexus_client().get(
-        f"/api/shotplots/v1beta/{job_item_id}",
+        f"/api/job_items/v1beta/{job_item_id}/runtime_traces",
         params={"scope": scope.value},
     )
     if resp.status_code != 200:
         raise qnx_exc.ResourceFetchFailed(
             message=resp.text, status_code=resp.status_code
         )
-    trace = Trace.model_validate(
-        resp.json()["data"]["attributes"]["shotplot"]["shots"][0]["trace"]
-    )
+    trace = Trace.model_validate(resp.json()["data"]["attributes"]["shots"][0]["trace"])
     return trace
 
 
 @merge_scope_from_context
-def _shotplots(
+def _runtime_traces(
     execute_job: ExecuteJobRef,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
-) -> list[ShotplotRef]:
+) -> list[RuntimeTracesRef]:
 
     resp = get_nexus_client().get(
         f"/api/jobs/v1beta3/{execute_job.id}",
@@ -332,16 +330,16 @@ def _shotplots(
             message=resp.text, status_code=resp.status_code
         )
     resp_data = resp.json()["data"]
-    shotplots = []
+    runtime_traces = []
     for item in resp_data["attributes"]["definition"]["items"]:
-        has_shotplot = item.get("has_shotplot", False)
-        if has_shotplot:
-            shotplots.append(
-                ShotplotRef(
+        has_runtime_trace = item.get("has_runtime_traces", False)
+        if has_runtime_trace:
+            runtime_traces.append(
+                RuntimeTracesRef(
                     id=item["item_uuid"],
                     job_item_id=item["item_uuid"],
                     job_item_integer_id=item.get("item_id", None),
                     project=execute_job.project,
                 )
             )
-    return shotplots
+    return runtime_traces

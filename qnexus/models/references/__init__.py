@@ -706,17 +706,17 @@ class CompilationPassRef(BaseRef):
         )
 
 
-class ShotplotRef(BaseRef):
+class RuntimeTracesRef(BaseRef):
     project: ProjectRef
     job_item_id: UUID
     job_item_integer_id: int | None = None
-    type: Literal["ShotplotRef"] = "ShotplotRef"
+    type: Literal["RuntimeTracesRef"] = "RuntimeTracesRef"
 
-    def download_shotplot(self) -> Trace:
-        """Given a shotplot ref, download and return to user"""
-        from qnexus.client.jobs._execute import _download_shotplot
+    def download_runtime_traces(self) -> Trace:
+        """Given a runtime traces ref, download and return to user"""
+        from qnexus.client.jobs._execute import _download_runtime_traces
 
-        return _download_shotplot(self.job_item_id)
+        return _download_runtime_traces(self.job_item_id)
 
 
 Ref = Annotated[
@@ -737,7 +737,7 @@ Ref = Annotated[
         CompilationPassRef,
         SystemRef,
         IncompleteJobItemRef,
-        ShotplotRef,
+        RuntimeTracesRef,
     ],
     Field(discriminator="type"),
 ]

@@ -60,7 +60,7 @@ from qnexus.models.references import (
     JobRef,
     JobType,
     ProjectRef,
-    ShotplotRef,
+    RuntimeTracesRef,
     SystemRef,
     WasmModuleRef,
 )
@@ -1020,10 +1020,10 @@ def cost_confidence(
 
 
 @merge_scope_from_context
-def shotplots(
+def runtime_tracess(
     job: ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
-) -> list[ShotplotRef]:
+) -> list[RuntimeTracesRef]:
     assert isinstance(job, ExecuteJobRef), (
-        "Shotplots are only available for Execute jobs."
+        "Runtime traces are only available for Execute jobs."
     )
-    return _execute._shotplots(job, scope)
+    return _execute._runtime_traces(job, scope)

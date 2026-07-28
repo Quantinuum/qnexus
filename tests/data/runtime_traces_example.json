@@ -1,0 +1,164 @@
+{
+  "data": {
+    "attributes": {
+      "shots": [
+        {
+          "index": 0,
+          "trace": {
+            "events":[
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":0
+                   },
+                   "event":{
+                      "kind":"Gate",
+                      "qubits":[
+                         0
+                      ],
+                      "gate_name":"QAlloc",
+                      "params":[
+                         
+                      ],
+                      "predicates":[
+                         
+                      ]
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":1
+                   },
+                   "event":{
+                      "kind":"Reset",
+                      "qubit":0
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":38
+                   },
+                   "event":{
+                      "kind":"Gate",
+                      "qubits":[
+                         18
+                      ],
+                      "gate_name":"Rxy",
+                      "params":[
+                         1.5707963267948966,
+                         -1.5707963267948966
+                      ],
+                      "predicates":[
+                         
+                      ]
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":39
+                   },
+                   "event":{
+                      "kind":"Gate",
+                      "qubits":[
+                         18
+                      ],
+                      "gate_name":"Rz",
+                      "params":[
+                         3.141592653589793
+                      ],
+                      "predicates":[
+                         
+                      ]
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"Runtime",
+                      "start_time":0,
+                      "end_time":0
+                   },
+                   "event":{
+                      "kind":"Custom",
+                      "payload":{
+                         "kind":"OpaquePayload",
+                         "tag":8056874943318669037,
+                         "data":"gapSZWxhYmVsaW5nktwAGAIJCgIICwoFFBAMBxENBhIOAwQTDwIBAhg="
+                      }
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"Runtime",
+                      "start_time":1083748803,
+                      "end_time":1083778803
+                   },
+                   "event":{
+                      "kind":"Gate",
+                      "qubits":[
+                         15,
+                         20
+                      ],
+                      "gate_name":"Rzz",
+                      "params":[
+                         1.5707963267948966
+                      ],
+                      "predicates":[
+                         
+                      ]
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"Runtime",
+                      "start_time":1084209659,
+                      "end_time":1084290659
+                   },
+                   "event":{
+                      "kind":"Custom",
+                      "payload":{
+                         "kind":"OpaquePayload",
+                         "tag":8056874943318669037,
+                         "data":"gaNSeHmVmIGkU29tZQ-kTm9uZaROb25lpE5vbmWkTm9uZaROb25lpE5vbmWkTm9uZZjLP_kh-1RELRjLAAAAAAAAAADLAAAAAAAAAADLAAAAAAAAAADLAAAAAAAAAADLAAAAAAAAAADLAAAAAAAAAADLAAAAAAAAAACYy0AS2Xx_MyHSywAAAAAAAAAAywAAAAAAAAAAywAAAAAAAAAAywAAAAAAAAAAywAAAAAAAAAAywAAAAAAAAAAywAAAAAAAAAAokNSokxS"
+                      }
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":1272
+                   },
+                   "event":{
+                      "kind":"Measurement",
+                      "qubit":7
+                   }
+                },
+                {
+                   "source":{
+                      "kind":"UserProgram",
+                      "index":1273
+                   },
+                   "event":{
+                      "kind":"Gate",
+                      "qubits":[
+                         7
+                      ],
+                      "gate_name":"QFree",
+                      "params":[
+                         
+                      ],
+                      "predicates":[
+                         
+                      ]
+                   }
+                }
+             ]
+          }
+        }
+      ]
+     }
+   }
+}
+       
