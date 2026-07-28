@@ -78,7 +78,7 @@ jobs:
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
-                        --vv
+                        -vv
 
       - name: Upload integration test results
         if: "!cancelled()"
