@@ -1,4 +1,4 @@
-"""Tests for"""
+"""Tests for getting and downloading runtime traces."""
 
 import json
 from typing import cast
@@ -133,7 +133,7 @@ def test_runtime_traces_get_and_download() -> None:
 
         job_ref = qnx.jobs.get(id=job_id)
         job_ref = cast(ExecuteJobRef, job_ref)
-        runtime_traces = qnx.jobs.runtime_tracess(job_ref)
+        runtime_traces = qnx.jobs.runtime_traces(job_ref)
         assert len(runtime_traces) == 1
 
         download_runtime_traces_client = mock.MagicMock()

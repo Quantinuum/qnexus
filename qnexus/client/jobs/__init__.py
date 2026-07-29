@@ -1020,7 +1020,7 @@ def cost_confidence(
 
 
 @merge_scope_from_context
-def runtime_tracess(
+def runtime_traces(
     job: ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> list[RuntimeTracesRef]:
     assert isinstance(job, ExecuteJobRef), (
