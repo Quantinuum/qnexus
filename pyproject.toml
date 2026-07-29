@@ -52,6 +52,7 @@ dev = [
     "guppylang >=0.21.0, <1.0.0",
     "pytket-qir>=0.22.0",
     "scipy-stubs>=1.15.3.0",
+    "fastapi==0.136.3",
 ]
 
 

@@ -60,6 +60,7 @@ from qnexus.models.references import (
     JobRef,
     JobType,
     ProjectRef,
+    RuntimeTracesRef,
     SystemRef,
     WasmModuleRef,
 )
@@ -1016,3 +1017,13 @@ def cost_confidence(
         )
 
     return cost_confidence_items
+
+
+@merge_scope_from_context
+def runtime_traces(
+    job: ExecuteJobRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER
+) -> list[RuntimeTracesRef]:
+    assert isinstance(job, ExecuteJobRef), (
+        "Runtime traces are only available for Execute jobs."
+    )
+    return _execute._runtime_traces(job, scope)
