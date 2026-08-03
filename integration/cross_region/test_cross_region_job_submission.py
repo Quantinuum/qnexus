@@ -10,7 +10,6 @@ from typing import Callable, ContextManager, cast
 
 import pytest
 from hugr.package import Package
-from pathlib import Path
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
@@ -24,11 +23,9 @@ import qnexus.exceptions as qnx_exc
 
 import qnexus as qnx
 from test_qir.py import make_qir_bitcode_from_file
-from qnexus.exceptions import ResourceCreateFailed
 from qnexus.models.references import ExecutionResultRef, ProjectRef, CircuitRef, QIRRef, QIRResult, ResultVersions
 from qnexus.models.region import Region
 from cross_region.region_devices import load_region_devices
-import pyqir
 
 
 def test_cross_region_execute_job_hugr_ng(
