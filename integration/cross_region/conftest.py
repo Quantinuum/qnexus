@@ -49,7 +49,7 @@ def target_region() -> Region:
 
 @pytest.fixture(scope="module", autouse=True)
 def authenticated_nexus(home_region: Region) -> Generator[None, None, None]:
-    """Override `authenticated_nexus` to log in against `home_region`, instead of 
+    """Override `authenticated_nexus` to log in against `home_region`, instead of
     the default region used by the rest of the integration suite."""
     try:
         login_no_interaction(

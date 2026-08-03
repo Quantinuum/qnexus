@@ -23,7 +23,14 @@ import qnexus.exceptions as qnx_exc
 
 import qnexus as qnx
 from test_qir.py import make_qir_bitcode_from_file
-from qnexus.models.references import ExecutionResultRef, ProjectRef, CircuitRef, QIRRef, QIRResult, ResultVersions
+from qnexus.models.references import (
+    ExecutionResultRef,
+    ProjectRef,
+    CircuitRef,
+    QIRRef,
+    QIRResult,
+    ResultVersions,
+)
 from qnexus.models.region import Region
 from cross_region.region_devices import load_region_devices
 
@@ -73,52 +80,52 @@ def test_cross_region_execute_job_hugr_ng(
 
 
 def test_cross_region_execute_job_qir_ng(
-        test_case_name: str,
-        create_qir_in_project: Callable[[str, str, bytes], ContextManager[QIRRef]],
-        target_region: Region,
-    ) -> None:
-     """Test the execution of a cross island QIR program on an NG device"""
+    test_case_name: str,
+    create_qir_in_project: Callable[[str, str, bytes], ContextManager[QIRRef]],
+    target_region: Region,
+) -> None:
+    """Test the execution of a cross island QIR program on an NG device"""
 
-     ng_device_name = load_region_devices(target_region)["helios_ng_device"]
+    ng_device_name = load_region_devices(target_region)["helios_ng_device"]
 
-     project_name = f"project for {test_case_name}"
-     qir_name = f"qir for {test_case_name}"
-     
-     with create_qir_in_project(
-             project_name,
-             qir_name,
-             make_qir_bitcode_from_file("base.ll"),
-         ) as qir_ref:
-             project_ref = qnx.projects.get(name=project_name)
-     
-             job_ref = qnx.start_execute_job(
-                 programs=[qir_ref],
-                 n_shots=[10],
-                 max_cost=[10.0],
-                 backend_config=qnx.QuantinuumConfig(
-                     device_name=ng_device_name, compiler_options={"max-qubits": 5}
-                 ),
-                 project=project_ref,
-                 name=f"qir job for {test_case_name}",
-                 target_region=target_region,
-             )
-     
-             qnx.jobs.wait_for(job_ref)
-     
-             result_ref = qnx.jobs.results(job_ref)[0]
-             assert isinstance(result_ref, ExecutionResultRef)
-             results = result_ref.download_result()
-             # Assert this is a QIR compliant result
-             assert isinstance(results, QIRResult)
-             escaped_results = results.results.encode("unicode_escape").decode()
-             assert "HEADER\\tschema_id\\tlabeled" in escaped_results
-             # Can't assert the value is the same, so just check the output is there
-             assert "OUTPUT\\tTUPLE\\t2\\tt0" in escaped_results
-     
-             v4_results = result_ref.download_result(version=ResultVersions.RAW)
-             # Assert this is in v4 format
-             assert isinstance(v4_results, QsysResult)
-             assert v4_results.results[0].entries[0][0] == "USER:QIRTUPLE:t0"
+    project_name = f"project for {test_case_name}"
+    qir_name = f"qir for {test_case_name}"
+
+    with create_qir_in_project(
+        project_name,
+        qir_name,
+        make_qir_bitcode_from_file("base.ll"),
+    ) as qir_ref:
+        project_ref = qnx.projects.get(name=project_name)
+
+        job_ref = qnx.start_execute_job(
+            programs=[qir_ref],
+            n_shots=[10],
+            max_cost=[10.0],
+            backend_config=qnx.QuantinuumConfig(
+                device_name=ng_device_name, compiler_options={"max-qubits": 5}
+            ),
+            project=project_ref,
+            name=f"qir job for {test_case_name}",
+            target_region=target_region,
+        )
+
+        qnx.jobs.wait_for(job_ref)
+
+        result_ref = qnx.jobs.results(job_ref)[0]
+        assert isinstance(result_ref, ExecutionResultRef)
+        results = result_ref.download_result()
+        # Assert this is a QIR compliant result
+        assert isinstance(results, QIRResult)
+        escaped_results = results.results.encode("unicode_escape").decode()
+        assert "HEADER\\tschema_id\\tlabeled" in escaped_results
+        # Can't assert the value is the same, so just check the output is there
+        assert "OUTPUT\\tTUPLE\\t2\\tt0" in escaped_results
+
+        v4_results = result_ref.download_result(version=ResultVersions.RAW)
+        # Assert this is in v4 format
+        assert isinstance(v4_results, QsysResult)
+        assert v4_results.results[0].entries[0][0] == "USER:QIRTUPLE:t0"
 
 
 def test_cross_region_execute_job_qir_og(
@@ -225,8 +232,8 @@ def test_reject_cross_region_job_for_nexus_simulators(
     test_case_name: str,
     create_project: Callable[[str], ContextManager[ProjectRef]],
     create_circuit_in_project: Callable[
-            [Circuit, str, str], ContextManager[CircuitRef]
-        ],
+        [Circuit, str, str], ContextManager[CircuitRef]
+    ],
     qa_hugr_package: Package,
     target_region: Region,
     test_circuit: Circuit,
@@ -236,24 +243,24 @@ def test_reject_cross_region_job_for_nexus_simulators(
 
     local_project_name = f"project for {test_case_name}"
     local_circuit_name = f"circuit for {test_case_name}"
-    
+
     with create_circuit_in_project(
-            test_circuit,
-            local_project_name,
-            local_circuit_name,
-        ) as circ_ref:
-            my_proj = qnx.projects.get_or_create(local_project_name)
-    
-            with pytest.raises(qnx_exc.ResourceCreateFailed) as exc:
-                qnx.start_execute_job(
-                                programs=[circ_ref],
-                                n_shots=[10],
-                                backend_config=AerConfig(),
-                                project=my_proj,
-                                name=f"cross-region simulator job for {test_case_name}",
-                                target_region=target_region,
-                            )
-                assert exc.value.status_code == 400
-                assert "Nexus hosted simulators can only be run in the current region" in (
-                    exc.value.message
-                )
+        test_circuit,
+        local_project_name,
+        local_circuit_name,
+    ) as circ_ref:
+        my_proj = qnx.projects.get_or_create(local_project_name)
+
+        with pytest.raises(qnx_exc.ResourceCreateFailed) as exc:
+            qnx.start_execute_job(
+                programs=[circ_ref],
+                n_shots=[10],
+                backend_config=AerConfig(),
+                project=my_proj,
+                name=f"cross-region simulator job for {test_case_name}",
+                target_region=target_region,
+            )
+            assert exc.value.status_code == 400
+            assert "Nexus hosted simulators can only be run in the current region" in (
+                exc.value.message
+            )

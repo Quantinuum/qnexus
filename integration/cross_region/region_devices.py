@@ -1,5 +1,4 @@
-"""Helper to load per-region device names for cross-region integration tests.
-"""
+"""Helper to load per-region device names for cross-region integration tests."""
 
 import json
 from pathlib import Path
