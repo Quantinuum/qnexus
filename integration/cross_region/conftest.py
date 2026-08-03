@@ -36,13 +36,13 @@ def pytest_collection_modifyitems(
 
 
 @pytest.fixture(scope="module")
-def home_region() -> Region:
+def home_region() -> str:
     """The region the test user logs in against."""
     return os.getenv("NEXUS_HOME_REGION", "sg")
 
 
 @pytest.fixture(scope="module")
-def target_region() -> Region:
+def target_region() -> str:
     """The region that jobs are submitted to from the home region."""
     return os.getenv("NEXUS_TARGET_REGION", "us")
 

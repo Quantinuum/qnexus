@@ -22,7 +22,7 @@ from pytket.circuit import Circuit, Bit
 import qnexus.exceptions as qnx_exc
 
 import qnexus as qnx
-from test_qir.py import make_qir_bitcode_from_file
+from test_qir import make_qir_bitcode_from_file
 from qnexus.models.references import (
     ExecutionResultRef,
     ProjectRef,
