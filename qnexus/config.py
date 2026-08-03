@@ -42,6 +42,8 @@ class Config(BaseSettings):
     # testing
     qa_user_email: str = ""
     qa_user_password: str = ""
+    qa_home_user_email: str = ""
+    qa_home_user_password: str = ""
 
     def __str__(self) -> str:
         """String representation of current config."""
