@@ -94,6 +94,6 @@ def test_gpu_decoder_config_flow(
         )
 
         # Don't fully submit the job (July 2025)
-        qnx.jobs.wait_for(execute_job_ref, wait_for_status=JobStatusEnum.SUBMITTED)
+        qnx.jobs.wait_for(execute_job_ref, wait_for_status=JobStatusEnum.QUEUED)
         qnx.jobs.cancel(execute_job_ref)
         qnx.jobs.wait_for(execute_job_ref, wait_for_status=JobStatusEnum.CANCELLED)
