@@ -98,8 +98,8 @@ jobs:
       matrix:
         python-version: ["3.12"]
     env:
-      NEXUS_QA_HOME_USER_EMAIL: ${{ secrets.NEXUS_CROSS_REGION_QA_USER_EMAIL }}
-      NEXUS_QA_HOME_USER_PASSWORD: ${{ secrets.NEXUS_CROSS_REGION_QA_USER_PASSWORD }}
+      NEXUS_QA_HOME_USER_EMAIL: ${{ secrets.NEXUS_QA_HOME_USER_EMAIL }}
+      NEXUS_QA_HOME_USER_PASSWORD: ${{ secrets.NEXUS_QA_HOME_USER_PASSWORD }}
       NEXUS_DOMAIN: "qa.myqos.com"
       NEXUS_SG_DOMAIN: "sg.qa.myqos.com"
       NEXUS_STORE_TOKENS: "false"
