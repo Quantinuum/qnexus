@@ -139,8 +139,6 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
           cache-dependency-glob: uv.lock
-          # Distinct suffix to avoid cache collisions with the normal integration job running in parallel.
-          cache-suffix: cross-region
 
       - name: Run cross-region integration tests
         run: |
