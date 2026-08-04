@@ -75,7 +75,7 @@ jobs:
                         --ignore=integration/cross_region \
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
-                        --timeout=600 \
+                        --timeout=100 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
@@ -145,7 +145,7 @@ jobs:
           uv run pytest integration/cross_region \
                         --html=cross-region-integration-results.html \
                         --junit-xml=cross-region-integration-results.xml \
-                        --timeout=600 \
+                        --timeout=100 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
