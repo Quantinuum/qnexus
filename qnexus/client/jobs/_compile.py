@@ -7,7 +7,7 @@ from quantinuum_schemas.models.hypertket_config import HyperTketConfig
 import qnexus.exceptions as qnx_exc
 from qnexus.client import circuits as circuit_api
 from qnexus.client import get_nexus_client
-from qnexus.client.utils import accept_circuits_for_programs
+from qnexus.client.utils import accept_circuits_for_programs, handle_fetch_errors
 from qnexus.context import (
     get_active_project,
     merge_properties_from_context,
@@ -142,10 +142,7 @@ def _results(
         params={"scope": scope.value},
     )
 
-    if resp.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(
-            message=resp.text, status_code=resp.status_code
-        )
+    handle_fetch_errors(resp)
     resp_data = resp.json()["data"]
 
     job_status = resp_data["attributes"]["status"]["status"]
@@ -167,11 +164,7 @@ def _results(
                 params={"scope": scope.value},
             )
 
-            if comp_record_resp.status_code != 200:
-                raise qnx_exc.ResourceFetchFailed(
-                    message=comp_record_resp.text,
-                    status_code=comp_record_resp.status_code,
-                )
+            handle_fetch_errors(comp_record_resp)
 
             comp_json = comp_record_resp.json()
 
@@ -228,10 +221,7 @@ def _fetch_compilation_output(
         params={"scope": scope.value},
     )
 
-    if resp.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(
-            message=resp.text, status_code=resp.status_code
-        )
+    handle_fetch_errors(resp)
 
     res_dict = resp.json()
     relationships = res_dict["data"]["relationships"]
@@ -259,10 +249,7 @@ def _fetch_compilation_passes(
 
     resp = get_nexus_client().get("/api/compilation_passes/v1beta2", params=params)
 
-    if resp.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(
-            message=resp.text, status_code=resp.status_code
-        )
+    handle_fetch_errors(resp)
 
     pass_json = resp.json()
     pass_list: DataframableList[CompilationPassRef] = DataframableList([])

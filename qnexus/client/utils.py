@@ -137,6 +137,9 @@ def handle_fetch_errors(res: Response) -> None:
     if res.status_code == 404:
         raise qnx_exc.ZeroMatches()
 
+    if res.status_code == 410:
+        raise qnx_exc.DataGone("Requested data is no longer available.")
+
     if res.status_code != 200:
         raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
 

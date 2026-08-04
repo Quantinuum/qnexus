@@ -14,7 +14,7 @@ from qnexus.client.results import (
     fetch_pytket_execution_result_by_id,
     fetch_qsys_result_by_id,
 )
-from qnexus.client.utils import accept_circuits_for_programs
+from qnexus.client.utils import accept_circuits_for_programs, handle_fetch_errors
 from qnexus.context import (
     get_active_project,
     merge_properties_from_context,
@@ -196,10 +196,7 @@ def _results(
         f"/api/jobs/v1beta3/{execute_job.id}",
         params={"scope": scope.value},
     )
-    if resp.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(
-            message=resp.text, status_code=resp.status_code
-        )
+    handle_fetch_errors(resp)
     resp_data = resp.json()["data"]
     job_status = resp_data["attributes"]["status"]["status"]
 

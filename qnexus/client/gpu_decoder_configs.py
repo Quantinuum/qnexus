@@ -331,7 +331,6 @@ def _fetch_gpu_decoder_config(
         f"/api/gpu_decoder_configs/v1beta/{handle.id}",
         params={"scope": scope.value},
     )
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     return base64.b64decode(res.json()["data"]["attributes"]["contents"]).decode()

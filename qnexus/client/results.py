@@ -21,6 +21,7 @@ from qnexus.client import circuits as circuit_api
 from qnexus.client import get_nexus_client
 from qnexus.client import hugr as hugr_api
 from qnexus.client import qir as qir_api
+from qnexus.client.utils import handle_fetch_errors
 from qnexus.context import merge_scope_from_context
 from qnexus.models import StoredBackendInfo, to_pytket_backend_info
 from qnexus.models.references import (
@@ -50,6 +51,8 @@ def get(
     except qnx_exc.ResourceFetchFailed as ex:
         if ex.status_code == 404:  # if status is not found, try qsys
             res = fetch_qsys_result_by_id(id, ResultVersions.DEFAULT, scope)
+        elif ex.status_code == 410:
+            raise qnx_exc.DataGone("Requested data is no longer available.")
         else:
             raise ex
     return res
@@ -113,8 +116,7 @@ def fetch_qsys_result_by_id(
         f"/api/qsys_results/v1beta2/partial/{id}", params=params
     )
 
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     # This is only needed to be set once, as subsequent calls will
     # return the same information for the relationships.
@@ -157,6 +159,8 @@ def fetch_qsys_result_by_id(
         if partial.status_code == 404:
             # No more chunks. Stop here.
             break
+        if partial.status_code == 410:
+            raise qnx_exc.DataGone("Requested data is no longer available.")
         if partial.status_code != 200:
             raise qnx_exc.ResourceFetchFailed(
                 message=res.text, status_code=partial.status_code

@@ -325,8 +325,7 @@ def _fetch_wasm_module(
         f"/api/wasm/v1beta/{handle.id}",
         params={"scope": scope.value},
     )
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     res_data_attributes_dict = res.json()["data"]["attributes"]
 

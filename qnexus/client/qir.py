@@ -385,8 +385,7 @@ def _fetch_qir(handle: QIRRef, scope: ScopeFilterEnum = ScopeFilterEnum.USER) ->
         f"/api/qir/v1beta/{handle.id}",
         params={"scope": scope.value},
     )
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     contents: str = res.json()["data"]["attributes"]["contents"]
     return _decode_qir(contents)
