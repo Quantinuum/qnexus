@@ -33,6 +33,10 @@ class ZeroMatches(Exception):
     """Raised when a ``get`` call finds no matches."""
 
 
+class DataGone(Exception):
+    """Raised when previously available data is no longer available (HTTP 410)."""
+
+
 class NoUniqueMatch(Exception):
     """Raised when a ``get`` call finds more than one match."""
 

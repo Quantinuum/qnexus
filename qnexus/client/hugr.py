@@ -428,8 +428,7 @@ def _fetch_hugr_bytes(
         f"/api/hugr/v1beta/{handle.id}",
         params={"scope": scope.value},
     )
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     contents = res.json()["data"]["attributes"]["contents"]
     return base64.b64decode(contents)

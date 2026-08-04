@@ -331,8 +331,7 @@ def _fetch_circuit(
         f"/api/circuits/v1beta2/{handle.id}",
         params={"scope": scope.value},
     )
-    if res.status_code != 200:
-        raise qnx_exc.ResourceFetchFailed(message=res.text, status_code=res.status_code)
+    handle_fetch_errors(res)
 
     res_data_attributes_dict = res.json()["data"]["attributes"]
     circuit_dict = {k: v for k, v in res_data_attributes_dict.items() if v is not None}
