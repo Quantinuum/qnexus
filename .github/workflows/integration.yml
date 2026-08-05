@@ -77,7 +77,6 @@ jobs:
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
                         --timeout=600 \
-                        --timeout-method=thread \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
@@ -150,11 +149,10 @@ jobs:
                         --html=cross-region-integration-results.html \
                         --junit-xml=cross-region-integration-results.xml \
                         --timeout=600 \
-                        --timeout-method=thread \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
-                        -o addopts="--strict-markers -n 0" \
+                        -o addopts="--strict-markers -n 1" \
                         -vv
 
       - name: Upload cross-region integration test results

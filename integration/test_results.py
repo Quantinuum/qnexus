@@ -20,6 +20,8 @@ from qnexus.models.references import (
     ProjectRef,
 )
 
+from constants import JOB_TIMEOUT
+
 
 def test_fetch_qsys_result(
     test_case_name: str,
@@ -51,7 +53,7 @@ def test_fetch_qsys_result(
             max_cost=[10.0],
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
 
@@ -106,7 +108,7 @@ def test_fetch_pytket_result(
         circuit=test_circuit,
         circuit_name=circuit_name,
     ) as execute_job_ref:
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         execute_results = qnx.jobs.results(execute_job_ref)
 

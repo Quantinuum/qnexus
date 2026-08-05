@@ -32,6 +32,8 @@ from qnexus.models.references import (
     ResultVersions,
 )
 from qnexus.models.region import Region
+
+from constants import JOB_TIMEOUT
 from cross_region.region_devices import load_region_devices
 
 
@@ -68,7 +70,7 @@ def test_cross_region_execute_job_hugr_ng(
             target_region=target_region,
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
         assert len(results) == 1
@@ -110,7 +112,7 @@ def test_cross_region_execute_job_qir_ng(
             target_region=target_region,
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         result_ref = qnx.jobs.results(job_ref)[0]
         assert isinstance(result_ref, ExecutionResultRef)
@@ -159,7 +161,7 @@ def test_cross_region_execute_job_qir_og(
             target_region=target_region,
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
 
@@ -212,7 +214,7 @@ def test_cross_region_execute_job_pytket_og(
             target_region=target_region,
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
         assert len(results) == 1

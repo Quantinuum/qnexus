@@ -12,6 +12,8 @@ from qnexus.models.references import (
     ExecutionResultRef,
 )
 
+from constants import JOB_TIMEOUT
+
 
 def get_rng_circuit(seed: int, n_rng: int, test_index: bool = False) -> Circuit:
     """Creates a single qubit pytket circuit to test RNGs.
@@ -121,7 +123,7 @@ def test_rng(
 
                 # Case 1: Executing a circuit with the same seed and no index
                 #         multiple times should give the same RNG numbers in all shots.
-                qnx.jobs.wait_for(execute_job_case1)
+                qnx.jobs.wait_for(execute_job_case1, timeout=JOB_TIMEOUT)
                 results_same = qnx.jobs.results(execute_job_case1)
                 rng1_A_result_ref = results_same[0]
                 rng1_B_result_ref = results_same[1]
@@ -150,7 +152,7 @@ def test_rng(
 
                 # Case 2: Executing the same circuit with the same seed and changing the
                 #         index should give different RNG numbers in all shots.
-                qnx.jobs.wait_for(execute_job_case2)
+                qnx.jobs.wait_for(execute_job_case2, timeout=JOB_TIMEOUT)
                 results_index = qnx.jobs.results(execute_job_case2)
                 rng2_result_ref = results_index[0]
                 assert isinstance(rng2_result_ref, ExecutionResultRef)
@@ -172,7 +174,7 @@ def test_rng(
 
                 # Case 3: Executing the circuit with a different seed should give
                 #         a different RNG number than the case 1 execution.
-                qnx.jobs.wait_for(execute_job_case3)
+                qnx.jobs.wait_for(execute_job_case3, timeout=JOB_TIMEOUT)
                 results_diff = qnx.jobs.results(execute_job_case3)
                 rng3_result_ref = results_diff[0]
                 assert isinstance(rng3_result_ref, ExecutionResultRef)
