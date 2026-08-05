@@ -152,7 +152,7 @@ jobs:
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
-                        -o addopts="--strict-markers -n 1" \
+                        -o addopts="--strict-markers -n 2" \
                         -vv
 
       - name: Upload cross-region integration test results
