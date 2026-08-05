@@ -80,7 +80,7 @@ jobs:
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
-                        -o addopts="--strict-markers -n 2 --reruns 3" \
+                        -o addopts="--strict-markers -n 3 --reruns 3" \
                         -vv
 
       - name: Upload integration test results
