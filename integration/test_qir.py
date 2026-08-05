@@ -246,6 +246,7 @@ def test_costing_qir_on_NG_devices(
             programs=[qir_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost, float)
 
@@ -271,6 +272,7 @@ def test_qir_cost_confidence(
             programs=[qir_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0

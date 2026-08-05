@@ -118,6 +118,7 @@ def test_hugr_costing(
             programs=[hugr_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost, float)
 
@@ -141,6 +142,7 @@ def test_hugr_cost_confidence(
             programs=[hugr_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0

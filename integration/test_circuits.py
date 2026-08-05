@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from pytket.circuit import Circuit
 
+from constants import JOB_TIMEOUT
 import qnexus as qnx
 import qnexus.exceptions as qnx_exc
 from qnexus.models.annotations import PropertiesDict
@@ -157,6 +158,7 @@ def test_circuit_get_cost(
                 backend_config=qnx.QuantinuumConfig(device_name=device_name),
                 syntax_checker=syntax_checker,
                 project=my_proj,
+                timeout=JOB_TIMEOUT,
             )
 
             assert isinstance(cost, float)
