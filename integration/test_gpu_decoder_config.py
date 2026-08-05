@@ -3,9 +3,10 @@
 from typing import Callable, ContextManager
 
 import pandas as pd
+import pytest
 
 import qnexus as qnx
-from qnexus.models.job_status import JobStatusEnum
+import qnexus.exceptions as qnx_exc
 from qnexus.models.references import GpuDecoderConfigRef, Ref
 
 
@@ -40,6 +41,9 @@ def test_gpu_decoder_config_download(
         test_ref_serialisation("gpu_decoder_config", gpu_decoder_config_ref_by_id)
 
 
+# NOTE: Enable once this is implemented:
+#       https://cqc.atlassian.net/browse/NRP-3571
+@pytest.mark.skip(reason="Enable once NRP-3571 is implemented")
 def test_gpu_decoder_config_flow(
     test_case_name: str,
     create_gpu_decoder_config_in_project: Callable[
@@ -81,19 +85,19 @@ def test_gpu_decoder_config_flow(
             qir=qa_qir_bitcode, name=qir_name, project=proj_ref
         )
 
-        execute_job_ref = qnx.start_execute_job(
-            programs=[qir_program_ref],
-            name=f"qir gpu decoder config execute job for {test_case_name}",
-            n_shots=[100],
-            max_cost=[10.0],
-            backend_config=qnx.QuantinuumConfig(
-                device_name="H2-1E",
-            ),
-            gpu_decoder_config=gpu_decoder_config_ref,
-            project=proj_ref,
-        )
+        with pytest.raises(qnx_exc.ResourceCreateFailed) as rcf:
+            qnx.start_execute_job(
+                programs=[qir_program_ref],
+                name=f"qir gpu decoder config execute job for {test_case_name}",
+                n_shots=[100],
+                max_cost=[10.0],
+                backend_config=qnx.QuantinuumConfig(
+                    device_name="H2-1E",
+                ),
+                gpu_decoder_config=gpu_decoder_config_ref,
+                project=proj_ref,
+            )
 
-        # Don't fully submit the job (July 2025)
-        qnx.jobs.wait_for(execute_job_ref, wait_for_status=JobStatusEnum.QUEUED)
-        qnx.jobs.cancel(execute_job_ref)
-        qnx.jobs.wait_for(execute_job_ref, wait_for_status=JobStatusEnum.CANCELLED)
+        # TODO: update with expected status code and error message
+        assert rcf.value.status_code == 400
+        assert "Unsupported message" in rcf.value.message

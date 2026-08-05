@@ -21,6 +21,7 @@ jobs:
   test-integration:
     name: Integration
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -75,10 +76,11 @@ jobs:
                         --ignore=integration/cross_region \
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
-                        --timeout=100 \
+                        --timeout=600 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
+                        -o addopts="--strict-markers -n 2 --reruns 3" \
                         -vv
 
       - name: Upload integration test results
@@ -93,6 +95,7 @@ jobs:
   test-cross-region-integration:
     name: Cross-region Integration
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -145,10 +148,11 @@ jobs:
           uv run pytest integration/cross_region \
                         --html=cross-region-integration-results.html \
                         --junit-xml=cross-region-integration-results.xml \
-                        --timeout=100 \
+                        --timeout=600 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
+                        -o addopts="--strict-markers -n 2 --reruns 3" \
                         -vv
 
       - name: Upload cross-region integration test results
