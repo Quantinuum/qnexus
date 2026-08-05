@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any, Literal, Union, cast
 from uuid import UUID
 
+from integration.constants import JOB_TIMEOUT
 import qnexus.exceptions as qnx_exc
 from qnexus.client import get_nexus_client
 from qnexus.client.nexus_iterator import NexusIterator
@@ -339,7 +340,7 @@ def cost_confidence(
         name="QIR cost estimation job",
     )
 
-    qnx.jobs.wait_for(job_ref)
+    qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
     return qnx.jobs.cost_confidence(job_ref)
 
