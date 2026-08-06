@@ -10,6 +10,8 @@ import qnexus as qnx
 from qnexus.models.job_status import JobStatusEnum
 from qnexus.models.references import Ref, WasmModuleRef
 
+from constants import JOB_TIMEOUT
+
 
 def test_wasm_download(
     test_case_name: str,
@@ -92,5 +94,5 @@ def test_wasm_flow(
             project=proj_ref,
         )
 
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
         assert qnx.jobs.status(execute_job_ref).status == JobStatusEnum.COMPLETED

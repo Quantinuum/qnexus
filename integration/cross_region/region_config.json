@@ -1,0 +1,12 @@
+{
+  "us": {
+    "helios_sc_device": "Helios-1SC",
+    "helios_ng_device": "Helios-1E",
+    "og_device": "H2-1E"
+  },
+  "sg": {
+    "helios_sc_device": "Helios-2SC",
+    "helios_ng_device": "Helios-2E",
+    "og_device": ""
+  }
+}

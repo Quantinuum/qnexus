@@ -21,6 +21,7 @@ jobs:
   test-integration:
     name: Integration
     runs-on: ubuntu-24.04
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -72,12 +73,14 @@ jobs:
       - name: Run integration tests
         run: |
           uv run pytest integration/ \
+                        --ignore=integration/cross_region \
                         --html=integration-results.html \
                         --junit-xml=integration-results.xml \
                         --timeout=600 \
                         -ra --reruns=3 \
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
+                        -o addopts="--strict-markers -n 3" \
                         -vv
 
       - name: Upload integration test results
@@ -89,8 +92,80 @@ jobs:
             ./assets/*.css
           name: integration-results
 
+  test-cross-region-integration:
+    name: Cross-region Integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
+    env:
+      NEXUS_QA_HOME_USER_EMAIL: ${{ secrets.NEXUS_QA_HOME_USER_EMAIL }}
+      NEXUS_QA_HOME_USER_PASSWORD: ${{ secrets.NEXUS_QA_HOME_USER_PASSWORD }}
+      NEXUS_DOMAIN: "qa.myqos.com"
+      NEXUS_SG_DOMAIN: "sg.qa.myqos.com"
+      NEXUS_STORE_TOKENS: "false"
+      NEXUS_CROSS_REGION_TESTS: "true"
+      NEXUS_HOME_REGION: "sg"
+      NEXUS_TARGET_REGION: "us"
+
+    steps:
+      - name: Validate workflow dispatch inputs
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [[ -n "${{ github.event.inputs.pr_number }}" && -n "${{ github.event.inputs.release_tag }}" ]]; then
+            echo "Only one of pr_number or release_tag may be set. Leave both empty to run from main."
+            exit 1
+          fi
+
+      - name: Comment action run link on PR
+        if: ${{ github.event.inputs.pr_number && github.event.inputs.pr_number != '' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            Cross-region integration tests are running on this PR at:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+          pr-number: ${{ github.event.inputs.pr_number }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+          # Prefer a release tag when provided, otherwise use the PR merge ref or main.
+          ref: ${{ github.event.inputs.release_tag || (github.event.inputs.pr_number && format('refs/pull/{0}/merge', github.event.inputs.pr_number)) || 'main' }}
+
+      - name: Set up uv & venv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+          cache-dependency-glob: uv.lock
+
+      - name: Run cross-region integration tests
+        run: |
+          uv run pytest integration/cross_region \
+                        --html=cross-region-integration-results.html \
+                        --junit-xml=cross-region-integration-results.xml \
+                        --timeout=600 \
+                        -ra --reruns=3 \
+                        --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
+                        --purge-projects \
+                        -o addopts="--strict-markers -n 2" \
+                        -vv
+
+      - name: Upload cross-region integration test results
+        if: "!cancelled()"
+        uses: actions/upload-artifact@master
+        with:
+          path: |
+            ./cross-region-integration-results.*
+            ./assets/*.css
+          name: cross-region-integration-results
+
   publish-result-in-slack:
-    needs: test-integration
+    needs: [test-integration, test-cross-region-integration]
     if: "!cancelled()"
     runs-on: ubuntu-24.04
     steps:
@@ -104,7 +179,9 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ !startsWith(github.ref_name, 'dependabot/') }}
         with:
-          files: "**/integration-results.xml"
+          files: |
+            **/integration-results.xml
+            **/cross-region-integration-results.xml
           comment_title: qnexus integration results
 
       - name: "Post scheduled runs summary in Slack: #nexus-tests"
@@ -118,3 +195,4 @@ jobs:
           slackbottoken: ${{ secrets.NEXUS_TESTS_SLACK_BOT_TOKEN }}
           slackchannel: "C08LQ4ST2JV"
           junitxml_filepath: integration-results.xml
+

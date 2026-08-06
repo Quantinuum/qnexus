@@ -22,6 +22,8 @@ from qnexus.models.references import (
     ResultVersions,
 )
 
+from constants import JOB_TIMEOUT
+
 
 def test_qir_create_and_update(
     test_case_name: str,
@@ -156,7 +158,7 @@ def test_execution(
             name=f"qir job for {test_case_name}",
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
 
@@ -205,7 +207,7 @@ def test_execution_on_NG_devices(
             name=f"qir job for {test_case_name}",
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         result_ref = qnx.jobs.results(job_ref)[0]
         assert isinstance(result_ref, ExecutionResultRef)
@@ -244,6 +246,7 @@ def test_costing_qir_on_NG_devices(
             programs=[qir_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost, float)
 
@@ -269,6 +272,7 @@ def test_qir_cost_confidence(
             programs=[qir_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0

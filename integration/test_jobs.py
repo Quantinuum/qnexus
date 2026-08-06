@@ -32,6 +32,8 @@ from qnexus.models.references import (
     Ref,
 )
 
+from constants import JOB_TIMEOUT
+
 # The following global variables and autoused fixture are a
 # bit of a hack to have global identifiers for the resources
 # used by the `*job_get` tests in this suite. Using the same name for the
@@ -208,7 +210,7 @@ def test_submit_compile(
     ) as compile_job_ref:
         assert isinstance(compile_job_ref, CompileJobRef)
 
-        qnx.jobs.wait_for(compile_job_ref)
+        qnx.jobs.wait_for(compile_job_ref, timeout=JOB_TIMEOUT)
 
         compile_results = qnx.jobs.results(compile_job_ref)
 
@@ -312,7 +314,7 @@ def test_get_results_for_incomplete_compile(
         assert compile_item.get_input().id == circ_ref.id
 
         # check the job after completion
-        qnx.jobs.wait_for(compile_job_ref)
+        qnx.jobs.wait_for(compile_job_ref, timeout=JOB_TIMEOUT)
         complete_results = qnx.jobs.results(compile_job_ref, allow_incomplete=True)
         assert len(complete_results) == 1
         assert isinstance(complete_results[0], CompilationResultRef)
@@ -365,7 +367,7 @@ def test_submit_execute(
         circuit=test_circuit,
         circuit_name=circuit_name,
     ) as execute_job_ref:
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         execute_results = qnx.jobs.results(execute_job_ref)
 
@@ -459,7 +461,7 @@ def test_get_results_for_incomplete_execute(
         assert isinstance(execute_job_ref, ExecuteJobRef)
 
         with pytest.raises(qnx_exc.JobError):
-            qnx.jobs.wait_for(execute_job_ref)
+            qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         with pytest.raises(qnx_exc.ResourceFetchFailed):
             qnx.jobs.results(execute_job_ref)
@@ -523,7 +525,7 @@ def test_wait_for_raises_on_job_error(
             qnx.jobs.results(failing_job_ref)
 
         with pytest.raises(qnx_exc.JobError):
-            qnx.jobs.wait_for(failing_job_ref)
+            qnx.jobs.wait_for(failing_job_ref, timeout=JOB_TIMEOUT)
 
 
 def test_results_not_available_error(
@@ -557,7 +559,7 @@ def test_results_not_available_error(
         with pytest.raises(qnx_exc.ResourceFetchFailed):
             qnx.jobs.results(execute_job_ref)
 
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         execute_results = qnx.jobs.results(execute_job_ref)
 
@@ -671,7 +673,7 @@ def test_job_cost(
 
     assert isinstance(execute_job_ref, ExecuteJobRef)
 
-    qnx.jobs.wait_for(execute_job_ref)
+    qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
     job_ref = qnx.jobs.get(id=execute_job_ref.id)
     assert job_ref.last_status_detail is not None
@@ -709,7 +711,7 @@ def test_job_cost_confidence(
             name="Circuit cost confidence estimation job",
         )
 
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         cost_confidence = qnx.jobs.cost_confidence(execute_job_ref)
         assert isinstance(cost_confidence, list)

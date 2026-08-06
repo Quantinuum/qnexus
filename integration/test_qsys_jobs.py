@@ -21,6 +21,8 @@ from qnexus.models.references import (
     ResultVersions,
 )
 
+from constants import JOB_TIMEOUT
+
 
 @pytest.mark.parametrize(
     "backend_config",
@@ -61,7 +63,7 @@ def test_guppy_execution(
             max_cost=[10.0],
         )
 
-        qnx.jobs.wait_for(job_ref)
+        qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
         results = qnx.jobs.results(job_ref)
 
@@ -116,6 +118,7 @@ def test_hugr_costing(
             programs=[hugr_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost, float)
 
@@ -139,6 +142,7 @@ def test_hugr_cost_confidence(
             programs=[hugr_ref],
             n_shots=[10],
             project=project_ref,
+            timeout=JOB_TIMEOUT,
         )
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0

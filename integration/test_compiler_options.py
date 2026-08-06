@@ -11,6 +11,8 @@ from qnexus.models.references import (
     CompileJobRef,
 )
 
+from constants import JOB_TIMEOUT
+
 
 def assert_op_count_in_circuit(
     circuit: Circuit, op: OpType, should_be_gt_0: bool
@@ -66,7 +68,7 @@ def test_target_2qb_gate(
         backend_config=config,
         skip_intermediate_circuits=True,
     ) as compile_job_ref:
-        qnx.jobs.wait_for(compile_job_ref)
+        qnx.jobs.wait_for(compile_job_ref, timeout=JOB_TIMEOUT)
         compile_result = qnx.jobs.results(compile_job_ref)[0]
         assert isinstance(compile_result, CompilationResultRef)
         compiled_circuit_ref = compile_result.get_output()

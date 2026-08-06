@@ -12,6 +12,8 @@ from qnexus.models.references import (
     ProjectRef,
 )
 
+from constants import JOB_TIMEOUT
+
 CONFIGS_REQUIRE_NO_MEASURE = [qnx.AerUnitaryConfig]
 
 
@@ -43,7 +45,7 @@ def test_basic_backend_config_usage(
             project=project_ref,
         )
 
-        qnx.jobs.wait_for(compile_job_ref)
+        qnx.jobs.wait_for(compile_job_ref, timeout=JOB_TIMEOUT)
 
         # Check the backend config as stored in Nexus matches the one specified
         # at job submission
@@ -75,7 +77,7 @@ def test_basic_backend_config_usage(
             project=project_ref,
         )
 
-        qnx.jobs.wait_for(execute_job_ref)
+        qnx.jobs.wait_for(execute_job_ref, timeout=JOB_TIMEOUT)
 
         execute_job_result_refs = qnx.jobs.results(execute_job_ref)
 
