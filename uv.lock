@@ -3538,7 +3538,7 @@ provides-extras = ["qiskit"]
 [package.metadata.requires-dev]
 dev = [
     { name = "fastapi", specifier = "==0.136.3" },
-    { name = "guppylang", specifier = ">=0.21.0,<1.0.0" },
+    { name = "guppylang", specifier = ">=0.21.0,<2.0.0" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "jupyter", specifier = ">=1.0.0,<2.0.0" },
     { name = "mypy", specifier = ">=1.10.0,<2.0.0" },
