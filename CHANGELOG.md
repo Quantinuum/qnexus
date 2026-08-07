@@ -2,6 +2,16 @@
 
 # `qnexus` Release Notes
 
+## v0.48.0 (2026-08-07)
+
+
+### Added
+
+- Add retrying and cancelling to waiting_status.
+- Handle data gone errors (#363).
+- Add function to get runtime traces for a job (#360).
+
+
 ## v0.47.0 (2026-07-24)
 
 
