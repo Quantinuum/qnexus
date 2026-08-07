@@ -99,4 +99,10 @@ class JobStatus(NamedTuple):
         ).T
 
 
-WAITING_STATUS = {JobStatusEnum.QUEUED, JobStatusEnum.SUBMITTED, JobStatusEnum.RUNNING}
+WAITING_STATUS = {
+    JobStatusEnum.QUEUED,
+    JobStatusEnum.SUBMITTED,
+    JobStatusEnum.RUNNING,
+    JobStatusEnum.RETRYING,
+    JobStatusEnum.CANCELLING,
+}
