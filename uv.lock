@@ -738,7 +738,7 @@ wheels = [
 
 [[package]]
 name = "guppylang"
-version = "0.21.13"
+version = "0.21.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "guppylang-internals" },
@@ -750,14 +750,14 @@ dependencies = [
     { name = "tqdm" },
     { name = "types-tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9a/91/e16178e9fc0dcf489268410b22e6377c5511623069ab5c6468c41913d434/guppylang-0.21.13.tar.gz", hash = "sha256:004c2d2a84e216f6bbd0a33deb7872ede6f26ab5b22fde5e9809f38056019a08", size = 69972 }
+sdist = { url = "https://files.pythonhosted.org/packages/45/79/e148d43eebdbd0e670cfe983d2806c1d8199d4b69e45680a352d2a6c6265/guppylang-0.21.16.tar.gz", hash = "sha256:37ecb3267734540104ada3be1e12726f631edfba2b013efa8f8064cc324d7fda", size = 70378 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/78/3162318e82c9558d7e0249377f3edef0f62bce1db9831e6577337ead133c/guppylang-0.21.13-py3-none-any.whl", hash = "sha256:0010df1f11e25662220396729c96da2e11cbc93b2febdfb7b8ec770a69635259", size = 66966 },
+    { url = "https://files.pythonhosted.org/packages/3c/6a/7120b688f8543ef39ac1d42d325233aacde677a562fe72e3e51f10e433ee/guppylang-0.21.16-py3-none-any.whl", hash = "sha256:22ada5f013d96574102b89d88c290449b23f9972a8f0e88e92227308b8aa275c", size = 67031 },
 ]
 
 [[package]]
 name = "guppylang-internals"
-version = "0.34.0"
+version = "0.36.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "hugr" },
@@ -767,9 +767,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "wasmtime" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/18/0663560df8cd67a64f8f494998fb751e60cf0a6685324644ce86fbead5a7/guppylang_internals-0.34.0.tar.gz", hash = "sha256:a803f6e4798a7f8c25ce770be099b9e4d1fc7ea8e2acd4b9762f5a49a2b956e2", size = 213576 }
+sdist = { url = "https://files.pythonhosted.org/packages/df/67/c2ea5658a28d1ea814a64e91cf0433197dd0e99a3eab1dc3538e14499634/guppylang_internals-0.36.1.tar.gz", hash = "sha256:3ee67ffdd7e97cf9273f9a65697c48fb192bb98f110c960931d6ea1f2b7f0934", size = 214605 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/21/0c/5f50a36236a5858a0c4ab0bd2798198fe00063a8a959786e0e25a7dfd5a1/guppylang_internals-0.34.0-py3-none-any.whl", hash = "sha256:533281123483c5cbe2a2195d167f9313a07e5a2b5c24dc27238b54e2d9c22513", size = 266770 },
+    { url = "https://files.pythonhosted.org/packages/31/ac/f66326c93cc7e0c74ec8a195d23c78690cb470c77519e77a4d4876f5d355/guppylang_internals-0.36.1-py3-none-any.whl", hash = "sha256:d70dc644bdfaff46b5b94b308aa90e4aa667c60b85f72a82fbc1ea729d2dfe51", size = 267518 },
 ]
 
 [[package]]
@@ -1606,7 +1606,7 @@ wheels = [
 
 [[package]]
 name = "llvmlite"
-version = "0.48.0"
+version = "0.47.0"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "(python_full_version >= '3.15' and platform_machine != 'x86_64') or (python_full_version >= '3.15' and sys_platform != 'darwin')",
@@ -4109,7 +4109,7 @@ dependencies = [
     { name = "hugr" },
     { name = "lief" },
     { name = "llvmlite", version = "0.45.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine == 'x86_64' and sys_platform == 'darwin'" },
-    { name = "llvmlite", version = "0.48.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
+    { name = "llvmlite", version = "0.47.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_machine != 'x86_64' or sys_platform != 'darwin'" },
     { name = "networkx", version = "3.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pydantic" },
