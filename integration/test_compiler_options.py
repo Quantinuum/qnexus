@@ -3,6 +3,7 @@
 from typing import Callable, ContextManager
 
 import pytest
+from constants import JOB_TIMEOUT
 from pytket.circuit import Circuit, OpType
 
 import qnexus as qnx
@@ -10,8 +11,6 @@ from qnexus.models.references import (
     CompilationResultRef,
     CompileJobRef,
 )
-
-from constants import JOB_TIMEOUT
 
 
 def assert_op_count_in_circuit(

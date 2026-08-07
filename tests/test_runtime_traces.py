@@ -1,15 +1,14 @@
 """Tests for getting and downloading runtime traces."""
 
 import json
+import uuid
 from typing import cast
 from unittest import mock
-import uuid
-import qnexus as qnx
-
-
-from qnexus.models.references import ExecuteJobRef
 
 from selene_core.trace import Trace
+
+import qnexus as qnx
+from qnexus.models.references import ExecuteJobRef
 
 
 def test_runtime_traces_get_and_download() -> None:

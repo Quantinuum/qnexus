@@ -1,6 +1,7 @@
 from typing import Callable, ContextManager, cast
 
 import pytest
+from constants import JOB_TIMEOUT
 from hugr.package import Package
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
@@ -19,8 +20,6 @@ from qnexus.models.references import (
     HUGRRef,
     ProjectRef,
 )
-
-from constants import JOB_TIMEOUT
 
 
 def test_fetch_qsys_result(

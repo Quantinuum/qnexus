@@ -2,6 +2,7 @@
 
 from typing import Callable, ContextManager
 
+from constants import JOB_TIMEOUT
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Circuit
 
@@ -11,8 +12,6 @@ from qnexus.models.references import (
     ExecutionResultRef,
     ProjectRef,
 )
-
-from constants import JOB_TIMEOUT
 
 CONFIGS_REQUIRE_NO_MEASURE = [qnx.AerUnitaryConfig]
 

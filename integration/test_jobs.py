@@ -8,6 +8,7 @@ from uuid import UUID
 
 import pandas as pd
 import pytest
+from constants import JOB_TIMEOUT
 from hugr.package import Package
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
@@ -31,8 +32,6 @@ from qnexus.models.references import (
     ProjectRef,
     Ref,
 )
-
-from constants import JOB_TIMEOUT
 
 # The following global variables and autoused fixture are a
 # bit of a hack to have global identifiers for the resources

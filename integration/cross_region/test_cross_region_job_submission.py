@@ -9,32 +9,31 @@ can be retrieved.
 from typing import Callable, ContextManager, cast
 
 import pytest
+from constants import JOB_TIMEOUT
 from hugr.package import Package
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
+from pytket.circuit import Bit, Circuit
 from quantinuum_schemas.models.backend_config import (
     AerConfig,
     HeliosConfig,
     HeliosEmulatorConfig,
 )
-from pytket.circuit import Circuit, Bit
-import qnexus.exceptions as qnx_exc
+from test_qir import make_qir_bitcode_from_file
 
 import qnexus as qnx
-from test_qir import make_qir_bitcode_from_file
+import qnexus.exceptions as qnx_exc
+from cross_region.region_devices import load_region_devices
 from qnexus.models.references import (
+    CircuitRef,
     ExecutionResultRef,
     ProjectRef,
-    CircuitRef,
     QIRRef,
     QIRResult,
     ResultVersions,
 )
 from qnexus.models.region import Region
-
-from constants import JOB_TIMEOUT
-from cross_region.region_devices import load_region_devices
 
 
 def test_cross_region_execute_job_hugr_ng(

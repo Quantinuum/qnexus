@@ -3,6 +3,7 @@
 from typing import Callable, ContextManager, cast
 
 import pytest
+from constants import JOB_TIMEOUT
 from hugr.package import Package
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
@@ -20,8 +21,6 @@ from qnexus.models.references import (
     ProjectRef,
     ResultVersions,
 )
-
-from constants import JOB_TIMEOUT
 
 
 @pytest.mark.parametrize(
