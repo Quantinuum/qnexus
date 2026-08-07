@@ -8,12 +8,8 @@ from unittest import mock
 import pytest
 
 import qnexus.exceptions as qnx_exc
-from qnexus.client import circuits
-from qnexus.client import gpu_decoder_configs
-from qnexus.client import hugr
-from qnexus.client import qir
+from qnexus.client import circuits, gpu_decoder_configs, hugr, qir, wasm_modules
 from qnexus.client import results as results_api
-from qnexus.client import wasm_modules
 from qnexus.client.jobs import _compile, _execute
 from qnexus.client.utils import handle_fetch_errors
 from qnexus.models.annotations import Annotations

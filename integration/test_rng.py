@@ -3,6 +3,7 @@
 from typing import Callable, ContextManager
 
 import numpy as np
+from constants import JOB_TIMEOUT
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Bit, Circuit
 
@@ -11,8 +12,6 @@ from qnexus.models.references import (
     CircuitRef,
     ExecutionResultRef,
 )
-
-from constants import JOB_TIMEOUT
 
 
 def get_rng_circuit(seed: int, n_rng: int, test_index: bool = False) -> Circuit:

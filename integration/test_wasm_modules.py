@@ -3,14 +3,13 @@
 from typing import Callable, ContextManager
 
 import pandas as pd
+from constants import JOB_TIMEOUT
 from pytket.circuit import Circuit
 from pytket.wasm.wasm import WasmFileHandler, WasmModuleHandler
 
 import qnexus as qnx
 from qnexus.models.job_status import JobStatusEnum
 from qnexus.models.references import Ref, WasmModuleRef
-
-from constants import JOB_TIMEOUT
 
 
 def test_wasm_download(

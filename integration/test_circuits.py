@@ -4,9 +4,9 @@ from typing import Callable, ContextManager
 
 import pandas as pd
 import pytest
+from constants import JOB_TIMEOUT
 from pytket.circuit import Circuit
 
-from constants import JOB_TIMEOUT
 import qnexus as qnx
 import qnexus.exceptions as qnx_exc
 from qnexus.models.annotations import PropertiesDict

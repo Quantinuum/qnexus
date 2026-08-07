@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Callable, ContextManager
 
 import pyqir
+from constants import JOB_TIMEOUT
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
@@ -21,8 +22,6 @@ from qnexus.models.references import (
     Ref,
     ResultVersions,
 )
-
-from constants import JOB_TIMEOUT
 
 
 def test_qir_create_and_update(

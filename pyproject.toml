@@ -1,6 +1,6 @@
 [project]
 name = "qnexus"
-version = "0.47.0"
+version = "0.48.0"
 description = "Quantinuum Nexus python client."
 authors = [
     {name = "Vanya Eccles", email = "vanya.eccles@quantinuum.com"},
@@ -49,7 +49,7 @@ dev = [
     "twine <6.0.0,>=5.1.1",
     "ipykernel>=6.29.5",
     "pytest-xdist>=3.6.1",
-    "guppylang >=0.21.0, <1.0.0",
+    "guppylang >=0.21.0, <2.0.0",
     "pytket-qir>=0.22.0",
     "scipy-stubs>=1.15.3.0",
     "fastapi==0.136.3",
