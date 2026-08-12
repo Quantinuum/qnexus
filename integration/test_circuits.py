@@ -150,6 +150,7 @@ def test_circuit_get_cost(
                     backend_config=qnx.QuantinuumConfig(device_name=device_name),
                     syntax_checker=syntax_checker,
                     project=my_proj,
+                    timeout=JOB_TIMEOUT,
                 )
         else:
             cost = qnx.circuits.cost(
