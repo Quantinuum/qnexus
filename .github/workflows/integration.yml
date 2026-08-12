@@ -21,7 +21,7 @@ jobs:
   test-integration:
     name: Integration
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -32,6 +32,7 @@ jobs:
       NEXUS_DOMAIN: "qa.myqos.com"
       NEXUS_STORE_TOKENS: "false"
       NEXUS_QA_QSYS_DEVICE: ${{ secrets.NEXUS_QA_QSYS_DEVICE }}
+      QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
 
     steps:
       - name: Validate workflow dispatch inputs
@@ -95,7 +96,7 @@ jobs:
   test-cross-region-integration:
     name: Cross-region Integration
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -109,6 +110,7 @@ jobs:
       NEXUS_CROSS_REGION_TESTS: "true"
       NEXUS_HOME_REGION: "sg"
       NEXUS_TARGET_REGION: "us"
+      QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
 
     steps:
       - name: Validate workflow dispatch inputs
@@ -195,4 +197,3 @@ jobs:
           slackbottoken: ${{ secrets.NEXUS_TESTS_SLACK_BOT_TOKEN }}
           slackchannel: "C08LQ4ST2JV"
           junitxml_filepath: integration-results.xml
-

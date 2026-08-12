@@ -258,6 +258,7 @@ def test_compile(
             name=local_compile_job_name,
             project=my_proj,
             backend_config=qnx.AerConfig(),
+            timeout=JOB_TIMEOUT,
         )
 
         assert len(compiled_circuits) == 1
@@ -345,6 +346,7 @@ def test_compile_hypertket(
             project=my_proj,
             backend_config=qnx.QuantinuumConfig(device_name="H1-1LE"),
             hypertket_config=HyperTketConfig(),
+            timeout=JOB_TIMEOUT,
         )
 
         assert len(compiled_circuits) == 1
@@ -415,6 +417,7 @@ def test_execute(
             project=my_proj,
             backend_config=qnx.AerConfig(),
             n_shots=[10],
+            timeout=JOB_TIMEOUT,
         )
 
         assert len(backend_results) == 1

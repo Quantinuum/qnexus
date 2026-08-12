@@ -4,6 +4,7 @@ import abc
 import asyncio
 import json
 import logging
+import os
 import ssl
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -69,6 +70,8 @@ from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_JOB_TIMEOUT_ENV_VAR = "QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS"
 
 EPOCH_START = datetime(1970, 1, 1, tzinfo=timezone.utc)
 WS_SERVER_RETRY_TIMEOUT = 5
@@ -598,7 +601,9 @@ def wait_for(
     Args:
         job: The job to monitor.
         wait_for_status: The status to wait for (default: COMPLETED).
-        timeout: Overall timeout in seconds. None for no timeout (default: None).
+        timeout: Overall timeout in seconds. None uses the
+            QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS environment variable if set,
+            otherwise no timeout.
         strategy: How to monitor the job:
             - WebsocketStrategy(): Real-time updates via websocket.
               Best for short jobs (<10 minutes).
@@ -637,6 +642,9 @@ def wait_for(
         ...     ),
         ... )
     """
+    if timeout is None:
+        timeout = _default_job_timeout_from_env()
+
     if strategy is None:
         strategy = HybridStrategy()
 
@@ -678,6 +686,24 @@ def wait_for(
         raise qnx_exc.JobError("Job has been terminated")
 
     return job_status
+
+
+def _default_job_timeout_from_env() -> float | None:
+    raw_timeout = os.getenv(DEFAULT_JOB_TIMEOUT_ENV_VAR)
+    if raw_timeout is None or raw_timeout == "":
+        return None
+
+    try:
+        timeout = float(raw_timeout)
+    except ValueError as exc:
+        raise ValueError(
+            f"{DEFAULT_JOB_TIMEOUT_ENV_VAR} must be a number of seconds."
+        ) from exc
+
+    if timeout <= 0:
+        raise ValueError(f"{DEFAULT_JOB_TIMEOUT_ENV_VAR} must be greater than 0.")
+
+    return timeout
 
 
 @merge_scope_from_context
