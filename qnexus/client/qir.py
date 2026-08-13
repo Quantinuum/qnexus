@@ -36,6 +36,10 @@ from qnexus.models.references import (
     QIRRef,
 )
 from qnexus.models.scope import ScopeFilterEnum
+from quantinuum_schemas.models.backend_config import (
+    HeliosConfig,
+    HeliosEmulatorConfig,
+)
 
 
 class Params(
@@ -303,7 +307,7 @@ def cost(
     job_ref = qnx.start_execute_job(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
-        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        backend_config=HeliosConfig(system_name=f"{system_name}SC", emulator_config=HeliosEmulatorConfig()),
         project=project,
         name="QIR cost estimation job",
     )
@@ -340,7 +344,7 @@ def cost_confidence(
     job_ref = qnx.start_execute_job(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
-        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        backend_config=HeliosConfig(system_name=f"{system_name}SC", emulator_config=HeliosEmulatorConfig()),
         project=project,
         name="QIR cost estimation job",
     )

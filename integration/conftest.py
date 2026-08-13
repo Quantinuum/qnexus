@@ -500,10 +500,10 @@ def get_backend_config_name(backend_config: qnx.BackendConfig) -> str:
         qnx.AerConfig(),
         qnx.AerStateConfig(),
         qnx.AerUnitaryConfig(),
-        qnx.QuantinuumConfig(device_name="H1-1LE"),
+        qnx.QuantinuumConfig(device_name="H1-1LE", simulator="state-vector"),
         qnx.QulacsConfig(),
         # Non Nexus-hosted
-        qnx.QuantinuumConfig(device_name="H2-1SC"),  # Cluster-hosted
+        qnx.QuantinuumConfig(device_name="H2-1SC", simulator="state-vector"),  # Cluster-hosted
     ],
     ids=get_backend_config_name,
 )

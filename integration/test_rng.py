@@ -68,7 +68,7 @@ def test_rng(
 ) -> None:
     """Test that we can run RNG circuits in H-Series machines."""
     local_project_name = f"project for {test_case_name}"
-    backend_config = qnx.QuantinuumConfig(device_name="H2-1E")
+    backend_config = qnx.QuantinuumConfig(device_name="H2-1E", simulator="state-vector")
     n_shots = 5
     n_rng = 3
 
