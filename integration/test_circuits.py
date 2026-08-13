@@ -147,7 +147,9 @@ def test_circuit_get_cost(
                 qnx.circuits.cost(
                     circuit_ref=my_q_systems_circuit,
                     n_shots=10,
-                    backend_config=qnx.QuantinuumConfig(device_name=device_name, simulator="state-vector"),
+                    backend_config=qnx.QuantinuumConfig(
+                        device_name=device_name, simulator="state-vector"
+                    ),
                     syntax_checker=syntax_checker,
                     project=my_proj,
                     timeout=JOB_TIMEOUT,
@@ -156,7 +158,9 @@ def test_circuit_get_cost(
             cost = qnx.circuits.cost(
                 circuit_ref=my_q_systems_circuit,
                 n_shots=10,
-                backend_config=qnx.QuantinuumConfig(device_name=device_name, simulator="state-vector"),
+                backend_config=qnx.QuantinuumConfig(
+                    device_name=device_name, simulator="state-vector"
+                ),
                 syntax_checker=syntax_checker,
                 project=my_proj,
                 timeout=JOB_TIMEOUT,

@@ -103,10 +103,10 @@ def test_cross_region_execute_job_qir_ng(
             programs=[qir_ref],
             n_shots=[10],
             max_cost=[10.0],
-            backend_config=qnx.HelioConfig(
-                system_name=ng_device_name, 
+            backend_config=HeliosConfig(
+                system_name=ng_device_name,
                 emulator_config=HeliosEmulatorConfig(),
-                compiler_options={"max-qubits": 5}
+                compiler_options={"max-qubits": 5},
             ),
             project=project_ref,
             name=f"qir job for {test_case_name}",
@@ -156,7 +156,9 @@ def test_cross_region_execute_job_qir_og(
         job_ref = qnx.start_execute_job(
             programs=[qir_program_ref],
             n_shots=[10],
-            backend_config=qnx.QuantinuumConfig(device_name=device_name, simulator="state-vector"),
+            backend_config=qnx.QuantinuumConfig(
+                device_name=device_name, simulator="state-vector"
+            ),
             project=project_ref,
             name=f"qir job for {test_case_name}",
             target_region=target_region,
@@ -209,7 +211,9 @@ def test_cross_region_execute_job_pytket_og(
         job_ref = qnx.start_execute_job(
             programs=[circuit_ref],
             n_shots=[10],
-            backend_config=qnx.QuantinuumConfig(device_name=device_name, simulator="state-vector"),
+            backend_config=qnx.QuantinuumConfig(
+                device_name=device_name, simulator="state-vector"
+            ),
             project=project_ref,
             name=f"pytket job for {test_case_name}",
             target_region=target_region,

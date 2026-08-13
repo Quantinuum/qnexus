@@ -34,6 +34,7 @@ from qnexus.models.references import (
 )
 
 from quantinuum_schemas.models.backend_config import (
+    HeliosConfig,
     HeliosEmulatorConfig,
 )
 
@@ -460,7 +461,9 @@ def test_get_results_for_incomplete_execute(
             programs=[circ_ref, my_q_systems_circuit],
             name=job_name,
             project=proj_ref,
-            backend_config=qnx.QuantinuumConfig(device_name="H1-1LE", simulator="state-vector"),
+            backend_config=qnx.QuantinuumConfig(
+                device_name="H1-1LE", simulator="state-vector"
+            ),
             n_shots=[10, 10],
         )
 
@@ -524,7 +527,9 @@ def test_wait_for_raises_on_job_error(
             name=job_name,
             project=proj_ref,
             n_shots=[10],
-            backend_config=qnx.QuantinuumConfig(device_name="H1-1LE", simulator="state-vector"),
+            backend_config=qnx.QuantinuumConfig(
+                device_name="H1-1LE", simulator="state-vector"
+            ),
         )
 
         with pytest.raises(qnx_exc.ResourceFetchFailed):
@@ -673,7 +678,9 @@ def test_job_cost(
         programs=[my_q_systems_circuit],
         name=job_name,
         project=proj_ref,
-        backend_config=qnx.QuantinuumConfig(device_name="H2-1SC", simulator="state-vector"),
+        backend_config=qnx.QuantinuumConfig(
+            device_name="H2-1SC", simulator="state-vector"
+        ),
         n_shots=[10],
     )
 
@@ -712,7 +719,9 @@ def test_job_cost_confidence(
             programs=[hugr_ref],
             n_shots=[10],
             # No other parameters matter for cost estimation, so construct a minimal costing config
-            backend_config=qnx.HeliosConfig(system_name="Helios-1SC", emulator_config=HeliosEmulatorConfig()),
+            backend_config=HeliosConfig(
+                system_name="Helios-1SC", emulator_config=HeliosEmulatorConfig()
+            ),
             project=project_ref,
             name="Circuit cost confidence estimation job",
         )
