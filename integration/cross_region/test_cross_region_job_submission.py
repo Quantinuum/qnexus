@@ -105,8 +105,7 @@ def test_cross_region_execute_job_qir_ng(
             max_cost=[10.0],
             backend_config=HeliosConfig(
                 system_name=ng_device_name,
-                emulator_config=HeliosEmulatorConfig(),
-                compiler_options={"max-qubits": 5},
+                emulator_config=HeliosEmulatorConfig({"max-qubits": 5}),
             ),
             project=project_ref,
             name=f"qir job for {test_case_name}",
