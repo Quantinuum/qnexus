@@ -11,6 +11,7 @@ from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Bit, Circuit
 from pytket.qir import pytket_to_qir  # type: ignore[attr-defined]
+from quantinuum_schemas.models.backend_config import HeliosEmulatorConfig
 
 import qnexus as qnx
 from qnexus.models.annotations import PropertiesDict
@@ -199,8 +200,10 @@ def test_execution_on_NG_devices(
             programs=[qir_ref],
             n_shots=[10],
             max_cost=[10.0],
+            n_qubits=[5],
             backend_config=qnx.HeliosConfig(
-                system_name="Helios-1E", compiler_options={"max-qubits": 5}
+                system_name="Helios-1E",
+                emulator_config=HeliosEmulatorConfig(),
             ),
             project=project_ref,
             name=f"qir job for {test_case_name}",
