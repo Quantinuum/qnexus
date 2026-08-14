@@ -212,7 +212,7 @@ def upload(
         case PackagePointer():
             package = hugr_package.package
         case Hugr():
-            package = Package([hugr_package])
+            package = hugr_package.to_package()
         case Package():
             package = hugr_package
         case _:
