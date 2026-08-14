@@ -24,7 +24,7 @@ from qnexus.context import (
     merge_properties_from_context,
     merge_scope_from_context,
 )
-from qnexus.models import QuantinuumConfig
+from qnexus.models import HeliosConfig
 from qnexus.models.annotations import Annotations, CreateAnnotations, PropertiesDict
 from qnexus.models.filters import (
     CreatorFilter,
@@ -323,7 +323,7 @@ def cost(
     job_ref = qnx.start_execute_job(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
-        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        backend_config=HeliosConfig(system_name=f"{system_name}SC"),
         project=project,
         name="Hugr cost estimation job",
     )
@@ -371,7 +371,7 @@ def cost_confidence(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
         # No other parameters matter for cost estimation, so construct a minimal costing config
-        backend_config=QuantinuumConfig(device_name=f"{system_name}SC"),
+        backend_config=HeliosConfig(system_name=f"{system_name}SC"),
         project=project,
         name="Circuit cost confidence estimation job",
     )
