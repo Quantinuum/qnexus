@@ -3,7 +3,7 @@
 import base64
 import warnings
 from datetime import datetime
-from typing import Any, Literal, Union, cast
+from typing import Any, Union, cast
 from uuid import UUID
 
 import qnexus.exceptions as qnx_exc
@@ -16,7 +16,7 @@ from qnexus.context import (
     merge_properties_from_context,
     merge_scope_from_context,
 )
-from qnexus.models import HeliosConfig
+from qnexus.models import HeliosConfig, QuantinuumConfig
 from qnexus.models.annotations import Annotations, CreateAnnotations, PropertiesDict
 from qnexus.models.filters import (
     CreatorFilter,
@@ -280,7 +280,7 @@ def cost(
     programs: QIRRef | list[QIRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: Literal["Helios-1"] = "Helios-1",
+    system_name: str = "Helios-1",
     timeout: float | None = None,
 ) -> float:
     """Estimate the cost (in HQC) of running QIR programs for n_shots
@@ -303,7 +303,7 @@ def cost(
     job_ref = qnx.start_execute_job(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
-        backend_config=HeliosConfig(system_name=f"{system_name}SC"),
+        backend_config=_costing_backend_config(system_name),
         project=project,
         name="QIR cost estimation job",
     )
@@ -316,7 +316,7 @@ def cost_confidence(
     programs: QIRRef | list[QIRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: Literal["Helios-1"] = "Helios-1",
+    system_name: str = "Helios-1",
     timeout: float | None = None,
 ) -> list[tuple[float, float]]:
     """Estimate the cost (in HQC) of running QIR programs for n_shots
@@ -340,7 +340,7 @@ def cost_confidence(
     job_ref = qnx.start_execute_job(
         programs=cast(list[ExecutionProgram], programs),
         n_shots=n_shots,
-        backend_config=HeliosConfig(system_name=f"{system_name}SC"),
+        backend_config=_costing_backend_config(system_name),
         project=project,
         name="QIR cost estimation job",
     )
@@ -348,6 +348,14 @@ def cost_confidence(
     qnx.jobs.wait_for(job_ref, timeout=timeout)
 
     return qnx.jobs.cost_confidence(job_ref)
+
+
+def _costing_backend_config(system_name: str) -> HeliosConfig | QuantinuumConfig:
+    """Build the syntax-checker backend config for QIR cost estimation."""
+    syntax_checker_name = f"{system_name}SC"
+    if "Helios" in system_name:
+        return HeliosConfig(system_name=syntax_checker_name)
+    return QuantinuumConfig(device_name=syntax_checker_name)
 
 
 @merge_scope_from_context
