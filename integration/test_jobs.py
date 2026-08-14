@@ -708,7 +708,7 @@ def test_job_cost_confidence(
             programs=[hugr_ref],
             n_shots=[10],
             # No other parameters matter for cost estimation, so construct a minimal costing config
-            backend_config=qnx.QuantinuumConfig(device_name="Helios-1SC"),
+            backend_config=qnx.HeliosConfig(system_name="Helios-1SC"),
             project=project_ref,
             name="Circuit cost confidence estimation job",
         )

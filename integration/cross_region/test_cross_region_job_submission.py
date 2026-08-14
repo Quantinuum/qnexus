@@ -103,8 +103,8 @@ def test_cross_region_execute_job_qir_ng(
             programs=[qir_ref],
             n_shots=[10],
             max_cost=[10.0],
-            backend_config=qnx.QuantinuumConfig(
-                device_name=ng_device_name, compiler_options={"max-qubits": 5}
+            backend_config=HeliosConfig(
+                system_name=ng_device_name, compiler_options={"max-qubits": 5}
             ),
             project=project_ref,
             name=f"qir job for {test_case_name}",
