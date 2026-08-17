@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.48.2 (2026-08-17)
+
+
+### Fixed
+
+- Keep hugr extensions when packaging (#372).
+
+
 ## v0.48.1 (2026-08-13)
 
 
