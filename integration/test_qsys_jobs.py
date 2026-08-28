@@ -142,6 +142,7 @@ def test_hugr_cost_confidence(
             n_shots=[10],
             project=project_ref,
             timeout=JOB_TIMEOUT,
+            system_name="Helios-1",
         )
         assert isinstance(cost_confidence, list)
         assert len(cost_confidence) > 0

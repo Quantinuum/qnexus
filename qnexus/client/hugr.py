@@ -23,6 +23,7 @@ from qnexus.context import (
     merge_project_from_context,
     merge_properties_from_context,
     merge_scope_from_context,
+    merge_target_region_from_context,
 )
 from qnexus.models import HeliosConfig
 from qnexus.models.annotations import Annotations, CreateAnnotations, PropertiesDict
@@ -40,9 +41,12 @@ from qnexus.models.filters import (
 from qnexus.models.references import (
     DataframableList,
     ExecutionProgram,
+    GpuDecoderConfigRef,
     HUGRRef,
     ProjectRef,
+    WasmModuleRef,
 )
+from qnexus.models.region import Region, get_costing_system_for_region
 from qnexus.models.scope import ScopeFilterEnum
 
 
@@ -296,12 +300,14 @@ def update(
     )
 
 
+@merge_target_region_from_context
 def cost(
     programs: HUGRRef | list[HUGRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: Literal["Helios-1"] = "Helios-1",
+    system_name: Literal["Helios-1", "Helios-2"] | None = None,
     timeout: float | None = None,
+    target_region: Region | None = None,
 ) -> float:
     """Estimate the cost (in HQC) of running Hugr programs for n_shots
     number of shots on a Quantinuum Helios system.
@@ -317,6 +323,8 @@ def cost(
         category=DeprecationWarning,
     )
 
+    system_name = system_name or get_costing_system_for_region(target_region)
+
     if isinstance(programs, HUGRRef):
         programs = [programs]
 
@@ -326,18 +334,23 @@ def cost(
         backend_config=HeliosConfig(system_name=f"{system_name}SC"),
         project=project,
         name="Hugr cost estimation job",
+        target_region=target_region,
     )
     status = qnx.jobs.wait_for(job_ref, timeout=timeout)
 
     return cast(float, status.cost)
 
 
+@merge_target_region_from_context
 def cost_confidence(
     programs: HUGRRef | list[HUGRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: Literal["Helios-1"] = "Helios-1",
+    system_name: Literal["Helios-1", "Helios-2"] | None = None,
     timeout: float | None = None,
+    target_region: Region | None = None,
+    wasm_module: WasmModuleRef | None = None,
+    gpu_decoder_config: GpuDecoderConfigRef | None = None,
 ) -> list[tuple[float, float]]:
     """Estimate the cost (in HQC) of running Hugr programs for n_shots
     number of shots on a Quantinuum Helios system.
@@ -364,6 +377,8 @@ def cost_confidence(
     """
     import qnexus as qnx
 
+    system_name = system_name or get_costing_system_for_region(target_region)
+
     if isinstance(programs, HUGRRef):
         programs = [programs]
 
@@ -374,6 +389,9 @@ def cost_confidence(
         backend_config=HeliosConfig(system_name=f"{system_name}SC"),
         project=project,
         name="Circuit cost confidence estimation job",
+        target_region=target_region,
+        wasm_module=wasm_module,
+        gpu_decoder_config=gpu_decoder_config,
     )
 
     qnx.jobs.wait_for(job_ref, timeout=timeout)
