@@ -186,7 +186,7 @@ def get(
 
 @merge_properties_from_context
 def upload(
-    hugr_package: Package | PackagePointer | Hugr[Module],
+    hugr_package: Package | PackagePointer | Hugr[Module] | bytes,
     name: str,
     project: ProjectRef | None = None,
     description: str | None = None,
@@ -210,14 +210,16 @@ def upload(
 
     match hugr_package:
         case PackagePointer():
-            package = hugr_package.package
+            package_bytes = hugr_package.package.to_bytes()
         case Hugr():
-            package = hugr_package.to_package()
+            package_bytes = hugr_package.to_package().to_bytes()
         case Package():
-            package = hugr_package
+            package_bytes = hugr_package.to_bytes()
+        case bytes():
+            package_bytes = hugr_package
         case _:
             raise ValueError(f"Unsupported type for HUGR upload: {type(hugr_package)}.")
-    attributes = {"contents": _encode_hugr(package)}
+    attributes = {"contents": _encode_hugr(package_bytes)}
 
     annotations = CreateAnnotations(
         name=name,
@@ -440,6 +442,6 @@ def _fetch_hugr_bytes(
     return base64.b64decode(contents)
 
 
-def _encode_hugr(hugr_package: Package) -> str:
-    """Utility method for encoding a HUGR Package as base64-encoded string"""
-    return base64.b64encode(hugr_package.to_bytes()).decode("utf-8")
+def _encode_hugr(package_bytes: bytes) -> str:
+    """Utility method for encoding a serialised HUGR package as base64-encoded string"""
+    return base64.b64encode(package_bytes).decode("utf-8")

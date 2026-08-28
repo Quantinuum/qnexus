@@ -82,3 +82,39 @@ def test_uploading_hugr_module_keeps_used_extensions() -> None:
     }
 
     assert uploaded_extension_names == used_extension_names
+
+
+def test_uploading_hugr_module_as_bytes() -> None:
+    """A HUGR should be uploadable in byte form without deserialising first."""
+    pkg_bytes = Path("tests/data/example_bell.hugr").read_bytes()
+    project = ProjectRef(
+        id=uuid.uuid4(),
+        annotations=Annotations(),
+        contents_modified=datetime.now(timezone.utc),
+    )
+
+    with mock.patch("qnexus.client.hugr.get_nexus_client") as get_client:
+        response = mock.MagicMock()
+        response.status_code = 201
+        response.json.return_value = {
+            "data": {
+                "id": str(uuid.uuid4()),
+                "attributes": {
+                    "name": "example bell",
+                    "timestamps": {
+                        "created": datetime.now(timezone.utc).isoformat(),
+                        "modified": datetime.now(timezone.utc).isoformat(),
+                    },
+                },
+            }
+        }
+        get_client.return_value.post.return_value = response
+
+        qnx.hugr.upload(pkg_bytes, name="example bell", project=project)
+
+    contents = get_client.return_value.post.call_args.kwargs["json"]["data"][
+        "attributes"
+    ]["contents"]
+    uploaded_bytes = base64.b64decode(contents)
+
+    assert pkg_bytes == uploaded_bytes
