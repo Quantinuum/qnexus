@@ -15,6 +15,7 @@ from qnexus.context import (
     merge_project_from_context,
     merge_properties_from_context,
     merge_scope_from_context,
+    merge_target_region_from_context,
 )
 from qnexus.models import HeliosConfig, QuantinuumConfig
 from qnexus.models.annotations import Annotations, CreateAnnotations, PropertiesDict
@@ -32,9 +33,12 @@ from qnexus.models.filters import (
 from qnexus.models.references import (
     DataframableList,
     ExecutionProgram,
+    GpuDecoderConfigRef,
     ProjectRef,
     QIRRef,
+    WasmModuleRef,
 )
+from qnexus.models.region import Region, _get_costing_system_for_region
 from qnexus.models.scope import ScopeFilterEnum
 
 
@@ -280,8 +284,9 @@ def cost(
     programs: QIRRef | list[QIRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: str = "Helios-1",
+    system_name: str | None = None,
     timeout: float | None = None,
+    target_region: Region | None = None,
 ) -> float:
     """Estimate the cost (in HQC) of running QIR programs for n_shots
     number of shots on a Quantinuum Helios system.
@@ -293,9 +298,11 @@ def cost(
     import qnexus as qnx
 
     warnings.warn(
-        "qir.cost() is deprecated. Please update to use qir.cost_confidence() instead.",
+        "qir.cost() is deprecated for Helios systems or newer. Please update to use qir.cost_confidence() instead.",
         category=DeprecationWarning,
     )
+
+    system_name = system_name or _get_costing_system_for_region(target_region)
 
     if isinstance(programs, QIRRef):
         programs = [programs]
@@ -312,12 +319,16 @@ def cost(
     return cast(float, status.cost)
 
 
+@merge_target_region_from_context
 def cost_confidence(
     programs: QIRRef | list[QIRRef],
     n_shots: int | list[int],
     project: ProjectRef | None = None,
-    system_name: str = "Helios-1",
+    system_name: str | None = None,
     timeout: float | None = None,
+    target_region: Region | None = None,
+    wasm_module: WasmModuleRef | None = None,
+    gpu_decoder_config: GpuDecoderConfigRef | None = None,
 ) -> list[tuple[float, float]]:
     """Estimate the cost (in HQC) of running QIR programs for n_shots
     number of shots on a Quantinuum Helios system.
@@ -334,6 +345,8 @@ def cost_confidence(
     """
     import qnexus as qnx
 
+    system_name = system_name or _get_costing_system_for_region(target_region)
+
     if isinstance(programs, QIRRef):
         programs = [programs]
 
@@ -343,6 +356,9 @@ def cost_confidence(
         backend_config=_costing_backend_config(system_name),
         project=project,
         name="QIR cost estimation job",
+        target_region=target_region,
+        wasm_module=wasm_module,
+        gpu_decoder_config=gpu_decoder_config,
     )
 
     qnx.jobs.wait_for(job_ref, timeout=timeout)
