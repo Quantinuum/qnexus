@@ -2,6 +2,13 @@
 
 # `qnexus` Release Notes
 
+## v0.49.0 (2026-09-01)
+
+
+### Added
+
+- Automatically select a default cost estimation system based on region (temporary and will be removed after a deprecation period) (#378).
+
 ## v0.48.2 (2026-08-17)
 
 
