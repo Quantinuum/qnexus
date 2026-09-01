@@ -37,7 +37,7 @@ def _get_home_region() -> Region:
             raise ValueError(f"Unknown home region: {CONFIG.domain}")
 
 
-def get_costing_system_for_region(
+def _get_costing_system_for_region(
     region: Region | None = None,
 ) -> str:
     """Get the default costing system name for a given region.
