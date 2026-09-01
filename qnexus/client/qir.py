@@ -38,7 +38,7 @@ from qnexus.models.references import (
     QIRRef,
     WasmModuleRef,
 )
-from qnexus.models.region import Region, get_costing_system_for_region
+from qnexus.models.region import Region, _get_costing_system_for_region
 from qnexus.models.scope import ScopeFilterEnum
 
 
@@ -302,7 +302,7 @@ def cost(
         category=DeprecationWarning,
     )
 
-    system_name = system_name or get_costing_system_for_region(target_region)
+    system_name = system_name or _get_costing_system_for_region(target_region)
 
     if isinstance(programs, QIRRef):
         programs = [programs]
@@ -345,7 +345,7 @@ def cost_confidence(
     """
     import qnexus as qnx
 
-    system_name = system_name or get_costing_system_for_region(target_region)
+    system_name = system_name or _get_costing_system_for_region(target_region)
 
     if isinstance(programs, QIRRef):
         programs = [programs]
