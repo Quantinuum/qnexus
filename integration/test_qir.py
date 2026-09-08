@@ -249,6 +249,7 @@ def test_costing_qir_on_NG_devices(
             n_shots=[10],
             project=project_ref,
             timeout=JOB_TIMEOUT,
+            system_name="Helios-1",
         )
         assert isinstance(cost, float)
 

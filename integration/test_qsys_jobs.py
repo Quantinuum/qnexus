@@ -118,6 +118,7 @@ def test_hugr_costing(
             n_shots=[10],
             project=project_ref,
             timeout=JOB_TIMEOUT,
+            system_name="Helios-1",
         )
         assert isinstance(cost, float)
 
