@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Callable, ContextManager
+from typing import Callable, ContextManager, cast
 
 from constants import JOB_TIMEOUT
 from hugr.package import Package
-from hugr.qsystem.result import DataPrimitive, DataValue
+from hugr.qsystem.result import DataPrimitive, DataValue, QsysResult
 from quantinuum_schemas.models.backend_config import (
     HeliosConfig,
     HeliosEmulatorConfig,
@@ -53,7 +53,7 @@ def big_int() -> Comparison:
     return Comparison(lambda a: type(a) is int and a > 1e6, "> 1e6")
 
 
-# NOTE: These metrics are valid only for the specific guppy program used in the test.
+# WARNING: These metrics are valid only for the specific guppy program used in the test.
 expected_runtime_metrics = [
     {
         "key": "METRICS:BOOL:runtime:METRICS:BOOL:LEAKAGE_REPUMP",
@@ -115,15 +115,19 @@ expected_runtime_metrics = [
 
 
 def assert_key_and_value_in_raw_collated_shot_results(
-    results: dict[str, list[DataPrimitive] | list[DataValue]],
+    results: dict[str, list[DataValue]],
     key: str,
     comparison: Comparison,
 ) -> None:
     """Helper function to assert expected metrics in RAW results."""
     assert key in results, f"'{key}' expected but not found in RAW results"
-    actual = results[key][
-        0
-    ]  # NOTE: assuming metrics are returned as list of single values
+
+    # Handling results as scalars and list of a single value
+    value = results[key]
+    if isinstance(value, list):
+        actual = value[0]
+    else:
+        actual = value
     assert comparison(actual), (
         f"metric '{key}': expected {comparison}, but got {actual!r}"
     )
@@ -170,6 +174,7 @@ def test_real_time_metrics(
         assert isinstance(result_ref, ExecutionResultRef)
         raw_results = result_ref.download_result(version=ResultVersions.RAW)
 
+        assert isinstance(raw_results, QsysResult)
         assert len(raw_results.results) == 10
         raw_results_last_shot = raw_results.collated_shots()[-1]
 
@@ -185,6 +190,8 @@ def test_real_time_metrics(
 
         # Assert expected runtime metrics
         for metric in expected_runtime_metrics:
+            key = str(metric["key"])
+            comparison = cast(Comparison, metric["comparison"])
             assert_key_and_value_in_raw_collated_shot_results(
-                raw_results_last_shot, **metric
+                raw_results_last_shot, key, comparison
             )
