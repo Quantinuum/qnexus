@@ -34,6 +34,13 @@ def exact(expected: DataPrimitive) -> Comparison:
     return Comparison(lambda a: a == expected, f"== {expected!r}")
 
 
+def between(lower: int | float, upper: int | float) -> Comparison:
+    return Comparison(
+        lambda a: (type(a) is int or type(a) is float) and lower <= a <= upper,
+        f"between {lower} and {upper} (inclusive)",
+    )
+
+
 def positive() -> Comparison:
     return Comparison(lambda a: (type(a) is int or type(a) is float) and a > 0, "> 0")
 
@@ -46,6 +53,7 @@ def big_int() -> Comparison:
     return Comparison(lambda a: type(a) is int and a > 1e6, "> 1e6")
 
 
+# NOTE: These metrics are valid only for the specific guppy program used in the test.
 expected_runtime_metrics = [
     {
         "key": "METRICS:BOOL:runtime:METRICS:BOOL:LEAKAGE_REPUMP",
@@ -61,23 +69,23 @@ expected_runtime_metrics = [
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_PHI_MEAN",
-        "comparison": positive(),
+        "comparison": exact(1.5707963267948966),
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_PHI_VARIANCE",
-        "comparison": positive(),
+        "comparison": one_of(2.467401100272339, 2.819886971739816),
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_THETA_MEAN",
-        "comparison": positive(),
+        "comparison": one_of(0.8975979010256552, 1.1780972450961724),
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_THETA_VARIANCE",
-        "comparison": positive(),
+        "comparison": one_of(2.7191767227491086, 2.9300388065734033),
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RZZ_THETA_MEAN",
-        "comparison": positive(),
+        "comparison": exact(1.5707963267948966),
     },
     {
         "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RZZ_THETA_VARIANCE",
