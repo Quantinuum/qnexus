@@ -56,59 +56,59 @@ def big_int() -> Comparison:
 # WARNING: These metrics are valid only for the specific guppy program used in the test.
 expected_runtime_metrics = [
     {
-        "key": "METRICS:BOOL:runtime:METRICS:BOOL:LEAKAGE_REPUMP",
+        "key": "METRICS:BOOL:runtime:LEAKAGE_REPUMP",
         "comparison": exact(0),
     },
     {
-        "key": "METRICS:BOOL:runtime:METRICS:BOOL:RXY_SQUASHING",
+        "key": "METRICS:BOOL:runtime:RXY_SQUASHING",
         "comparison": exact(1),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:DD_IDLING_THRESHOLD_NS",
+        "key": "METRICS:FLOAT:runtime:DD_IDLING_THRESHOLD_NS",
         "comparison": exact(0.0),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_PHI_MEAN",
+        "key": "METRICS:FLOAT:runtime:RXY_PHI_MEAN",
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_PHI_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:RXY_PHI_VARIANCE",
         "comparison": one_of(2.467401100272339, 2.819886971739816),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_THETA_MEAN",
+        "key": "METRICS:FLOAT:runtime:RXY_THETA_MEAN",
         "comparison": one_of(0.8975979010256552, 1.1780972450961724),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RXY_THETA_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:RXY_THETA_VARIANCE",
         "comparison": one_of(2.7191767227491086, 2.9300388065734033),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RZZ_THETA_MEAN",
+        "key": "METRICS:FLOAT:runtime:RZZ_THETA_MEAN",
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:METRICS:FLOAT:RZZ_THETA_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:RZZ_THETA_VARIANCE",
         "comparison": exact(0.0),
     },
     {
-        "key": "METRICS:INT:runtime:METRICS:INT:MEASLEAKED_COUNT",
+        "key": "METRICS:INT:runtime:MEASLEAKED_COUNT",
         "comparison": exact(0),
     },
     {
-        "key": "METRICS:INT:runtime:METRICS:INT:MEAS_COUNT",
+        "key": "METRICS:INT:runtime:MEAS_COUNT",
         "comparison": exact(3),
     },
     {
-        "key": "METRICS:INT:runtime:METRICS:INT:RXY_COUNT",
+        "key": "METRICS:INT:runtime:RXY_COUNT",
         "comparison": one_of(7, 8),  # TODO: confirm RXY_COUNT can differ between shots
     },
     {
-        "key": "METRICS:INT:runtime:METRICS:INT:RZZ_COUNT",
+        "key": "METRICS:INT:runtime:RZZ_COUNT",
         "comparison": exact(2),
     },
     {
-        "key": "METRICS:INT:runtime:METRICS:INT:SHOTTIME_NS",
+        "key": "METRICS:INT:runtime:SHOTTIME_NS",
         "comparison": big_int(),
     },
 ]
