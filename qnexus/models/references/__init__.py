@@ -606,14 +606,12 @@ class ExecutionResultRef(BaseRef):
             >>> qsys_result = execute_results[0].download_h2_qsysresult()
         """
         try:
-            from hugr_qir.h_series_helpers.results import (
-                backendresult_to_qsysresult
-            )
+            from hugr_qir.h_series_helpers.results import backendresult_to_qsysresult
         except ImportError:
             raise ValueError(
                 "Please install hugr-qir via 'pip install hugr-qir==0.3.0'"
             )
-        
+
         return backendresult_to_qsysresult(self.download_result())
 
     def df(self) -> pd.DataFrame:
