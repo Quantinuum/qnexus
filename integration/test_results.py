@@ -21,6 +21,10 @@ from qnexus.models.references import (
     ProjectRef,
 )
 
+backendresult_to_qsysresult = pytest.importorskip(
+    "hugr_qir.h_series_helpers.results",
+    reason="the optional hugr-qir package is not installed",
+).backendresult_to_qsysresult
 
 def test_fetch_qsys_result(
     test_case_name: str,
@@ -122,3 +126,14 @@ def test_fetch_pytket_result(
         assert cast(BackendResult, downloaded_result) == cast(
             BackendResult, direct_fetched_result
         )
+
+def test_qir_qsysresult() -> None:
+    qir_result = qnx.jobs.results("99ad92cf-4f04-4ffc-a61d-6c72f6388a8d")[0].download_result()
+
+    # Convert Pytket BackendResult to QSysResult
+
+    qsysres = backendresult_to_qsysresult(qir_result)
+
+    # snapshot test?
+
+    print(qsysres)
