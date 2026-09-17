@@ -606,7 +606,7 @@ class ExecutionResultRef(BaseRef):
             >>> qsys_result = execute_results[0].download_h2_qsysresult()
         """
         try:
-            from hugr_qir.h_series_helpers.results import backendresult_to_qsysresult
+            from hugr_qir.h_series_helpers.results import backendresult_to_qsysresult  # type: ignore
         except ImportError:
             raise ValueError(
                 "Please install hugr-qir via 'pip install hugr-qir==0.3.0'"
