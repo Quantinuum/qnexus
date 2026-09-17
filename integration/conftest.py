@@ -463,6 +463,12 @@ def qa_hugr_package_fixture() -> Package:
     return Package.from_bytes(hugr_path.read_bytes())
 
 
+@pytest.fixture(name="qa_h2_hugr_qir_package")
+def qa_h2_hugr_qir_package_fixture() -> Package:
+    hugr_path = Path("tests/data/h2_hugr_qir_program.hugr").resolve()
+    return Package.from_bytes(hugr_path.read_bytes())
+
+
 @pytest.fixture(name="qa_wasm_module")
 def qa_wasm_module_fixture() -> WasmFileHandler:
     wasm_path = Path("tests/data/add_one.wasm").resolve()

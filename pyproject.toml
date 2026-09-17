@@ -53,7 +53,7 @@ dev = [
     "pytket-qir>=0.22.0",
     "scipy-stubs>=1.15.3.0",
     "fastapi==0.136.3",
-    "hugr-qir>=0.3.0rc2; python_version >= '3.12'", # Only installs if Python is 3.12+
+    "hugr-qir>=0.3.0; python_version >= '3.12'", # Only installs if Python is 3.12+
 ]
 
 

@@ -4,7 +4,7 @@ from pathlib import Path
 from sys import argv
 
 from guppylang import guppy
-from guppylang.std.builtins import result
+from guppylang.std.builtins import output
 from guppylang.std.quantum import cx, h, measure, qubit, x, z
 
 
@@ -25,12 +25,12 @@ def main() -> None:
 
     cx(src, alice)
     h(src)
-    if measure(alice):
+    if measure(alice).read():
         x(bob)
-    if measure(src):
+    if measure(src).read():
         z(bob)
 
-    result("teleported", measure(bob))
+    output("teleported", measure(bob).read())
 
 
 main.check()

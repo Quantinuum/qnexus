@@ -26,6 +26,7 @@ backendresult_to_qsysresult = pytest.importorskip(
     reason="the optional hugr-qir package is not installed",
 ).backendresult_to_qsysresult
 
+
 def test_fetch_qsys_result(
     test_case_name: str,
     create_project: Callable[[str], ContextManager[ProjectRef]],
@@ -127,145 +128,66 @@ def test_fetch_pytket_result(
             BackendResult, direct_fetched_result
         )
 
-def test_qir_qsysresult() -> None:
 
+def test_h2_qsysresult(
+    test_case_name: str,
+    create_project: Callable[[str], ContextManager[ProjectRef]],
+    qa_h2_hugr_qir_package: Package,
+) -> None:
+    """Test the execution and results conversion of a HUGR program compiled to
+    QIR for a H2-generation system."""
 
-##### GUPPY PROGRAM:
+    from hugr_qir.hugr_to_qir import hugr_to_qir
+    from hugr_qir.output import OutputFormat
 
-from typing import no_type_check
+    EXPECTED_SHOTS = 10
 
-from guppylang import guppy
-
-import sys
-from typing import no_type_check
-
-
-from guppylang import array, qubit, guppy
-from guppylang.std.num import nat
-from guppylang.std.platform import output
-from guppylang.std.quantum import measure
-
-
-@guppy
-def main() -> None:
-    output("bool", measure(qubit()).read())
-    output("int", -14)
-    # output("uint", nat(14))  # guppy cannot currently generate uint
-    output("bool_array", array(True, False))
-    output("int_array", array(-1, 0, 1))
-    # output("uint_array", array(nat(0), nat(1), nat(2)))  # guppy cannot currently generate array[nat, n]
-
-
-#### workflow for submission with qnexus:
-
-
-import datetime
-import qnexus as qnx  # type: ignore
-from qnexus.exceptions import AuthenticationError  # type: ignore [import-not-found]
-from typing import no_type_check
-from guppylang import guppy, qubit
-from guppylang.std.builtins import output
-from guppylang.std.quantum import measure, x
-from hugr_qir.hugr_to_qir import hugr_to_qir
-from hugr_qir.output import OutputFormat
-from hugr_qir.h_series_helpers.results import backendresult_to_qsysresult
-
-# Generate QIR
-hugr_package = main.compile()
-qir_bitcode = hugr_to_qir(hugr_package, validate_qir=True, output_format=OutputFormat.BITCODE)
-
-# Get or create a Nexus project to submit jobs in
-try:
-    project = qnx.projects.get_or_create(name="HUGR-QIR-Demo")
-except AuthenticationError:
-    qnx.login()
-    project = qnx.projects.get_or_create(name="HUGR-QIR-Demo")
-qnx.context.set_active_project(project)
-
-# Run job on Nexus
-# Use the H2-1 syntax checker (emits dummy results)
-# Switch to H2-1E or H2-2E for actual emulation
-device_name = "H2-1SC"
-qir_name = "HUGR-QIR"
-jobname_suffix = datetime.datetime.now().strftime("%Y_%m_%d-%H-%M-%S")
-job_name = f"execution-job-qir-{qir_name}-{device_name}-{jobname_suffix}"
-qir_program_ref = qnx.qir.upload(qir=qir_bitcode, name=qir_name, project=project)
-config = qnx.QuantinuumConfig(device_name=device_name)
-ref_execute_job = qnx.start_execute_job(
-    programs=[qir_program_ref],
-    n_shots=[10],
-    backend_config=config,
-    name=job_name,
-)
-qnx.jobs.wait_for(ref_execute_job)
-qir_result = qnx.jobs.results(ref_execute_job)[0].download_result()
-
-# Convert Pytket BackendResult to QSysResult
-qsysres = backendresult_to_qsysresult(qir_result)
-
-# Print QSysResult
-for i, shot in enumerate(qsysres.results):
-    print(f"{i}: {shot.entries}")
-
-
-
-### CONVERSION and CHECK:
-
-
-# Convert Pytket BackendResult to QSysResult
-
-qsysres = backendresult_to_qsysresult(qir_result)
-
-
-
-# snapshot test?
-
-
-# Test on the result:
-
-
-    for i in range(EXPECTED_SHOTS):
-        assert len(qsysres[i]) == 3
-
-        set_reg = set()
-
-        for x in qsysres[i]:  # check if reg names are in new qsys result
-            set_reg.add(x[0])
-
-        assert set_reg == {"bool", "int", "uint", "bool_array", "int_array"}
-
-        for x in qsysres[i]:
-            if x[0] == "bool":
-                assert type(x[1]) is bool
-            elif x[0] == "int":          
-                assert type(x[1]) is int
-                assert x[1] == -14
-            #elif x[0] == "uint":  # guppy cannot currently generate uint          
-            #    assert type(x[1]) is int
-            #    assert x[1] == 14
-            elif x[0] == "bool_array":
-                assert type(x[1]) is list
-                assert x[1] == [True, False]
-                for y in x[1]:
-                    assert type(y) is bool
-            elif x[0] == "int_array":
-                assert type(x[1]) is list
-                assert x[1] == [-1, 0, 1]
-                for y in x[1]:
-                    assert type(y) is int
-            #elif x[0] == "uint_array":  # guppy cannot currently generate uint
-            #    assert type(x[1]) is list
-            #    assert x[1] == [-1, 0, 1]
-            #    for y in x[1]:
-            #        assert type(y) is int
-
-                    
-
-    if not skip_snapshot_checks:
-        snapshot.assert_match(
-            _qs_to_str(qs),
-            "test_backend_array.txt",
+    with create_project(project_name) as project_ref:
+        qir_bitcode = hugr_to_qir(
+            qa_h2_hugr_qir_package,
+            validate_qir=True,
+            output_format=OutputFormat.BITCODE,
+        )
+        qir_ref = qnx.qir.upload(
+            qir=cast(bytes, qir_bitcode),
+            name=f"hugr for {test_case_name}",
+            project=project_ref,
         )
 
+        ref_execute_job = qnx.start_execute_job(
+            programs=[qir_ref],
+            n_shots=[EXPECTED_SHOTS],
+            backend_config=qnx.QuantinuumConfig(device_name="H2-1E"),
+            name=f"H2-1E hugr_qir job for {test_case_name}",
+            project=project_ref,
+        )
+        qnx.jobs.wait_for(ref_execute_job, timeout=JOB_TIMEOUT)
+        result_ref = cast(ExecutionResultRef, qnx.jobs.results(ref_execute_job)[0])
+        qsysres = result_ref.download_h2_qsysresult()
 
+        for i in range(EXPECTED_SHOTS):
+            assert len(qsysres[i]) == 4
 
+            set_reg = set()
+
+            for x in qsysres[i]:  # check if reg names are in new qsys result
+                set_reg.add(x[0])
+
+            assert set_reg == {"bool", "int", "bool_array", "int_array"}
+
+            for x in qsysres[i]:
+                if x[0] == "bool":
+                    assert type(x[1]) is bool
+                elif x[0] == "int":
+                    assert type(x[1]) is int
+                    assert x[1] == -14
+                elif x[0] == "bool_array":
+                    assert type(x[1]) is list
+                    assert x[1] == [True, False]
+                    for y in x[1]:
+                        assert type(y) is bool
+                elif x[0] == "int_array":
+                    assert type(x[1]) is list
+                    assert x[1] == [-1, 0, 1]
+                    for y in x[1]:
+                        assert type(y) is int
