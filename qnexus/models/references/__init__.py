@@ -612,7 +612,7 @@ class ExecutionResultRef(BaseRef):
                 "Please install hugr-qir via 'pip install hugr-qir==0.3.0'"
             )
 
-        return backendresult_to_qsysresult(self.download_result())
+        return backendresult_to_qsysresult(self.download_result())  # type: ignore
 
     def df(self) -> pd.DataFrame:
         """Present in a pandas DataFrame."""
