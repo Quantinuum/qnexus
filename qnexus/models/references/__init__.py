@@ -617,8 +617,8 @@ class ExecutionResultRef(BaseRef):
         result = self.download_result()
         if not isinstance(result, BackendResult):
             raise ValueError(
-                "download_h2_qsysresult is only valid for results of type "
-                "BackendResult for executions of programs generated with hugr-qir."
+                "download_h2_qsysresult is only valid "
+                "for executions of programs generated with hugr-qir."
             )
         return backendresult_to_qsysresult(result)
 
