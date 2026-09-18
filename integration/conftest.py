@@ -1,6 +1,7 @@
 """Pytest fixtures and settings used in the qnexus integration tests."""
 
 import logging
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, ContextManager, Generator, Literal, Union, cast
@@ -457,16 +458,21 @@ def fixture_test_ref_serialisation(  # type: ignore[no-untyped-def]
     return test_ref_serialisation
 
 
+def _versioned_hugr_path(name: str) -> Path:
+    """guppylang's API (and the hugr envelope format it emits) differs before
+    and after Python 3.12, so pick the fixture compiled for the running version."""
+    suffix = "_v0.21" if sys.version_info < (3, 12) else ""
+    return Path(f"tests/data/{name}{suffix}.hugr").resolve()
+
+
 @pytest.fixture(name="qa_hugr_package")
 def qa_hugr_package_fixture() -> Package:
-    hugr_path = Path("tests/data/example_bell.hugr").resolve()
-    return Package.from_bytes(hugr_path.read_bytes())
+    return Package.from_bytes(_versioned_hugr_path("example_bell").read_bytes())
 
 
 @pytest.fixture(name="qa_h2_hugr_qir_package")
 def qa_h2_hugr_qir_package_fixture() -> Package:
-    hugr_path = Path("tests/data/h2_hugr_qir_program.hugr").resolve()
-    return Package.from_bytes(hugr_path.read_bytes())
+    return Package.from_bytes(_versioned_hugr_path("h2_hugr_qir_program").read_bytes())
 
 
 @pytest.fixture(name="qa_wasm_module")
