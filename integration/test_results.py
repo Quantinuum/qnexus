@@ -179,7 +179,7 @@ def test_h2_qsysresult(
             for x in qsysres[i]:
                 if x[0] == "bool":
                     assert type(x[1]) is bool
-                    assert x[1] == False
+                    assert not x[1]
                 elif x[0] == "int":
                     assert type(x[1]) is int
                     assert x[1] == 0
