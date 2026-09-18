@@ -67,6 +67,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache-dependency-glob: uv.lock
 
+      - name: Sync and display installed dependencies
+        run: |
+          uv sync
+          uv pip list
+
       - name: Set up qnexus login tokens
         run: |
           uv run python integration/setup_tokens.py
