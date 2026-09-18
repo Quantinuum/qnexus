@@ -21,11 +21,6 @@ from qnexus.models.references import (
     ProjectRef,
 )
 
-backendresult_to_qsysresult = pytest.importorskip(
-    "hugr_qir.h_series_helpers.results",
-    reason="the optional hugr-qir package is not installed",
-).backendresult_to_qsysresult
-
 
 def test_fetch_qsys_result(
     test_case_name: str,
@@ -137,6 +132,11 @@ def test_h2_qsysresult(
     """Test the execution and results conversion of a HUGR program compiled to
     QIR for a H2-generation system."""
 
+    pytest.importorskip(
+        "hugr_qir",
+        reason="the hugr-qir package is not installed",
+    )
+
     from hugr_qir.hugr_to_qir import hugr_to_qir
     from hugr_qir.output import OutputFormat
 
@@ -157,8 +157,8 @@ def test_h2_qsysresult(
         ref_execute_job = qnx.start_execute_job(
             programs=[qir_ref],
             n_shots=[EXPECTED_SHOTS],
-            backend_config=qnx.QuantinuumConfig(device_name="H2-1E"),
-            name=f"H2-1E hugr_qir job for {test_case_name}",
+            backend_config=qnx.QuantinuumConfig(device_name="H2-1SC"),
+            name=f"H2-1SC hugr_qir job for {test_case_name}",
             project=project_ref,
         )
         qnx.jobs.wait_for(ref_execute_job, timeout=JOB_TIMEOUT)
@@ -175,19 +175,21 @@ def test_h2_qsysresult(
 
             assert set_reg == {"bool", "int", "bool_array", "int_array"}
 
+            # Because we run on H2-1SC results will be all zeros
             for x in qsysres[i]:
                 if x[0] == "bool":
                     assert type(x[1]) is bool
+                    assert x[1] == False
                 elif x[0] == "int":
                     assert type(x[1]) is int
-                    assert x[1] == -14
+                    assert x[1] == 0
                 elif x[0] == "bool_array":
                     assert type(x[1]) is list
-                    assert x[1] == [True, False]
+                    assert x[1] == [False, False]
                     for y in x[1]:
                         assert type(y) is bool
                 elif x[0] == "int_array":
                     assert type(x[1]) is list
-                    assert x[1] == [-1, 0, 1]
+                    assert x[1] == [0, 0, 0]
                     for y in x[1]:
                         assert type(y) is int

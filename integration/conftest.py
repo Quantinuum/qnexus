@@ -472,7 +472,8 @@ def qa_hugr_package_fixture() -> Package:
 
 @pytest.fixture(name="qa_h2_hugr_qir_package")
 def qa_h2_hugr_qir_package_fixture() -> Package:
-    return Package.from_bytes(_versioned_hugr_path("h2_hugr_qir_program").read_bytes())
+    hugr_path = Path("tests/data/h2_hugr_qir_program.hugr").resolve()
+    return Package.from_bytes(hugr_path.read_bytes())
 
 
 @pytest.fixture(name="qa_wasm_module")
