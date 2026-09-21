@@ -6,6 +6,7 @@ from abc import abstractmethod
 from copy import copy
 from enum import Enum
 from typing import (
+    TYPE_CHECKING,
     Annotated,
     Any,
     Iterable,
@@ -28,7 +29,6 @@ from pytket.backends.backendresult import BackendResult
 from pytket.circuit import Circuit
 from pytket.wasm.wasm import WasmModuleHandler
 from quantinuum_schemas.models.backend_config import BackendConfig
-from selene_core.trace import Trace
 
 from qnexus.context import merge_scope_from_context
 from qnexus.exceptions import IncompatibleResultVersion
@@ -38,6 +38,9 @@ from qnexus.models.references.base import BaseRef
 from qnexus.models.references.projects import ProjectRef
 from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never
+
+if TYPE_CHECKING:
+    from selene_core.trace import Trace
 
 __all__ = [
     "BaseRef",  # re-export

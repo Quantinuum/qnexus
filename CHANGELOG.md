@@ -2,6 +2,20 @@
 
 # `qnexus` Release Notes
 
+## v0.50.0 (2026-09-22)
+
+
+### Added
+
+- Add function to obtain qsysresults for hugr-qir qir program executions (#385).
+
+
+### Fixed
+
+- Remove backendinfo optype warning (#380).
+- Make `selene_core` import optional, only required when downloading runtime traces.
+
+
 ## v0.49.0 (2026-09-01)
 
 
