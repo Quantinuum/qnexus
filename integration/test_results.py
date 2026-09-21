@@ -122,3 +122,74 @@ def test_fetch_pytket_result(
         assert cast(BackendResult, downloaded_result) == cast(
             BackendResult, direct_fetched_result
         )
+
+
+def test_h2_qsysresult(
+    test_case_name: str,
+    create_project: Callable[[str], ContextManager[ProjectRef]],
+    qa_h2_hugr_qir_package: Package,
+) -> None:
+    """Test the execution and results conversion of a HUGR program compiled to
+    QIR for a H2-generation system."""
+
+    pytest.importorskip(
+        "hugr_qir",
+        reason="the hugr-qir package is not installed",
+    )
+
+    from hugr_qir.hugr_to_qir import hugr_to_qir
+    from hugr_qir.output import OutputFormat
+
+    EXPECTED_SHOTS = 10
+
+    with create_project(project_name) as project_ref:
+        qir_bitcode = hugr_to_qir(
+            qa_h2_hugr_qir_package,
+            validate_qir=True,
+            output_format=OutputFormat.BITCODE,
+        )
+        qir_ref = qnx.qir.upload(
+            qir=cast(bytes, qir_bitcode),
+            name=f"hugr for {test_case_name}",
+            project=project_ref,
+        )
+
+        ref_execute_job = qnx.start_execute_job(
+            programs=[qir_ref],
+            n_shots=[EXPECTED_SHOTS],
+            backend_config=qnx.QuantinuumConfig(device_name="H2-1SC"),
+            name=f"H2-1SC hugr_qir job for {test_case_name}",
+            project=project_ref,
+        )
+        qnx.jobs.wait_for(ref_execute_job, timeout=JOB_TIMEOUT)
+        result_ref = cast(ExecutionResultRef, qnx.jobs.results(ref_execute_job)[0])
+        qsysres = result_ref.download_h2_qsysresult()
+
+        for i in range(EXPECTED_SHOTS):
+            assert len(qsysres[i]) == 4
+
+            set_reg = set()
+
+            for x in qsysres[i]:  # check if reg names are in new qsys result
+                set_reg.add(x[0])
+
+            assert set_reg == {"bool", "int", "bool_array", "int_array"}
+
+            # Because we run on H2-1SC results will be all zeros
+            for x in qsysres[i]:
+                if x[0] == "bool":
+                    assert type(x[1]) is bool
+                    assert not x[1]
+                elif x[0] == "int":
+                    assert type(x[1]) is int
+                    assert x[1] == 0
+                elif x[0] == "bool_array":
+                    assert type(x[1]) is list
+                    assert x[1] == [False, False]
+                    for y in x[1]:
+                        assert type(y) is bool
+                elif x[0] == "int_array":
+                    assert type(x[1]) is list
+                    assert x[1] == [0, 0, 0]
+                    for y in x[1]:
+                        assert type(y) is int

@@ -1,6 +1,7 @@
 """Basic checks for HUGR functionality."""
 
 import base64
+import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -35,8 +36,10 @@ def test_raises_when_trying_to_get_raw_results_from_pytket_result() -> None:
 
 def test_uploading_hugr_module_keeps_used_extensions() -> None:
     """Creating a package for a bare HUGR must retain its extension definitions."""
+    # guppylang's API (and hugr envelope format) differs before/after Python 3.12
+    suffix = "_v0.21" if sys.version_info < (3, 12) else ""
     original_package = Package.from_bytes(
-        Path("tests/data/example_bell.hugr").read_bytes()
+        Path(f"tests/data/example_bell{suffix}.hugr").read_bytes()
     )
     hugr = original_package.modules[0]
     used_extension_names = {

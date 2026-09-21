@@ -1,8 +1,8 @@
 """Simple guppylang program from https://docs.quantinuum.com/guppy"""
 # /// script
-# requires-python = ">=3.12"
+# requires-python = ">=3.11"
 # dependencies = [
-#     "guppylang >=1, <=2",
+#     "guppylang ==0.21.6",
 # ]
 # ///
 # mypy: ignore-errors
@@ -12,7 +12,7 @@ from pathlib import Path
 from sys import argv
 
 from guppylang import guppy
-from guppylang.std.builtins import output
+from guppylang.std.builtins import result
 from guppylang.std.quantum import cx, h, measure, qubit, x, z
 
 
@@ -33,12 +33,12 @@ def main() -> None:
 
     cx(src, alice)
     h(src)
-    if measure(alice).read():
+    if measure(alice):
         x(bob)
-    if measure(src).read():
+    if measure(src):
         z(bob)
 
-    output("teleported", measure(bob).read())
+    result("teleported", measure(bob))
 
 
 main.check()
