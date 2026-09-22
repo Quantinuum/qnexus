@@ -1,12 +1,13 @@
 """Client API for execution in Nexus."""
 
-from typing import Union, cast
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Union, cast
 from uuid import UUID
 
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
 from pytket.backends.backendresult import BackendResult
-from selene_core.trace import Trace
 
 import qnexus.exceptions as qnx_exc
 from qnexus.client import get_nexus_client
@@ -46,6 +47,9 @@ from qnexus.models.references import (
 from qnexus.models.region import Region
 from qnexus.models.scope import ScopeFilterEnum
 from qnexus.models.utils import assert_never, truncate_to_2dp
+
+if TYPE_CHECKING:
+    from selene_core.trace import Trace
 
 
 @accept_circuits_for_programs
@@ -300,6 +304,14 @@ def _fetch_qsys_execution_result(
 def _download_runtime_traces(
     job_item_id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> Trace:
+    try:
+        from selene_core.trace import Trace
+    except ImportError:
+        raise ImportError(
+            "Downloading runtime traces requires 'selene_core' to be installed. "
+            "Please install it, e.g. via 'pip install guppylang'."
+        )
+
     resp = get_nexus_client().get(
         f"/api/job_items/v1beta/{job_item_id}/runtime_traces",
         params={"scope": scope.value},
