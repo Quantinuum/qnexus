@@ -22,7 +22,7 @@ from qnexus.client import (
 )
 from qnexus.client.utils import consolidate_error, read_token, remove_token, write_token
 from qnexus.config import CONFIG
-from qnexus.models.region import Region, get_hostname
+from qnexus.models.region import Region, _rewrite_verification_uri, get_hostname
 
 console = Console()
 
@@ -109,7 +109,9 @@ def login(force: bool = False, region: Region | None = None) -> None:
 
     user_code = res.json()["user_code"]
     device_code = res.json()["device_code"]
-    verification_uri_complete = res.json()["verification_uri_complete"]
+    verification_uri_complete = _rewrite_verification_uri(
+        res.json()["verification_uri_complete"]
+    )
     expires_in = res.json()["expires_in"]
     poll_interval = res.json()["interval"]
 
@@ -299,7 +301,7 @@ def _request_tokens(user: EmailStr, pwd: str) -> None:
         if terms_redirect_uri.startswith("/auth/terms_challenge"):
             message = "Terms and conditions not accepted. To continue, "
             message += "please accept our new terms and conditions by signing in "
-            message += "to the Nexus website https://nexus.quantinuum.com/auth/login."
+            message += f"to the Nexus website https://{CONFIG.domain}/auth/login."
 
             # logger.error(message)
             raise qnx_exc.AuthenticationError(message)

@@ -9,6 +9,28 @@ from qnexus.models.utils import assert_never
 
 Region = Literal["us", "sg"]
 
+PROD_US_DOMAIN = "nexus.quantinuum.com"
+PROD_SG_DOMAIN = "nexus.quantinuum.sg"
+
+# The backend has no notion of the whitelabel domain, so any response content referencing the
+# backing domain (e.g. auth verification links) needs to be rewritten to the whitelabel domain.
+_WHITELABEL_SUFFIX = "-nexus.quantinuum.com"
+
+
+def _get_whitelabel_backing_domain(domain: str) -> str | None:
+    """Return the backing domain for a whitelabel domain, or None if not one."""
+    if domain.endswith(_WHITELABEL_SUFFIX):
+        return PROD_US_DOMAIN
+    return None
+
+
+def _rewrite_verification_uri(verification_uri_complete: str) -> str:
+    """Rewrite a verification URI to the configured whitelabel domain, if any."""
+    backing_domain = _get_whitelabel_backing_domain(CONFIG.domain)
+    if backing_domain and backing_domain in verification_uri_complete:
+        return verification_uri_complete.replace(backing_domain, CONFIG.domain)
+    return verification_uri_complete
+
 
 def get_hostname(region: Region) -> str:
     """Get the hostname for a given region."""
@@ -19,9 +41,9 @@ def get_hostname(region: Region) -> str:
         return hostname_override
 
     if region == "us":
-        return "nexus.quantinuum.com"
+        return PROD_US_DOMAIN
     if region == "sg":
-        return "nexus.quantinuum.sg"
+        return PROD_SG_DOMAIN
     raise ValueError(f"Invalid region: {region}")
 
 
@@ -29,9 +51,9 @@ def _get_home_region() -> Region:
     """Infer the home region for the current environment from the domain."""
 
     match CONFIG.domain:
-        case "nexus.quantinuum.com":
+        case domain if domain == PROD_US_DOMAIN:
             return "us"
-        case "nexus.quantinuum.sg":
+        case domain if domain == PROD_SG_DOMAIN:
             return "sg"
         case _:
             raise ValueError(f"Unknown home region: {CONFIG.domain}")

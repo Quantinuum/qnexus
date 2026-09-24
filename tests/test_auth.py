@@ -175,6 +175,67 @@ def test_login_region_sg_uses_sg_domain_and_does_not_short_circuit() -> None:
         CONFIG.domain = original_domain
 
 
+@respx.mock
+def test_login_whitelabel_domain_rewrites_verification_uri() -> None:
+    """Device code login against a whitelabel domain should rewrite the
+    verification URI from the backing US prod domain to the whitelabel domain."""
+    original_domain = CONFIG.domain
+
+    try:
+        whitelabel_domain = "acme-nexus.quantinuum.com"
+        CONFIG.domain = whitelabel_domain
+
+        backing_verification_uri = (
+            "https://nexus.quantinuum.com/auth/device?user_code=ABC-123"
+        )
+
+        device_auth_route = respx.post(
+            f"https://{whitelabel_domain}:443/auth/device/device_authorization"
+        ).mock(
+            return_value=httpx.Response(
+                status_code=200,
+                json={
+                    "user_code": "ABC-123",
+                    "device_code": "device-code",
+                    "verification_uri_complete": backing_verification_uri,
+                    "expires_in": 2,
+                    "interval": 1,
+                },
+            )
+        )
+        token_route = respx.post(
+            f"https://{whitelabel_domain}:443/auth/device/token"
+        ).mock(
+            return_value=httpx.Response(
+                status_code=200,
+                json={
+                    "refresh_token": "dummy_oat",
+                    "access_token": "dummy_id",
+                    "email": "user@example.com",
+                },
+            )
+        )
+
+        with (
+            mock.patch(
+                "qnexus.client.auth.webbrowser.open", return_value=True
+            ) as browser_open,
+            mock.patch("qnexus.client.auth.time.sleep", return_value=None),
+        ):
+            qnx.login(force=True)
+
+        assert device_auth_route.called
+        assert token_route.called
+        browser_open.assert_called_once()
+        opened_uri = browser_open.call_args.args[0]
+        assert opened_uri == backing_verification_uri.replace(
+            "nexus.quantinuum.com", whitelabel_domain
+        )
+        assert get_nexus_client().base_url == f"https://{whitelabel_domain}:443"
+    finally:
+        CONFIG.domain = original_domain
+
+
 def test_nexus_client_reloads_tokens() -> None:
     """Test the reload functionality of the nexus client.
 
