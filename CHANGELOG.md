@@ -2,6 +2,13 @@
 
 # `qnexus` Release Notes
 
+## v0.51.0 (2026-09-24)
+
+
+### Added
+
+- Support for custom nexus urls.
+
 ## v0.50.0 (2026-09-22)
 
 
