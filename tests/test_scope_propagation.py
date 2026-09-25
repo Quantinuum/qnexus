@@ -1,3 +1,4 @@
+import sys
 import uuid
 from datetime import datetime
 from unittest import mock
@@ -256,6 +257,7 @@ def test_execution_result_download_backend_info_propagates_scope(
     )
 
 
+@pytest.mark.skipif(sys.version_info < (3, 12), reason="hugr-qir requires Python>=3.12")
 @pytest.mark.parametrize("explicit_scope", [None, ScopeFilterEnum.GLOBAL_ADMIN])
 def test_download_h2_qsysresult_propagates_scope(
     explicit_scope: ScopeFilterEnum | None,
