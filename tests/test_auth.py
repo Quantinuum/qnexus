@@ -102,7 +102,7 @@ def test_token_refresh() -> None:
 
 
 @respx.mock
-def test_token_refresh_expired() -> None:
+def test_token_expired() -> None:
     """Test the case of an expired refresh token, using in-memory token storage."""
 
     write_token("refresh_token", "dummy_oat")
