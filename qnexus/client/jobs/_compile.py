@@ -227,10 +227,10 @@ def _fetch_compilation_output(
     relationships = res_dict["data"]["relationships"]
 
     compiled_circuit_id = relationships["compiled_circuit"]["data"]["id"]
-    compiled_circuit_ref = circuit_api.get(id=compiled_circuit_id)
+    compiled_circuit_ref = circuit_api.get(id=compiled_circuit_id, scope=scope)
 
     input_circuit_id = relationships["original_circuit"]["data"]["id"]
-    input_circuit_ref = circuit_api.get(id=input_circuit_id)
+    input_circuit_ref = circuit_api.get(id=input_circuit_id, scope=scope)
 
     return input_circuit_ref, compiled_circuit_ref
 
@@ -262,12 +262,14 @@ def _fetch_compilation_passes(
         ]
         pass_input_circuit = circuit_api._fetch_by_id(
             pass_input_circuit_id,
+            scope=scope,
         )
         pass_output_circuit_id = pass_info["relationships"]["compiled_circuit"]["data"][
             "id"
         ]
         pass_output_circuit = circuit_api._fetch_by_id(
             pass_output_circuit_id,
+            scope=scope,
         )
 
         pass_list.append(

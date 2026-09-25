@@ -58,6 +58,7 @@ def get(
     return res
 
 
+@merge_scope_from_context
 def fetch_pytket_execution_result_by_id(
     id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> tuple[BackendResult, BackendInfo, CircuitRef | QIRRef]:
@@ -77,9 +78,9 @@ def fetch_pytket_execution_result_by_id(
     input_program: CircuitRef | QIRRef
     match program_type:
         case "circuit":
-            input_program = circuit_api._fetch_by_id(program_id)
+            input_program = circuit_api._fetch_by_id(program_id, scope=scope)
         case "qir":
-            input_program = qir_api._fetch_by_id(program_id)
+            input_program = qir_api._fetch_by_id(program_id, scope=scope)
         case _:
             raise ValueError(f"Unknown program type {type}")
 
@@ -99,6 +100,7 @@ def fetch_pytket_execution_result_by_id(
     return (backend_result, backend_info, input_program)
 
 
+@merge_scope_from_context
 def fetch_qsys_result_by_id(
     id: UUID,
     version: ResultVersions,
@@ -127,14 +129,10 @@ def fetch_qsys_result_by_id(
     result: QsysResult | QIRResult
     match res_dict["data"]["relationships"]["program"]["data"]["type"]:
         case "hugr":
-            input_program = hugr_api._fetch_by_id(
-                input_program_id,
-            )
+            input_program = hugr_api._fetch_by_id(input_program_id, scope=scope)
             result = QsysResult(res_dict["data"]["attributes"].get("results"))
         case "qir":
-            input_program = qir_api._fetch_by_id(
-                input_program_id,
-            )
+            input_program = qir_api._fetch_by_id(input_program_id, scope=scope)
             if version == ResultVersions.DEFAULT:
                 result = QIRResult(res_dict["data"]["attributes"].get("results"))
             else:
