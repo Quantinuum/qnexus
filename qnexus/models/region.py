@@ -51,7 +51,7 @@ def _get_home_region() -> Region:
     """Infer the home region for the current environment from the domain."""
 
     match CONFIG.domain:
-        case domain if domain == PROD_US_DOMAIN:
+        case domain if domain == PROD_US_DOMAIN or domain.endswith(_WHITELABEL_SUFFIX):
             return "us"
         case domain if domain == PROD_SG_DOMAIN:
             return "sg"
