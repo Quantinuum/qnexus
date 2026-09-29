@@ -91,7 +91,7 @@ def assignments(
             RoleInfo(
                 assignment_type="user",
                 assignee=user_client._fetch_by_id(
-                    user_id=user_role_assignment["user_id"]
+                    user_id=user_role_assignment["user_id"], scope=scope
                 ),
                 role=roles_dict[user_role_assignment["role_id"]],
             )
@@ -101,7 +101,7 @@ def assignments(
             RoleInfo(
                 assignment_type="team",
                 assignee=team_client._fetch_by_id(
-                    team_id=team_role_assignment["team_id"]
+                    team_id=team_role_assignment["team_id"], scope=scope
                 ),
                 role=roles_dict[team_role_assignment["role_id"]],
             )
@@ -190,6 +190,7 @@ def assign_user(
     res = get_nexus_client().post(
         "/api/assignments/v1beta2/user",
         json=req_dict,
+        params={"scope": scope.value},
     )
 
     if res.status_code != 201:
