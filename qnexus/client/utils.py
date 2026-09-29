@@ -40,6 +40,17 @@ def normalize_included(included: list[Any]) -> dict[str, dict[str, Any]]:
     return included_map
 
 
+def _token_dir(token_type: TokenTypes) -> Path:
+    """Resolve the directory to use for a given token type.
+
+    In managed token environments ``token_path`` may be a read-only mount
+    managed externally, so the access token is cached elsewhere instead.
+    """
+    if token_type == "access_token" and is_managed_token_environment():
+        return Path.home() / CONFIG.managed_token_path
+    return Path.home() / CONFIG.token_path
+
+
 def remove_token(token_type: TokenTypes) -> None:
     """Delete a token file."""
     if not CONFIG.store_tokens:
@@ -47,7 +58,7 @@ def remove_token(token_type: TokenTypes) -> None:
 
     if is_managed_token_environment() and token_type == "refresh_token":
         return
-    token_file_path = Path.home() / CONFIG.token_path / token_file_from_type[token_type]
+    token_file_path = _token_dir(token_type) / token_file_from_type[token_type]
     if token_file_path.exists():
         token_file_path.unlink()
 
@@ -79,7 +90,7 @@ class AccessToken(BaseModel):
 
 def read_token(token_type: TokenTypes) -> str:
     """Read a token from a file."""
-    token_file_path = Path.home() / CONFIG.token_path
+    token_file_path = _token_dir(token_type)
     with (token_file_path / token_file_from_type[token_type]).open(
         encoding="UTF-8"
     ) as file:
@@ -97,7 +108,7 @@ def write_token(token_type: TokenTypes, token: str) -> None:
     if is_managed_token_environment() and token_type == "refresh_token":
         return
 
-    token_file_path = Path.home() / CONFIG.token_path
+    token_file_path = _token_dir(token_type)
     token_file_path.mkdir(parents=True, exist_ok=True)
     with (token_file_path / token_file_from_type[token_type]).open(
         encoding="UTF-8", mode="w"
