@@ -38,6 +38,9 @@ class Config(BaseSettings):
     # auth
     store_tokens: bool = True
     token_path: str = ".qnx/auth"
+    # Writable cache for the access token in managed token environments,
+    # where token_path may be a read-only mount managed externally.
+    managed_token_path: str = ".qnx/managed_auth"
 
     # testing
     qa_user_email: str = ""
