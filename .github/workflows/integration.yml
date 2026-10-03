@@ -34,11 +34,12 @@ jobs:
       NEXUS_STORE_TOKENS: "false"
       NEXUS_QA_QSYS_DEVICE: ${{ secrets.NEXUS_QA_QSYS_DEVICE }}
       QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
-      REPORTPORTAL_ENDPOINT: ${{ vars.RP_ENDPOINT }}
-      REPORTPORTAL_IP: ${{ vars.REPORTPORTAL_IP }}
-      REPORTPORTAL_PROJECT: ${{ vars.RP_PROJECT }}
-      REPORTPORTAL_CA_CERT: ${{ vars.REPORTPORTAL_CA_CERT_PATH }}
+      REPORTPORTAL_ENDPOINT: ${{ secrets.RP_ENDPOINT }}
+      REPORTPORTAL_IP: ${{ secrets.REPORTPORTAL_IP }}
+      REPORTPORTAL_PROJECT: ${{ secrets.RP_PROJECT }}
+      REPORTPORTAL_CA_CERT: ${{ secrets.REPORTPORTAL_CA_CERT_PATH }}
       RP_API_KEY: ${{ secrets.RP_API_KEY }}
+      
 
     steps:
       - name: Validate workflow dispatch inputs
@@ -135,10 +136,10 @@ jobs:
       NEXUS_HOME_REGION: "sg"
       NEXUS_TARGET_REGION: "us"
       QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
-      REPORTPORTAL_ENDPOINT: ${{ vars.RP_ENDPOINT }}
-      REPORTPORTAL_IP: ${{ vars.REPORTPORTAL_IP }}
-      REPORTPORTAL_PROJECT: ${{ vars.RP_PROJECT }}
-      REPORTPORTAL_CA_CERT: ${{ vars.REPORTPORTAL_CA_CERT_PATH }}
+      REPORTPORTAL_ENDPOINT: ${{ secrets.RP_ENDPOINT }}
+      REPORTPORTAL_IP: ${{ secrets.REPORTPORTAL_IP }}
+      REPORTPORTAL_PROJECT: ${{ secrets.RP_PROJECT }}
+      REPORTPORTAL_CA_CERT: ${{ secrets.REPORTPORTAL_CA_CERT_PATH }}
       RP_API_KEY: ${{ secrets.RP_API_KEY }}
 
     steps:
