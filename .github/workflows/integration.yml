@@ -20,7 +20,8 @@ env:
 jobs:
   test-integration:
     name: Integration
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: azure-private-vnet-runner-group
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -33,6 +34,12 @@ jobs:
       NEXUS_STORE_TOKENS: "false"
       NEXUS_QA_QSYS_DEVICE: ${{ secrets.NEXUS_QA_QSYS_DEVICE }}
       QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
+      REPORTPORTAL_ENDPOINT: ${{ secrets.RP_ENDPOINT }}
+      REPORTPORTAL_IP: ${{ secrets.REPORTPORTAL_IP }}
+      REPORTPORTAL_PROJECT: ${{ secrets.RP_PROJECT }}
+      REPORTPORTAL_CA_CERT: ${{ secrets.REPORTPORTAL_CA_CERT_PATH }}
+      RP_API_KEY: ${{ secrets.RP_API_KEY }}
+      
 
     steps:
       - name: Validate workflow dispatch inputs
@@ -76,6 +83,11 @@ jobs:
         run: |
           uv run python integration/setup_tokens.py
 
+      - name: Trust Quantinuum CA and ReportPortal host
+        env:
+          QUANTINUUM_CA_PUBLIC_KEY: ${{ secrets.QUANTINUUM_CA_PUBLIC_KEY }}
+        run: bash "${GITHUB_WORKSPACE}/.github/scripts/report_portal/trust-reportportal-ca.sh"
+
       - name: Run integration tests
         run: |
           uv run pytest integration/ \
@@ -88,6 +100,12 @@ jobs:
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
                         -o addopts="--strict-markers -n 3" \
+                        --reportportal \
+                        --rp-launch=nexus_qnexus_integration \
+                        --rp-endpoint "${REPORTPORTAL_ENDPOINT}" \
+                        --rp-project "${REPORTPORTAL_PROJECT}" \
+                        --rp-api-key "${RP_API_KEY}" \
+                        -o "rp_verify_ssl=${REPORTPORTAL_CA_CERT}" \
                         -vv
 
       - name: Upload integration test results
@@ -101,7 +119,8 @@ jobs:
 
   test-cross-region-integration:
     name: Cross-region Integration
-    runs-on: ubuntu-24.04
+    runs-on:
+      group: azure-private-vnet-runner-group
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -117,6 +136,11 @@ jobs:
       NEXUS_HOME_REGION: "sg"
       NEXUS_TARGET_REGION: "us"
       QNEXUS_DEFAULT_JOB_TIMEOUT_SECONDS: "500"
+      REPORTPORTAL_ENDPOINT: ${{ secrets.RP_ENDPOINT }}
+      REPORTPORTAL_IP: ${{ secrets.REPORTPORTAL_IP }}
+      REPORTPORTAL_PROJECT: ${{ secrets.RP_PROJECT }}
+      REPORTPORTAL_CA_CERT: ${{ secrets.REPORTPORTAL_CA_CERT_PATH }}
+      RP_API_KEY: ${{ secrets.RP_API_KEY }}
 
     steps:
       - name: Validate workflow dispatch inputs
@@ -151,6 +175,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache-dependency-glob: uv.lock
 
+      - name: Trust Quantinuum CA and ReportPortal host
+        env:
+          QUANTINUUM_CA_PUBLIC_KEY: ${{ secrets.QUANTINUUM_CA_PUBLIC_KEY }}
+        run: bash "${GITHUB_WORKSPACE}/.github/scripts/report_portal/trust-reportportal-ca.sh"
+
       - name: Run cross-region integration tests
         run: |
           uv run pytest integration/cross_region \
@@ -162,6 +191,12 @@ jobs:
                         --run-id="${{ github.run_id }}(${{ github.run_attempt }})" \
                         --purge-projects \
                         -o addopts="--strict-markers -n 2" \
+                        --reportportal \
+                        --rp-launch=qnexus_cross-region-integration \
+                        --rp-endpoint "${REPORTPORTAL_ENDPOINT}" \
+                        --rp-project "${REPORTPORTAL_PROJECT}" \
+                        --rp-api-key "${RP_API_KEY}" \
+                        -o "rp_verify_ssl=${REPORTPORTAL_CA_CERT}" \
                         -vv
 
       - name: Upload cross-region integration test results
