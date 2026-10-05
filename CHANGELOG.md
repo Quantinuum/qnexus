@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.51.1 (2026-10-05)
+
+
+### Fixed
+
+- Proper scope propagation and handling (#388).
+
+
 ## v0.51.0 (2026-09-24)
 
 
