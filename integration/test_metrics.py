@@ -72,15 +72,15 @@ expected_runtime_metrics = [
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RXY_PHI_VARIANCE",
-        "comparison": one_of(2.467401100272339, 2.819886971739816),
+        "key": "METRICS:FLOAT:runtime:experimental:RXY_PHI_VARIANCE",
+        "comparison": one_of(2.4674011002723395, 2.8198869717398165),
     },
     {
         "key": "METRICS:FLOAT:runtime:RXY_THETA_MEAN",
         "comparison": one_of(0.8975979010256552, 1.1780972450961724),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RXY_THETA_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:experimental:RXY_THETA_VARIANCE",
         "comparison": one_of(2.7191767227491086, 2.9300388065734033),
     },
     {
@@ -88,7 +88,7 @@ expected_runtime_metrics = [
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RZZ_THETA_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:experimental:RZZ_THETA_VARIANCE",
         "comparison": exact(0.0),
     },
     {
