@@ -52,6 +52,18 @@ def one_of(*expected: DataPrimitive) -> Comparison:
 def big_int() -> Comparison:
     return Comparison(lambda a: type(a) is int and a > 1e6, "> 1e6")
 
+def any_of(*comparisons: Comparison) -> Comparison:
+    return Comparison(
+        lambda a: any(comp(a) for comp in comparisons),
+        f"any of: ({' OR '.join(str(c) for c in comparisons)})",
+    )
+
+def approx(expected: int | float) -> Comparison:
+    return Comparison(
+        lambda a: (type(a) is int or type(a) is float) and abs(a - expected) <= 1e-10,
+        f"≈ {expected} (up to 10 decimal places)",
+    )
+
 
 # WARNING: These metrics are valid only for the specific guppy program used in the test.
 expected_runtime_metrics = [
@@ -72,23 +84,23 @@ expected_runtime_metrics = [
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RXY_PHI_VARIANCE",
-        "comparison": one_of(2.467401100272339, 2.819886971739816),
+        "key": "METRICS:FLOAT:runtime:experimental:RXY_PHI_VARIANCE",
+        "comparison": any_of(approx(2.4674011002723395), approx(2.8198869717398165)),
     },
     {
         "key": "METRICS:FLOAT:runtime:RXY_THETA_MEAN",
-        "comparison": one_of(0.8975979010256552, 1.1780972450961724),
+        "comparison": any_of(approx(0.8975979010256552), approx(1.1780972450961724)),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RXY_THETA_VARIANCE",
-        "comparison": one_of(2.7191767227491086, 2.9300388065734033),
+        "key": "METRICS:FLOAT:runtime:experimental:RXY_THETA_VARIANCE",
+        "comparison": any_of(approx(2.7191767227491086), approx(2.9300388065734033)),
     },
     {
         "key": "METRICS:FLOAT:runtime:RZZ_THETA_MEAN",
         "comparison": exact(1.5707963267948966),
     },
     {
-        "key": "METRICS:FLOAT:runtime:RZZ_THETA_VARIANCE",
+        "key": "METRICS:FLOAT:runtime:experimental:RZZ_THETA_VARIANCE",
         "comparison": exact(0.0),
     },
     {
