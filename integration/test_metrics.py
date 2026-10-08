@@ -52,11 +52,13 @@ def one_of(*expected: DataPrimitive) -> Comparison:
 def big_int() -> Comparison:
     return Comparison(lambda a: type(a) is int and a > 1e6, "> 1e6")
 
+
 def any_of(*comparisons: Comparison) -> Comparison:
     return Comparison(
         lambda a: any(comp(a) for comp in comparisons),
         f"any of: ({' OR '.join(str(c) for c in comparisons)})",
     )
+
 
 def approx(expected: int | float) -> Comparison:
     return Comparison(
