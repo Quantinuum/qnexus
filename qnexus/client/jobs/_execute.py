@@ -72,6 +72,7 @@ def start_execute_job(
     target_region: Region | None = None,
     max_cost: float | list[float] | list[None] = list(),
     n_qubits: int | list[int] | list[None] = list(),
+    compiler_version: str | None = None,
 ) -> ExecuteJobRef:
     """
     Submit an execute job to be run in Nexus. Returns an ``ExecuteJobRef``
@@ -150,6 +151,7 @@ def start_execute_job(
                     str(gpu_decoder_config.id) if gpu_decoder_config else None
                 ),
                 "credential_name": credential_name,
+                "compiler_version": compiler_version,
                 "items": items,
             },
         }
