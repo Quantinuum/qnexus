@@ -199,8 +199,8 @@ def test_pytket_results_with_no_snapshot_warn_but_dont_fail() -> None:
             _execute._fetch_pytket_execution_result(execute_result_ref)
         assert len(captured) == 1, captured
         assert captured[0].category is RuntimeWarning
-        assert (
-            "backend snapshot was expected, but couldn't be found" in str(captured[0].message)
+        assert "backend snapshot was expected, but couldn't be found" in str(
+            captured[0].message
         )
 
 
@@ -211,16 +211,19 @@ def test_qsys_execute_results_with_no_snapshot_warn_but_dont_fail() -> None:
         project=_project_ref(),
         annotations=Annotations(),
     )
-    mock_response = mock.MagicMock()
-    mock_response.status_code = 200
+    mock_response_1 = mock.MagicMock()
+    mock_response_1.status_code = 200
+    mock_response_2 = mock.MagicMock()
+    mock_response_2.status_code = 404
+
     with open("tests/data/qsys_result_response_no_backend_snapshot.json") as f:
-        mock_response.json.return_value = json.load(f)
+        mock_response_1.json.return_value = json.load(f)
     with (
         mock.patch("qnexus.client.results.get_nexus_client") as get_client_results,
         mock.patch("qnexus.client.hugr._fetch_by_id") as fetch_hugr,
     ):
         result_client = mock.MagicMock()
-        result_client.get.return_value = mock_response
+        result_client.get.side_effect = [mock_response_1, mock_response_2]
         get_client_results.return_value = result_client
 
         fetch_hugr.return_value = HUGRRef(
@@ -234,9 +237,12 @@ def test_qsys_execute_results_with_no_snapshot_warn_but_dont_fail() -> None:
         )
 
         with warnings.catch_warnings(record=True) as captured:
-            _execute._fetch_qsys_execution_result(execute_result_ref, ResultVersions.DEFAULT)
+            _execute._fetch_qsys_execution_result(
+                execute_result_ref, ResultVersions.DEFAULT
+            )
         assert len(captured) == 1, captured
         assert captured[0].category is RuntimeWarning
-        assert (
-                    "backend snapshot was expected, but couldn't be found" in str(captured[0].message)
-                )
+        assert "backend snapshot was expected, but couldn't be found" in str(
+            captured[0].message
+        )
+        return
