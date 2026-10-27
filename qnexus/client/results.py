@@ -10,7 +10,9 @@
 # def get_only():
 #     pass
 
+from typing import Any
 from uuid import UUID
+import warnings
 
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
@@ -57,7 +59,20 @@ def get(
             raise ex
     return res
 
-
+def _get_backend_info_from_results(res_dict: dict[Any, Any]) -> BackendInfo | None:
+    backend_info_data = [
+        data for data in res_dict["included"] if data["type"] == "backend_snapshot"
+    ]
+    if len(backend_info_data) < 1:
+        warnings.warn(RuntimeWarning("backend snapshot was expected, but couldn't be found"))
+        return None
+    elif len(backend_info_data) > 1:
+        raise ValueError("single backend snapshot was expected, multiple found")
+    else:
+        return to_pytket_backend_info(
+            StoredBackendInfo(**backend_info_data[0]["attributes"])
+        )
+    
 @merge_scope_from_context
 def fetch_pytket_execution_result_by_id(
     id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
@@ -90,18 +105,7 @@ def fetch_pytket_execution_result_by_id(
 
     backend_result = BackendResult.from_dict(results_dict)
 
-    backend_info_data = [
-        data for data in res_dict["included"] if data["type"] == "backend_snapshot"
-    ]
-    backend_info = None
-    if len(backend_info_data) < 1:
-        raise RuntimeWarning("backend snapshot was expected, but couldn't be found")
-    elif len(backend_info_data) > 1:
-        raise ValueError("single backend snapshot was expected, multiple found")
-    else:
-        backend_info = to_pytket_backend_info(
-            StoredBackendInfo(**backend_info_data[0]["attributes"])
-        )
+    backend_info = _get_backend_info_from_results(res_dict)
 
     return (backend_result, backend_info, input_program)
 
@@ -144,12 +148,7 @@ def fetch_qsys_result_by_id(
             else:
                 result = QsysResult(res_dict["data"]["attributes"].get("results"))
 
-    backend_info_data = next(
-        data for data in res_dict["included"] if data["type"] == "backend_snapshot"
-    )
-    backend_info = to_pytket_backend_info(
-        StoredBackendInfo(**backend_info_data["attributes"])
-    )
+    backend_info = _get_backend_info_from_results(res_dict)
 
     # We shouldn't be doing infinite loops, but the API currently doesn't
     # provide a way to know how many chunks there are, so we loop until we
