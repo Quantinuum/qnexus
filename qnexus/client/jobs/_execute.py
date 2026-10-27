@@ -283,7 +283,7 @@ def _results(
 def _fetch_pytket_execution_result(
     result_ref: ExecutionResultRef,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
-) -> tuple[BackendResult, BackendInfo, Union[CircuitRef, QIRRef]]:
+) -> tuple[BackendResult, BackendInfo | None, Union[CircuitRef, QIRRef]]:
     """Get the results for an execute job item."""
     assert result_ref.result_type == ResultType.PYTKET, "Incorrect result type"
 
@@ -295,7 +295,7 @@ def _fetch_qsys_execution_result(
     result_ref: ExecutionResultRef,
     version: ResultVersions,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
-) -> tuple[QsysResult | QIRResult, BackendInfo, HUGRRef | QIRRef]:
+) -> tuple[QsysResult | QIRResult, BackendInfo | None, HUGRRef | QIRRef]:
     """Get the results of a next-gen Qsys execute job."""
     assert result_ref.result_type == ResultType.QSYS, "Incorrect result type"
 
