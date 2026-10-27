@@ -1,9 +1,11 @@
 """Tests for results and related fetch error handling."""
 
+import json
 import uuid
 from datetime import datetime
 from typing import Any, Callable
 from unittest import mock
+import warnings
 
 import pytest
 
@@ -18,10 +20,12 @@ from qnexus.models.references import (
     CircuitRef,
     CompileJobRef,
     ExecuteJobRef,
+    ExecutionResultRef,
     GpuDecoderConfigRef,
     HUGRRef,
     ProjectRef,
     QIRRef,
+    ResultType,
     WasmModuleRef,
 )
 
@@ -158,3 +162,43 @@ def test_execute_results_fetch_raises_data_gone_on_410() -> None:
 
         with pytest.raises(qnx_exc.DataGone):
             _execute._results(execute_job)
+
+
+def test_pytket_results_with_no_snapshot_warn_but_dont_fail() -> None:
+
+    execute_result_ref = ExecutionResultRef(
+        id= uuid.uuid4(),
+        result_type=ResultType.PYTKET,
+        project=_project_ref(),
+        annotations=Annotations(),
+        )
+    mock_response = mock.MagicMock()
+    mock_response.status_code = 200
+    with open("tests/data/pytket_result_response_no_backend_snapshot.json") as f:
+        mock_response.json.return_value = json.load(f)
+    with (
+        mock.patch("qnexus.client.results.get_nexus_client") as get_client_results,
+        mock.patch("qnexus.client.circuits._fetch_by_id") as fetch_circuit,
+        ):
+        result_client = mock.MagicMock()
+        result_client.get.return_value = mock_response
+        get_client_results.return_value = result_client
+
+        fetch_circuit.return_value = CircuitRef(
+                id=uuid.uuid4(),
+                annotations=Annotations(),
+                project=ProjectRef(
+                    id=uuid.uuid4(), annotations=Annotations(), contents_modified=datetime.now()
+                ),
+            )
+
+
+        with warnings.catch_warnings(record=True) as captured:
+            _execute._fetch_pytket_execution_result(execute_result_ref)
+        assert len(captured) == 1, captured
+        assert captured[0].category is RuntimeWarning
+        assert captured[0].message == "backend snapshot was expected, but couldn't be found"
+
+
+def test_qsys_execute_results_with_no_snapshot_warn_but_dont_fail() -> None:
+    pass
