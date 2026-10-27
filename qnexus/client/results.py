@@ -61,7 +61,7 @@ def get(
 @merge_scope_from_context
 def fetch_pytket_execution_result_by_id(
     id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
-) -> tuple[BackendResult, BackendInfo, CircuitRef | QIRRef]:
+) -> tuple[BackendResult, BackendInfo | None, CircuitRef | QIRRef]:
     """Fetch a Pytket result directly using the ID."""
     res = get_nexus_client().get(
         f"/api/results/v1beta3/{id}",
@@ -90,12 +90,14 @@ def fetch_pytket_execution_result_by_id(
 
     backend_result = BackendResult.from_dict(results_dict)
 
-    backend_info_data = next(
-        data for data in res_dict["included"] if data["type"] == "backend_snapshot"
-    )
-    backend_info = to_pytket_backend_info(
-        StoredBackendInfo(**backend_info_data["attributes"])
-    )
+    backend_info_data = [data for data in res_dict["included"] if data["type"] == "backend_snapshot"]
+    backend_info = None
+    if len(backend_info_data) != 1:
+        raise RuntimeWarning("backend snapshot was expected, but couldn't be found")
+    else: 
+        backend_info = to_pytket_backend_info(
+            StoredBackendInfo(**backend_info_data["attributes"])
+        )
 
     return (backend_result, backend_info, input_program)
 
