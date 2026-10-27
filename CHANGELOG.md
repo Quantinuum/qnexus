@@ -2,6 +2,14 @@
 
 # `qnexus` Release Notes
 
+## v0.51.2 (2026-10-27)
+
+
+### Fixed
+
+- Warn, don't fail if a backend snapshot is missing at result fetch (#395).
+
+
 ## v0.51.1 (2026-10-05)
 
 
