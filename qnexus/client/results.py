@@ -40,12 +40,14 @@ from qnexus.models.scope import ScopeFilterEnum
 def get(
     id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
 ) -> tuple[
-    BackendResult | QsysResult | QIRResult, BackendInfo, CircuitRef | QIRRef | HUGRRef
+    BackendResult | QsysResult | QIRResult,
+    BackendInfo | None,
+    CircuitRef | QIRRef | HUGRRef,
 ]:
     """Fetch an execution job result directly, using the ID."""
     res: tuple[
         BackendResult | QsysResult | QIRResult,
-        BackendInfo,
+        BackendInfo | None,
         CircuitRef | QIRRef | HUGRRef,
     ]
     try:  # try classical result
@@ -59,12 +61,15 @@ def get(
             raise ex
     return res
 
+
 def _get_backend_info_from_results(res_dict: dict[Any, Any]) -> BackendInfo | None:
     backend_info_data = [
         data for data in res_dict["included"] if data["type"] == "backend_snapshot"
     ]
     if len(backend_info_data) < 1:
-        warnings.warn(RuntimeWarning("backend snapshot was expected, but couldn't be found"))
+        warnings.warn(
+            RuntimeWarning("backend snapshot was expected, but couldn't be found")
+        )
         return None
     elif len(backend_info_data) > 1:
         raise ValueError("single backend snapshot was expected, multiple found")
@@ -72,7 +77,8 @@ def _get_backend_info_from_results(res_dict: dict[Any, Any]) -> BackendInfo | No
         return to_pytket_backend_info(
             StoredBackendInfo(**backend_info_data[0]["attributes"])
         )
-    
+
+
 @merge_scope_from_context
 def fetch_pytket_execution_result_by_id(
     id: UUID, scope: ScopeFilterEnum = ScopeFilterEnum.USER
@@ -115,7 +121,7 @@ def fetch_qsys_result_by_id(
     id: UUID,
     version: ResultVersions,
     scope: ScopeFilterEnum = ScopeFilterEnum.USER,
-) -> tuple[QsysResult | QIRResult, BackendInfo, HUGRRef | QIRRef]:
+) -> tuple[QsysResult | QIRResult, BackendInfo | None, HUGRRef | QIRRef]:
     """Fetch a Qsys result directly using the ID."""
     chunk_number = 0
     params = {

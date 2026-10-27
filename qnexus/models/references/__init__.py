@@ -576,11 +576,13 @@ class ExecutionResultRef(BaseRef):
             self._input_program,
         ) = self._get_execute_results(ResultVersions.DEFAULT, scope=scope)
         self._result_version = ResultVersions.DEFAULT
+        if self._backend_info is None:
+            raise ValueError("Backend info was expected, but not provided")
         return copy(self._backend_info)
 
     def _get_execute_results(
         self, version: ResultVersions, scope: ScopeFilterEnum = ScopeFilterEnum.USER
-    ) -> tuple[ExecutionResult, BackendInfo, ExecutionProgram]:
+    ) -> tuple[ExecutionResult, BackendInfo | None, ExecutionProgram]:
         """Utility method to retrieve the passes and output circuit.
         result_version can be passed to request v4 results for qsys results only.
 
