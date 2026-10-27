@@ -90,13 +90,17 @@ def fetch_pytket_execution_result_by_id(
 
     backend_result = BackendResult.from_dict(results_dict)
 
-    backend_info_data = [data for data in res_dict["included"] if data["type"] == "backend_snapshot"]
+    backend_info_data = [
+        data for data in res_dict["included"] if data["type"] == "backend_snapshot"
+    ]
     backend_info = None
-    if len(backend_info_data) != 1:
+    if len(backend_info_data) < 1:
         raise RuntimeWarning("backend snapshot was expected, but couldn't be found")
-    else: 
+    elif len(backend_info_data) > 1:
+        raise ValueError("single backend snapshot was expected, multiple found")
+    else:
         backend_info = to_pytket_backend_info(
-            StoredBackendInfo(**backend_info_data["attributes"])
+            StoredBackendInfo(**backend_info_data[0]["attributes"])
         )
 
     return (backend_result, backend_info, input_program)
