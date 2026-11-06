@@ -527,6 +527,8 @@ class ExecutionResultRef(BaseRef):
     job_item_id: UUID | None = None
     job_item_integer_id: int | None = None
     type: Literal["ExecutionResultRef"] = "ExecutionResultRef"
+    retry_of: UUID | None = None
+    attempt_number: int = 0
 
     @merge_scope_from_context
     def get_input(
