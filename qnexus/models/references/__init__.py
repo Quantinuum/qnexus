@@ -531,6 +531,14 @@ class ExecutionResultRef(BaseRef):
     attempt_number: int = 0
 
     @merge_scope_from_context
+    def all_attempts(self) -> list["ExecutionResultRef"]:
+        """Get all attempts for this result reference."""
+        if self.attempt_number == 0:
+            return [self]
+        # Otherwise, fetch all attempts from the API
+    
+
+    @merge_scope_from_context
     def get_input(
         self, scope: ScopeFilterEnum = ScopeFilterEnum.USER
     ) -> ExecutionProgram:
