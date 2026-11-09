@@ -7,8 +7,6 @@ from uuid import uuid4
 import pytest
 from constants import JOB_TIMEOUT
 from hugr.package import Package
-from pytket.circuit import Circuit
-from quantinuum_schemas.models.backend_config import HeliosEmulatorConfig
 from selene_core.trace import Trace
 from test_qir import make_qir_bitcode_from_file
 
@@ -16,7 +14,6 @@ import qnexus as qnx
 import qnexus.exceptions as qnx_exc
 from qnexus.client import get_nexus_client
 from qnexus.models.references import (
-    ExecuteJobRef,
     HUGRRef,
     ProjectRef,
     QIRRef,
@@ -28,13 +25,6 @@ TRACE_TIMEOUT_SECONDS = 180
 TRACE_POLL_SECONDS = 10
 
 pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
-
-
-def helios_config() -> qnx.HeliosConfig:
-    return qnx.HeliosConfig(
-        system_name="Helios-1E", emulator_config=HeliosEmulatorConfig()
-    )
-
 
 def assert_trace_is_valid(trace: Trace) -> None:
     """The trace has events, and every event has a source and a kind."""
