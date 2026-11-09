@@ -30,19 +30,6 @@ TRACE_POLL_SECONDS = 10
 pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
 
 
-def wait_for_runtime_traces(job_ref: ExecuteJobRef) -> list[RuntimeTracesRef]:
-    """Traces are ingested after the job completes, so poll until the job has trace refs."""
-    deadline = time.monotonic() + TRACE_TIMEOUT_SECONDS
-    while time.monotonic() < deadline:
-        runtime_traces = qnx.jobs.runtime_traces(job_ref)
-        if runtime_traces:
-            return runtime_traces
-        time.sleep(TRACE_POLL_SECONDS)
-    raise AssertionError(
-        f"No runtime traces for job {job_ref.id} after {TRACE_TIMEOUT_SECONDS}s"
-    )
-
-
 def helios_config() -> qnx.HeliosConfig:
     return qnx.HeliosConfig(
         system_name="Helios-1E", emulator_config=HeliosEmulatorConfig()
@@ -66,6 +53,7 @@ def test_download_runtime_trace(
     create_qir_in_project: Callable[[str, str, bytes], ContextManager[QIRRef]],
     create_hugr_in_project: Callable[[str, str, Package], ContextManager[HUGRRef]],
     qa_hugr_package: Package,
+    qa_helios_emulator_config: qnx.HeliosConfig
 ) -> None:
     """A completed job on a Helios emulator has a downloadable runtime trace."""
     project_name = f"project for {test_case_name}"
@@ -85,21 +73,19 @@ def test_download_runtime_trace(
         job_ref = qnx.start_execute_job(
             programs=[program_ref],
             n_shots=[N_SHOTS],
-            max_cost=[10.0],
+            max_cost=[10000.0],
             n_qubits=[5],
-            backend_config=helios_config(),
+            backend_config=qa_helios_emulator_config,
             project=qnx.projects.get(name=project_name),
             name=f"{program_type} job for {test_case_name}",
         )
         qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
-        runtime_traces = wait_for_runtime_traces(job_ref)
+        runtime_traces = qnx.jobs.runtime_traces(job_ref)
         assert len(runtime_traces) == 1
         assert isinstance(runtime_traces[0], RuntimeTracesRef)
 
         trace = runtime_traces[0].download_runtime_traces()
-        print(f"{program_type}: {len(trace.events)} events")
-        print(trace.model_dump_json(indent=2))
         assert_trace_is_valid(trace)
 
 
