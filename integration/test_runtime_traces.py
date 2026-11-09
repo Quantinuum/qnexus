@@ -29,6 +29,7 @@ TRACE_POLL_SECONDS = 10
 
 pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
 
+
 def wait_for_runtime_traces(job_ref: ExecuteJobRef) -> list[RuntimeTracesRef]:
     """Traces are ingested after the job completes, so poll until the job has trace refs."""
     deadline = time.monotonic() + TRACE_TIMEOUT_SECONDS
