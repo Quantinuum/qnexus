@@ -2,6 +2,12 @@
 
 # `qnexus` Release Notes
 
+## v0.51.4 (2026-11-09)
+
+### Fixed
+
+- Relaxed constraints.
+
 ## v0.51.3 (2026-11-05)
 
 
