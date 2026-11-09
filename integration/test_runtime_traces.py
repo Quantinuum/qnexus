@@ -24,6 +24,7 @@ TRACE_POLL_SECONDS = 10
 
 pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
 
+
 def assert_trace_is_valid(trace: Trace) -> None:
     """The trace has events, and every event has a source and a kind."""
     assert isinstance(trace, Trace)
@@ -41,7 +42,7 @@ def test_download_runtime_trace(
     create_qir_in_project: Callable[[str, str, bytes], ContextManager[QIRRef]],
     create_hugr_in_project: Callable[[str, str, Package], ContextManager[HUGRRef]],
     qa_hugr_package: Package,
-    qa_helios_emulator_config: qnx.HeliosConfig
+    qa_helios_emulator_config: qnx.HeliosConfig,
 ) -> None:
     """A completed job on a Helios emulator has a downloadable runtime trace."""
     project_name = f"project for {test_case_name}"

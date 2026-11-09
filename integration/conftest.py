@@ -18,6 +18,7 @@ from quantinuum_schemas.models.backend_config import (
     AerStateConfig,
     AerUnitaryConfig,
     BackendConfig,
+    HeliosEmulatorConfig,
     QuantinuumConfig,
     QulacsConfig,
     SeleneConfig,
@@ -535,6 +536,13 @@ def test_circuit() -> Circuit:
         circuit.CX(i, j)
     circuit.measure_all()
     return circuit
+
+
+@pytest.fixture(name="qa_helios_emulator_config")
+def helios_config() -> qnx.HeliosConfig:
+    return qnx.HeliosConfig(
+        system_name="Helios-1E", emulator_config=HeliosEmulatorConfig()
+    )
 
 
 @pytest.fixture()
