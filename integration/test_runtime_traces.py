@@ -1,6 +1,5 @@
 """Tests for downloading runtime traces of jobs run on Helios emulators."""
 
-import time
 from typing import Callable, ContextManager
 from uuid import uuid4
 
@@ -12,7 +11,6 @@ from test_qir import make_qir_bitcode_from_file
 
 import qnexus as qnx
 import qnexus.exceptions as qnx_exc
-from qnexus.client import get_nexus_client
 from qnexus.models.references import (
     HUGRRef,
     ProjectRef,
