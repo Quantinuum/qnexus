@@ -5,7 +5,7 @@ import uuid
 from typing import cast
 from unittest import mock
 
-from selene_core.trace import Trace
+from selene_formats.trace import Trace
 
 import qnexus as qnx
 from qnexus.models.references import ExecuteJobRef

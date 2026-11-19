@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 from constants import JOB_TIMEOUT
 from hugr.package import Package
-from selene_core.trace import Trace
+from selene_formats.trace import Trace
 from test_qir import make_qir_bitcode_from_file
 
 import qnexus as qnx

@@ -10,9 +10,9 @@
 # def get_only():
 #     pass
 
+import warnings
 from typing import Any
 from uuid import UUID
-import warnings
 
 from hugr.qsystem.result import QsysResult
 from pytket.backends.backendinfo import BackendInfo
