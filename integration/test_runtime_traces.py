@@ -1,12 +1,13 @@
 """Tests for downloading runtime traces of jobs run on Helios emulators."""
 
+import time
 from typing import Callable, ContextManager
 from uuid import uuid4
 
 import pytest
 from constants import JOB_TIMEOUT
 from hugr.package import Package
-from selene_core.trace import Trace
+from selene_formats.trace import Trace
 from test_qir import make_qir_bitcode_from_file
 
 import qnexus as qnx
@@ -62,7 +63,7 @@ def test_download_runtime_trace(
         job_ref = qnx.start_execute_job(
             programs=[program_ref],
             n_shots=[N_SHOTS],
-            max_cost=[10000.0],
+            max_cost=[100.0],
             n_qubits=[5],
             backend_config=qa_helios_emulator_config,
             project=qnx.projects.get(name=project_name),
@@ -70,7 +71,15 @@ def test_download_runtime_trace(
         )
         qnx.jobs.wait_for(job_ref, timeout=JOB_TIMEOUT)
 
-        runtime_traces = qnx.jobs.runtime_traces(job_ref)
+        # Runtime traces are delivered in an event-driven manner so they
+        # aren't necessarily available right at the time the job completes
+        runtime_traces = []
+        for _ in range(5):
+            time.sleep(3.0)
+            runtime_traces = qnx.jobs.runtime_traces(job_ref)
+            if len(runtime_traces) == 1:
+                break
+
         assert len(runtime_traces) == 1
         assert isinstance(runtime_traces[0], RuntimeTracesRef)
 

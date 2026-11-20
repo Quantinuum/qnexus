@@ -2,10 +2,10 @@
 
 import json
 import uuid
+import warnings
 from datetime import datetime
 from typing import Any, Callable
 from unittest import mock
-import warnings
 
 import pytest
 

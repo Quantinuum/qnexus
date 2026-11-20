@@ -24,6 +24,7 @@ dependencies = [
     "quantinuum-schemas>=8.1.1",
     "hugr >=0.14.0, <1.0.0",
     "pyjwt>=2.10.1,<3.0.0",
+    "selene-formats>=0.2.0",
 ]
 
 [project.optional-dependencies]
@@ -77,3 +78,7 @@ package = true
 plugins = ["pydantic.mypy"]
 strict = true
 allow_redefinition = true
+
+[[tool.mypy.overrides]]
+module = ["selene_formats.*"]
+follow_untyped_imports = true
