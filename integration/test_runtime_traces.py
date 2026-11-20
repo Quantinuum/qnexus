@@ -23,7 +23,7 @@ N_SHOTS = 1
 TRACE_TIMEOUT_SECONDS = 180
 TRACE_POLL_SECONDS = 10
 
-# pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
+pytestmark = pytest.mark.skip(reason="Runtime traces changes are not in QA env yet.")
 
 
 def assert_trace_is_valid(trace: Trace) -> None:
