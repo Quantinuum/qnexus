@@ -80,7 +80,7 @@ def test_download_runtime_trace(
             if len(runtime_traces) == 1:
                 break
 
-        assert len(runtime_traces) == 1 
+        assert len(runtime_traces) == 1
         assert isinstance(runtime_traces[0], RuntimeTracesRef)
 
         trace = runtime_traces[0].download_runtime_traces()
