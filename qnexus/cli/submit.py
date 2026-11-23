@@ -12,6 +12,7 @@ import qnexus as qnx
 from .compile import _compile
 from .devices import backendConfigMap
 
+# mock project for testing
 qnx.context.set_active_project_token(
     qnx.projects.get(id="91199097-4aeb-4d52-9e67-1b6a0c5b0493")
 )
