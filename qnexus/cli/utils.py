@@ -20,27 +20,6 @@ current_path = os.getcwd()
 current_dir = current_path.split(os.sep)[-1]
 
 
-# # QNX utils interface
-# @click.command()
-# @is_documented_by(_status)
-# def status():
-#     click.echo(_status())
-
-
-# @click.command()
-# def init():
-#     """Initialize a new qnexus project."""
-#     if config:
-#         raise click.ClickException(
-#             Fore.GREEN + f"Project already initialized: {Fore.YELLOW}"
-#         )
-#     if config is None:
-#         name: str = click.prompt(
-#             "Enter a project name:",
-#             default=current_dir,
-#         )
-#         click.echo(Fore.GREEN + f"Intialized qnexus project: {name}")
-
 
 def add_options_to_command(command: Command, model: Any) -> None:
     """Add click options using fields of a pydantic model."""
