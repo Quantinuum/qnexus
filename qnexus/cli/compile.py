@@ -24,6 +24,7 @@ def compile(guppy_filename: str, hugr_filename: str, watch: bool) -> None:
     content_bytes = _compile(guppy_filename)
     with open(hugr_filename or f"{guppy_filename}.hugr", "wb") as f:
         f.write(content_bytes)
+    click.echo(f"HUGR bytes written to {hugr_filename}")
 
 
 def _compile(input: str) -> list[bytes]:

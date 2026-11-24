@@ -82,7 +82,7 @@ def submit(
         )
         click.confirm("Accept?", abort=True)
 
-    with Halo(text="Compiling program...", spinner="dots"):
+    with Halo(spinner="dots"):
         d_bytes = _compile(input)
 
     with Halo(text="Uploading program...", spinner="dots"):
